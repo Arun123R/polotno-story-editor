@@ -1,0 +1,132 @@
+import { observer } from 'mobx-react-lite';
+import { DurationSection } from '../shared/CommonControls';
+
+/**
+ * Page settings panel (when no element is selected) - Storyly-inspired dark theme
+ */
+export const PageSettings = observer(({ store }) => {
+  const activePage = store.activePage;
+  
+  if (!activePage) return null;
+
+  return (
+    <div className="settings-panel page-settings">
+      {/* Tab Navigation */}
+      <div className="sidebar-tabs">
+        <button className="sidebar-tab active">General</button>
+        <button className="sidebar-tab">Animation</button>
+      </div>
+
+      <div className="settings-content" style={{ padding: '16px' }}>
+        <div className="section">
+          <div className="section-title">Page</div>
+
+          {/* Background */}
+          <div className="control-row">
+            <span className="control-label">Background</span>
+            <div className="control-value">
+              <div className="color-picker-row">
+                <div 
+                  className="color-swatch" 
+                  style={{ backgroundColor: activePage.background || '#ffffff' }}
+                >
+                  <input
+                    type="color"
+                    value={activePage.background || '#ffffff'}
+                    onChange={(e) => activePage.set({ background: e.target.value })}
+                  />
+                </div>
+                <input
+                  type="text"
+                  className="color-input-text"
+                  value={activePage.background || '#ffffff'}
+                  onChange={(e) => activePage.set({ background: e.target.value })}
+                  style={{ width: '80px' }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Size */}
+          <div className="control-row">
+            <span className="control-label">Size</span>
+            <div className="control-value">
+              <div className="position-row">
+                <div className="position-field">
+                  <input
+                    type="number"
+                    className="position-input"
+                    value={store.width}
+                    onChange={(e) => store.setSize(parseInt(e.target.value) || 100, store.height)}
+                  />
+                  <label>W</label>
+                </div>
+                <div className="position-field">
+                  <input
+                    type="number"
+                    className="position-input"
+                    value={store.height}
+                    onChange={(e) => store.setSize(store.width, parseInt(e.target.value) || 100)}
+                  />
+                  <label>H</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Presets */}
+          <div className="control-row">
+            <span className="control-label">Presets</span>
+            <div className="control-value">
+              <div className="segment-group">
+                <button 
+                  className={`segment-btn ${store.width === 1080 && store.height === 1920 ? 'active' : ''}`}
+                  onClick={() => store.setSize(1080, 1920)}
+                >
+                  Story
+                </button>
+                <button 
+                  className={`segment-btn ${store.width === 1080 && store.height === 1080 ? 'active' : ''}`}
+                  onClick={() => store.setSize(1080, 1080)}
+                >
+                  Square
+                </button>
+                <button 
+                  className={`segment-btn ${store.width === 1920 && store.height === 1080 ? 'active' : ''}`}
+                  onClick={() => store.setSize(1920, 1080)}
+                >
+                  Wide
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Duration Section */}
+        <DurationSection store={store} />
+
+        {/* Page Actions */}
+        <div className="action-buttons">
+          <button 
+            className="action-btn delete" 
+            onClick={() => store.deletePages([activePage.id])}
+            disabled={store.pages.length <= 1}
+            style={{ opacity: store.pages.length <= 1 ? 0.5 : 1 }}
+          >
+            <span>🗑</span> Delete
+          </button>
+        </div>
+
+        {/* Page Info */}
+        <div style={{ 
+          marginTop: '16px', 
+          textAlign: 'center', 
+          fontSize: '11px', 
+          color: 'var(--sidebar-text-muted)' 
+        }}>
+          Page {store.pages.indexOf(activePage) + 1} of {store.pages.length}
+        </div>
+      </div>
+    </div>
+  );
+});

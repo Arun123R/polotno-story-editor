@@ -1,0 +1,652 @@
+@import "tailwindcss";
+
+/* ===================================
+   DARK THEME - Storyly-inspired Design
+   =================================== */
+
+/* CSS Variables - Dark Theme Palette */
+:root {
+    /* Primary background colors */
+    --bg-primary: #1a1a2e;
+    --bg-secondary: #16213e;
+    --bg-tertiary: #0f0f23;
+    --bg-elevated: #252547;
+    --bg-hover: #2a2a4a;
+
+    /* Surface colors */
+    --surface-dark: #1e1e3f;
+    --surface-light: #2d2d5a;
+
+    /* Border colors */
+    --border-primary: #3d3d6b;
+    --border-secondary: #2a2a4f;
+    --border-accent: #4a4a7f;
+
+    /* Text colors */
+    --text-primary: #ffffff;
+    --text-secondary: #b8b8d0;
+    --text-muted: #7a7a9a;
+    --text-disabled: #5a5a7a;
+
+    /* Accent colors - Teal/Cyan */
+    --accent-primary: #00d4aa;
+    --accent-secondary: #00b894;
+    --accent-hover: #00e6b8;
+
+    /* Secondary accent - Purple/Indigo */
+    --accent-purple: #6366f1;
+    --accent-purple-hover: #818cf8;
+
+    /* Status colors */
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+
+    /* Input colors */
+    --input-bg: #252547;
+    --input-border: #3d3d6b;
+    --input-focus: #00d4aa;
+
+    /* Shadow */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Global Reset for Dark Theme */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+/* ===================================
+   POLOTNO CONTAINER OVERRIDES
+   =================================== */
+
+/* Main container */
+.polotno-app-container,
+.go2072408551 {
+    background-color: var(--bg-primary) !important;
+}
+
+/* ===================================
+   SIDE PANEL (LEFT) - DARK THEME
+   =================================== */
+
+/* Side panel wrapper */
+.polotno-side-panel,
+.go685369399,
+[class*="polotno-side-panel"],
+.bp5-tabs {
+    background-color: var(--bg-secondary) !important;
+}
+
+/* Side panel tabs container */
+.polotno-side-tabs-container,
+.go3163804498 {
+    background-color: var(--bg-secondary) !important;
+    border-right: 1px solid var(--border-primary) !important;
+}
+
+/* Individual tab buttons */
+.polotno-side-panel-tab,
+.go2556403498,
+.bp5-tab {
+    background-color: transparent !important;
+    color: var(--text-secondary) !important;
+    border: none !important;
+    transition: all 0.2s ease !important;
+}
+
+.polotno-side-panel-tab:hover,
+.go2556403498:hover,
+.bp5-tab:hover {
+    background-color: var(--bg-hover) !important;
+    color: var(--text-primary) !important;
+}
+
+.polotno-side-panel-tab[aria-selected="true"],
+.go2556403498[aria-selected="true"],
+.bp5-tab[aria-selected="true"],
+.bp5-tab.bp5-selected {
+    background-color: var(--bg-elevated) !important;
+    color: var(--accent-primary) !important;
+    border-left: 3px solid var(--accent-primary) !important;
+}
+
+/* Tab icon colors */
+.polotno-side-panel-tab svg,
+.bp5-tab svg {
+    fill: currentColor !important;
+    color: inherit !important;
+}
+
+/* Side panel content area */
+.polotno-side-panel-content,
+.go2913498543,
+.bp5-tab-panel {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border-right: 1px solid var(--border-primary) !important;
+}
+
+/* Section headers in side panel */
+.polotno-panel-section-title {
+    color: var(--text-primary) !important;
+    font-weight: 600 !important;
+    font-size: 12px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* ===================================
+   TOOLBAR (TOP) - DARK THEME
+   =================================== */
+
+.polotno-toolbar,
+.go2498094019 {
+    background-color: var(--bg-secondary) !important;
+    border-bottom: 1px solid var(--border-primary) !important;
+}
+
+/* Toolbar buttons */
+.polotno-toolbar button,
+.polotno-toolbar .bp5-button {
+    background-color: transparent !important;
+    color: var(--text-secondary) !important;
+    border: none !important;
+}
+
+.polotno-toolbar button:hover,
+.polotno-toolbar .bp5-button:hover {
+    background-color: var(--bg-hover) !important;
+    color: var(--text-primary) !important;
+}
+
+.polotno-toolbar button:active,
+.polotno-toolbar .bp5-button:active,
+.polotno-toolbar .bp5-button.bp5-active {
+    background-color: var(--accent-purple) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ===================================
+   WORKSPACE (CANVAS AREA) - DARK THEME
+   =================================== */
+
+.polotno-workspace,
+.go3742766498,
+.go3845422651 {
+    background-color: var(--bg-tertiary) !important;
+}
+
+/* Canvas background */
+.polotno-canvas-container {
+    background-color: var(--bg-tertiary) !important;
+}
+
+/* Zoom buttons */
+.polotno-zoom-buttons,
+.go1704528498 {
+    background-color: var(--bg-elevated) !important;
+    border: 1px solid var(--border-primary) !important;
+    border-radius: 8px !important;
+}
+
+.polotno-zoom-buttons button {
+    background-color: transparent !important;
+    color: var(--text-secondary) !important;
+    border: none !important;
+}
+
+.polotno-zoom-buttons button:hover {
+    background-color: var(--bg-hover) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ===================================
+   PAGES TIMELINE (BOTTOM) - DARK THEME
+   =================================== */
+
+.polotno-pages-timeline,
+.go685639639 {
+    background-color: var(--bg-secondary) !important;
+    border-top: 1px solid var(--border-primary) !important;
+}
+
+/* Page thumbnails */
+.polotno-page-thumbnail,
+.go3162374498 {
+    background-color: var(--bg-elevated) !important;
+    border: 2px solid var(--border-primary) !important;
+    border-radius: 8px !important;
+}
+
+.polotno-page-thumbnail:hover {
+    border-color: var(--accent-primary) !important;
+}
+
+.polotno-page-thumbnail.selected,
+.polotno-page-thumbnail[data-selected="true"] {
+    border-color: var(--accent-primary) !important;
+    box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.3) !important;
+}
+
+/* Add page button */
+.polotno-add-page-button,
+.go1234567890 {
+    background-color: var(--bg-elevated) !important;
+    border: 2px dashed var(--border-primary) !important;
+    color: var(--text-muted) !important;
+    border-radius: 8px !important;
+}
+
+.polotno-add-page-button:hover {
+    border-color: var(--accent-primary) !important;
+    color: var(--accent-primary) !important;
+}
+
+/* Timeline controls */
+.polotno-timeline-controls button {
+    background-color: var(--bg-elevated) !important;
+    color: var(--text-secondary) !important;
+    border: 1px solid var(--border-primary) !important;
+}
+
+.polotno-timeline-controls button:hover {
+    background-color: var(--bg-hover) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ===================================
+   SEARCH INPUT STYLING
+   =================================== */
+
+.polotno-search-input,
+input[type="search"] {
+    background-color: var(--input-bg) !important;
+    border: 1px solid var(--input-border) !important;
+    color: var(--text-primary) !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+}
+
+.polotno-search-input:focus,
+input[type="search"]:focus {
+    border-color: var(--input-focus) !important;
+    outline: none !important;
+}
+
+/* Fix search icon and text overlap */
+.bp5-input-group .bp5-input {
+    padding-left: 36px !important;  /* Add space for the icon */
+    height: 40px !important;        /* Increase input height */
+    line-height: 40px !important;   /* Center text vertically */
+}
+
+.bp5-input-group .bp5-input-left-container,
+.bp5-input-group > .bp5-icon {
+    left: 10px !important;  /* Position icon with some margin */
+    top: 25% !important;   /*  Center icon vertically */
+    transform: translateY(-50%) !important;
+}
+
+/* ===================================
+   BLUEPRINT UI OVERRIDES - DARK THEME
+   =================================== */
+
+/* Buttons */
+.bp5-button {
+    background-color: var(--bg-elevated) !important;
+    color: var(--text-secondary) !important;
+    border: 1px solid var(--border-primary) !important;
+    box-shadow: none !important;
+}
+
+.bp5-button:hover {
+    background-color: var(--bg-hover) !important;
+    color: var(--text-primary) !important;
+}
+
+.bp5-button.bp5-intent-primary {
+    background-color: var(--accent-primary) !important;
+    color: var(--bg-primary) !important;
+    border-color: var(--accent-primary) !important;
+}
+
+.bp5-button.bp5-intent-primary:hover {
+    background-color: var(--accent-hover) !important;
+}
+
+.bp5-button.bp5-minimal {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+.bp5-button.bp5-minimal:hover {
+    background-color: var(--bg-hover) !important;
+}
+
+/* Inputs */
+.bp5-input,
+.bp5-input-group .bp5-input {
+    background-color: var(--input-bg) !important;
+    border: 1px solid var(--input-border) !important;
+    color: var(--text-primary) !important;
+    box-shadow: none !important;
+}
+
+.bp5-input:focus,
+.bp5-input-group .bp5-input:focus {
+    border-color: var(--input-focus) !important;
+    box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.2) !important;
+}
+
+.bp5-input::placeholder {
+    color: var(--text-muted) !important;
+}
+
+/* Numeric inputs */
+.bp5-numeric-input .bp5-button-group .bp5-button {
+    background-color: var(--bg-elevated) !important;
+    border-color: var(--border-primary) !important;
+}
+
+/* Select dropdowns */
+.bp5-html-select select,
+.bp5-select select {
+    background-color: var(--input-bg) !important;
+    border: 1px solid var(--input-border) !important;
+    color: var(--text-primary) !important;
+}
+
+.bp5-html-select::after,
+.bp5-select::after {
+    color: var(--text-secondary) !important;
+}
+
+/* Sliders */
+.bp5-slider-track {
+    background-color: var(--border-primary) !important;
+}
+
+.bp5-slider-progress {
+    background-color: var(--accent-primary) !important;
+}
+
+.bp5-slider-handle {
+    background-color: var(--text-primary) !important;
+    border-color: var(--accent-primary) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+/* Switches/Toggles */
+.bp5-switch {
+    color: var(--text-primary) !important;
+}
+
+.bp5-switch input:checked~.bp5-control-indicator {
+    background-color: var(--accent-primary) !important;
+}
+
+/* Checkboxes */
+.bp5-checkbox .bp5-control-indicator {
+    background-color: var(--input-bg) !important;
+    border: 1px solid var(--input-border) !important;
+}
+
+.bp5-checkbox input:checked~.bp5-control-indicator {
+    background-color: var(--accent-primary) !important;
+    border-color: var(--accent-primary) !important;
+}
+
+/* Radio buttons */
+.bp5-radio .bp5-control-indicator {
+    background-color: var(--input-bg) !important;
+    border: 1px solid var(--input-border) !important;
+}
+
+.bp5-radio input:checked~.bp5-control-indicator {
+    background-color: var(--accent-primary) !important;
+    border-color: var(--accent-primary) !important;
+}
+
+/* Popover/Dropdown menus */
+.bp5-popover,
+.bp5-popover2 {
+    box-shadow: var(--shadow-lg) !important;
+}
+
+.bp5-popover .bp5-popover-content,
+.bp5-popover2 .bp5-popover2-content {
+    background-color: var(--bg-elevated) !important;
+    border: 1px solid var(--border-primary) !important;
+}
+
+.bp5-menu {
+    background-color: var(--bg-elevated) !important;
+    color: var(--text-primary) !important;
+}
+
+.bp5-menu-item {
+    color: var(--text-secondary) !important;
+}
+
+.bp5-menu-item:hover {
+    background-color: var(--bg-hover) !important;
+    color: var(--text-primary) !important;
+}
+
+.bp5-menu-item.bp5-active,
+.bp5-menu-item.bp5-selected {
+    background-color: var(--accent-primary) !important;
+    color: var(--bg-primary) !important;
+}
+
+/* Dialogs/Modals */
+.bp5-dialog {
+    background-color: var(--bg-secondary) !important;
+    border: 1px solid var(--border-primary) !important;
+    box-shadow: var(--shadow-lg) !important;
+}
+
+.bp5-dialog-header {
+    background-color: var(--bg-secondary) !important;
+    border-bottom: 1px solid var(--border-primary) !important;
+}
+
+.bp5-dialog-header .bp5-heading {
+    color: var(--text-primary) !important;
+}
+
+.bp5-dialog-body {
+    color: var(--text-secondary) !important;
+}
+
+.bp5-dialog-footer {
+    background-color: var(--bg-secondary) !important;
+    border-top: 1px solid var(--border-primary) !important;
+}
+
+/* Overlay backdrop */
+.bp5-overlay-backdrop {
+    background-color: rgba(10, 10, 20, 0.8) !important;
+}
+
+/* Tabs */
+.bp5-tabs {
+    background-color: transparent !important;
+}
+
+.bp5-tab-list {
+    background-color: var(--bg-secondary) !important;
+    border-bottom: 1px solid var(--border-primary) !important;
+}
+
+.bp5-tab {
+    color: var(--text-secondary) !important;
+}
+
+.bp5-tab:hover {
+    color: var(--text-primary) !important;
+}
+
+.bp5-tab[aria-selected="true"],
+.bp5-tab.bp5-selected {
+    color: var(--accent-primary) !important;
+}
+
+.bp5-tab-indicator {
+    background-color: var(--accent-primary) !important;
+}
+
+/* Cards */
+.bp5-card {
+    background-color: var(--bg-elevated) !important;
+    border: 1px solid var(--border-primary) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+/* Tooltips */
+.bp5-tooltip .bp5-popover-content {
+    background-color: var(--bg-tertiary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Tags */
+.bp5-tag {
+    background-color: var(--bg-elevated) !important;
+    color: var(--text-secondary) !important;
+}
+
+.bp5-tag.bp5-intent-primary {
+    background-color: var(--accent-primary) !important;
+    color: var(--bg-primary) !important;
+}
+
+/* Forms */
+.bp5-form-group {
+    margin-bottom: 12px;
+}
+
+.bp5-label {
+    color: var(--text-secondary) !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+}
+
+/* Dividers */
+.bp5-divider {
+    border-color: var(--border-primary) !important;
+}
+
+/* ===================================
+   SCROLLBAR STYLING
+   =================================== */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-primary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* ===================================
+   SEARCH INPUT STYLING
+   =================================== */
+
+.polotno-search-input,
+input[type="search"] {
+    background-color: var(--input-bg) !important;
+    border: 1px solid var(--input-border) !important;
+    color: var(--text-primary) !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+}
+
+.polotno-search-input:focus,
+input[type="search"]:focus {
+    border-color: var(--input-focus) !important;
+    outline: none !important;
+}
+
+/* ===================================
+   GRID/GALLERY ITEMS
+   =================================== */
+
+.polotno-template-item,
+.polotno-element-item {
+    background-color: var(--bg-elevated) !important;
+    border: 1px solid var(--border-secondary) !important;
+    border-radius: 8px !important;
+    transition: all 0.2s ease !important;
+}
+
+.polotno-template-item:hover,
+.polotno-element-item:hover {
+    border-color: var(--accent-primary) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+/* ===================================
+   LOADING STATES
+   =================================== */
+
+.bp5-spinner .bp5-spinner-head {
+    stroke: var(--accent-primary) !important;
+}
+
+.bp5-progress-bar .bp5-progress-meter {
+    background-color: var(--accent-primary) !important;
+}
+
+/* ===================================
+   UTILITY CLASSES
+   =================================== */
+
+.dark-bg-primary {
+    background-color: var(--bg-primary) !important;
+}
+
+.dark-bg-secondary {
+    background-color: var(--bg-secondary) !important;
+}
+
+.dark-bg-tertiary {
+    background-color: var(--bg-tertiary) !important;
+}
+
+.dark-text-primary {
+    color: var(--text-primary) !important;
+}
+
+.dark-text-secondary {
+    color: var(--text-secondary) !important;
+}
+
+.dark-border {
+    border-color: var(--border-primary) !important;
+}

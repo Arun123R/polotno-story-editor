@@ -1,0 +1,209 @@
+import { observer } from 'mobx-react-lite';
+import { useState } from 'react';
+import { DurationSection, AnimationSection } from '../shared/CommonControls';
+
+/**
+ * Video element settings panel - Storyly-inspired dark theme
+ */
+export const VideoSettings = observer(({ store, element }) => {
+  const [activeTab, setActiveTab] = useState('general');
+  
+  if (!element) return null;
+
+  return (
+    <div className="settings-panel video-settings">
+      {/* Tab Navigation */}
+      <div className="sidebar-tabs">
+        <button 
+          className={`sidebar-tab ${activeTab === 'general' ? 'active' : ''}`}
+          onClick={() => setActiveTab('general')}
+        >
+          General
+        </button>
+        <button 
+          className={`sidebar-tab ${activeTab === 'animation' ? 'active' : ''}`}
+          onClick={() => setActiveTab('animation')}
+        >
+          Animation
+        </button>
+      </div>
+
+      <div className="settings-content" style={{ padding: '16px' }}>
+        {activeTab === 'general' ? (
+          <>
+            <div className="section">
+              <div className="section-title">Style</div>
+
+              {/* Position */}
+              <div className="control-row">
+                <span className="control-label">Position</span>
+                <div className="control-value">
+                  <div className="position-row">
+                    <div className="position-field">
+                      <input
+                        type="number"
+                        className="position-input"
+                        value={Math.round(element.x)}
+                        onChange={(e) => element.set({ x: parseFloat(e.target.value) || 0 })}
+                      />
+                      <label>X</label>
+                    </div>
+                    <div className="position-field">
+                      <input
+                        type="number"
+                        className="position-input"
+                        value={Math.round(element.y)}
+                        onChange={(e) => element.set({ y: parseFloat(e.target.value) || 0 })}
+                      />
+                      <label>Y</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Rotation */}
+              <div className="control-row">
+                <span className="control-label">Rotation</span>
+                <div className="control-value">
+                  <input
+                    type="number"
+                    className="position-input"
+                    value={Math.round(element.rotation || 0)}
+                    onChange={(e) => element.set({ rotation: parseFloat(e.target.value) || 0 })}
+                  />
+                  <span style={{ color: 'var(--sidebar-text-muted)', fontSize: '11px' }}>°</span>
+                </div>
+              </div>
+
+              {/* Opacity */}
+              <div className="control-row">
+                <span className="control-label">Opacity</span>
+                <div className="control-value">
+                  <div className="slider-container">
+                    <input
+                      type="number"
+                      className="slider-input"
+                      value={Math.round((element.opacity ?? 1) * 100)}
+                      onChange={(e) => element.set({ opacity: (parseInt(e.target.value) || 0) / 100 })}
+                      min={0}
+                      max={100}
+                    />
+                    <div className="slider-track">
+                      <input
+                        type="range"
+                        min={0}
+                        max={100}
+                        value={Math.round((element.opacity ?? 1) * 100)}
+                        onChange={(e) => element.set({ opacity: parseInt(e.target.value) / 100 })}
+                      />
+                      <div className="slider-fill" style={{ width: `${(element.opacity ?? 1) * 100}%` }}>
+                        <div className="slider-thumb" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Volume */}
+              <div className="control-row">
+                <span className="control-label">Volume</span>
+                <div className="control-value">
+                  <div className="slider-container">
+                    <input
+                      type="number"
+                      className="slider-input"
+                      value={Math.round((element.volume ?? 1) * 100)}
+                      onChange={(e) => element.set({ volume: (parseInt(e.target.value) || 0) / 100 })}
+                      min={0}
+                      max={100}
+                    />
+                    <div className="slider-track">
+                      <input
+                        type="range"
+                        min={0}
+                        max={100}
+                        value={Math.round((element.volume ?? 1) * 100)}
+                        onChange={(e) => element.set({ volume: parseInt(e.target.value) / 100 })}
+                      />
+                      <div className="slider-fill" style={{ width: `${(element.volume ?? 1) * 100}%` }}>
+                        <div className="slider-thumb" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mute */}
+              <div className="control-row">
+                <span className="control-label">Audio</span>
+                <div className="control-value">
+                  <button 
+                    className={`align-btn ${element.muted ? 'active' : ''}`}
+                    onClick={() => element.set({ muted: !element.muted })}
+                    style={{ width: 'auto', padding: '6px 12px' }}
+                  >
+                    {element.muted ? '🔇 Muted' : '🔊 On'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Loop */}
+              <div className="control-row">
+                <span className="control-label">Loop</span>
+                <div className="control-value">
+                  <button 
+                    className={`align-btn ${element.loop ? 'active' : ''}`}
+                    onClick={() => element.set({ loop: !element.loop })}
+                    style={{ width: 'auto', padding: '6px 12px' }}
+                  >
+                    {element.loop ? '🔁 On' : '➡️ Off'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Corner Radius */}
+              <div className="control-row">
+                <span className="control-label">Radius</span>
+                <div className="control-value">
+                  <div className="slider-container">
+                    <input
+                      type="number"
+                      className="slider-input"
+                      value={Math.round(element.cornerRadius || 0)}
+                      onChange={(e) => element.set({ cornerRadius: parseFloat(e.target.value) || 0 })}
+                    />
+                    <div className="slider-track">
+                      <input
+                        type="range"
+                        min={0}
+                        max={200}
+                        value={element.cornerRadius || 0}
+                        onChange={(e) => element.set({ cornerRadius: parseInt(e.target.value) })}
+                      />
+                      <div className="slider-fill" style={{ width: `${((element.cornerRadius || 0) / 200) * 100}%` }}>
+                        <div className="slider-thumb" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Duration Section */}
+            <DurationSection store={store} element={element} />
+
+            {/* Action Buttons */}
+            <div className="action-buttons">
+              <button className="action-btn delete" onClick={() => store.deleteElements([element.id])}>
+                <span>🗑</span> Delete
+              </button>
+            </div>
+          </>
+        ) : (
+          /* Animation Tab */
+          <AnimationSection store={store} element={element} />
+        )}
+      </div>
+    </div>
+  );
+});
