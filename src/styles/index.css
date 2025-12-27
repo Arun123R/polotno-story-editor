@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 /* ===================================
-   DARK THEME - Storyly-inspired Design
+   DARK THEME - AppStorys Brand Design
    =================================== */
 
-/* CSS Variables - Dark Theme Palette */
+/* CSS Variables - Dark Theme with AppStorys Orange */
 :root {
-    /* Primary background colors */
+    /* Primary background colors - Dark Theme */
     --bg-primary: #1a1a2e;
     --bg-secondary: #16213e;
     --bg-tertiary: #0f0f23;
@@ -28,14 +28,26 @@
     --text-muted: #7a7a9a;
     --text-disabled: #5a5a7a;
 
-    /* Accent colors - Teal/Cyan */
-    --accent-primary: #00d4aa;
-    --accent-secondary: #00b894;
-    --accent-hover: #00e6b8;
+    /* AppStorys Orange Gradient Theme */
+    --accent-primary: #F97316;
+    /* Main AppStorys orange */
+    --accent-secondary: #EA580C;
+    /* Darker orange */
+    --accent-hover: #FB923C;
+    /* Lighter orange on hover */
+    --accent-light: #FDBA74;
+    /* Light orange for subtle highlights */
+    --accent-dark: #C2410C;
+    /* Deep orange */
 
-    /* Secondary accent - Purple/Indigo */
-    --accent-purple: #6366f1;
-    --accent-purple-hover: #818cf8;
+    /* Orange gradient */
+    --gradient-primary: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+    --gradient-hover: linear-gradient(135deg, #FB923C 0%, #F97316 100%);
+    --gradient-subtle: linear-gradient(135deg, rgba(249, 115, 22, 0.2) 0%, rgba(234, 88, 12, 0.1) 100%);
+
+    /* Subtle orange for backgrounds */
+    --accent-subtle: rgba(249, 115, 22, 0.15);
+    --accent-glow: rgba(249, 115, 22, 0.4);
 
     /* Status colors */
     --success: #10b981;
@@ -46,12 +58,14 @@
     /* Input colors */
     --input-bg: #252547;
     --input-border: #3d3d6b;
-    --input-focus: #00d4aa;
+    --input-focus: #F97316;
 
     /* Shadow */
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
     --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
     --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+    --shadow-accent: 0 0 0 3px rgba(249, 115, 22, 0.3);
+    --shadow-glow: 0 0 20px rgba(249, 115, 22, 0.3);
 }
 
 /* Global Reset for Dark Theme */
@@ -90,6 +104,7 @@ body {
 [class*="polotno-side-panel"],
 .bp5-tabs {
     background-color: var(--bg-secondary) !important;
+
 }
 
 /* Side panel tabs container */
@@ -120,7 +135,7 @@ body {
 .go2556403498[aria-selected="true"],
 .bp5-tab[aria-selected="true"],
 .bp5-tab.bp5-selected {
-    background-color: var(--bg-elevated) !important;
+    background-color: var(--accent-subtle) !important;
     color: var(--accent-primary) !important;
     border-left: 3px solid var(--accent-primary) !important;
 }
@@ -138,7 +153,16 @@ body {
 .bp5-tab-panel {
     background-color: var(--bg-secondary) !important;
     color: var(--text-primary) !important;
-    border-right: 1px solid var(--border-primary) !important;
+    border: none !important;
+}
+
+/* Remove box-shadow border effect from side panel container */
+.polotno-panel-container,
+[class*="go"][class*="polotno-panel"] {
+    box-shadow: none !important;
+    border: none !important;
+    background-color: var(--bg-secondary) !important;
+    padding: 0 !important;
 }
 
 /* Section headers in side panel */
@@ -177,7 +201,7 @@ body {
 .polotno-toolbar button:active,
 .polotno-toolbar .bp5-button:active,
 .polotno-toolbar .bp5-button.bp5-active {
-    background-color: var(--accent-purple) !important;
+    background: var(--gradient-primary) !important;
     color: var(--text-primary) !important;
 }
 
@@ -240,7 +264,7 @@ body {
 .polotno-page-thumbnail.selected,
 .polotno-page-thumbnail[data-selected="true"] {
     border-color: var(--accent-primary) !important;
-    box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.3) !important;
+    box-shadow: var(--shadow-accent) !important;
 }
 
 /* Add page button */
@@ -286,19 +310,25 @@ input[type="search"] {
 input[type="search"]:focus {
     border-color: var(--input-focus) !important;
     outline: none !important;
+    box-shadow: var(--shadow-accent) !important;
 }
 
 /* Fix search icon and text overlap */
 .bp5-input-group .bp5-input {
-    padding-left: 36px !important;  /* Add space for the icon */
-    height: 40px !important;        /* Increase input height */
-    line-height: 40px !important;   /* Center text vertically */
+    padding-left: 36px !important;
+    /* Add space for the icon */
+    height: 40px !important;
+    /* Increase input height */
+    line-height: 40px !important;
+    /* Center text vertically */
 }
 
 .bp5-input-group .bp5-input-left-container,
-.bp5-input-group > .bp5-icon {
-    left: 10px !important;  /* Position icon with some margin */
-    top: 25% !important;   /*  Center icon vertically */
+.bp5-input-group>.bp5-icon {
+    left: 10px !important;
+    /* Position icon with some margin */
+    top: 25% !important;
+    /*  Center icon vertically */
     transform: translateY(-50%) !important;
 }
 
@@ -320,13 +350,15 @@ input[type="search"]:focus {
 }
 
 .bp5-button.bp5-intent-primary {
-    background-color: var(--accent-primary) !important;
-    color: var(--bg-primary) !important;
-    border-color: var(--accent-primary) !important;
+    background: var(--gradient-primary) !important;
+    color: white !important;
+    border: none !important;
+    font-weight: 500 !important;
 }
 
 .bp5-button.bp5-intent-primary:hover {
-    background-color: var(--accent-hover) !important;
+    background: var(--gradient-hover) !important;
+    box-shadow: var(--shadow-glow) !important;
 }
 
 .bp5-button.bp5-minimal {
@@ -350,7 +382,7 @@ input[type="search"]:focus {
 .bp5-input:focus,
 .bp5-input-group .bp5-input:focus {
     border-color: var(--input-focus) !important;
-    box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.2) !important;
+    box-shadow: var(--shadow-accent) !important;
 }
 
 .bp5-input::placeholder {
@@ -382,7 +414,7 @@ input[type="search"]:focus {
 }
 
 .bp5-slider-progress {
-    background-color: var(--accent-primary) !important;
+    background: var(--gradient-primary) !important;
 }
 
 .bp5-slider-handle {
@@ -391,13 +423,21 @@ input[type="search"]:focus {
     box-shadow: var(--shadow-sm) !important;
 }
 
+.bp5-slider-handle:hover {
+    box-shadow: var(--shadow-accent) !important;
+}
+
 /* Switches/Toggles */
 .bp5-switch {
     color: var(--text-primary) !important;
 }
 
+.bp5-switch .bp5-control-indicator {
+    background-color: var(--border-primary) !important;
+}
+
 .bp5-switch input:checked~.bp5-control-indicator {
-    background-color: var(--accent-primary) !important;
+    background: var(--gradient-primary) !important;
 }
 
 /* Checkboxes */
@@ -407,7 +447,7 @@ input[type="search"]:focus {
 }
 
 .bp5-checkbox input:checked~.bp5-control-indicator {
-    background-color: var(--accent-primary) !important;
+    background: var(--gradient-primary) !important;
     border-color: var(--accent-primary) !important;
 }
 
@@ -418,7 +458,7 @@ input[type="search"]:focus {
 }
 
 .bp5-radio input:checked~.bp5-control-indicator {
-    background-color: var(--accent-primary) !important;
+    background: var(--gradient-primary) !important;
     border-color: var(--accent-primary) !important;
 }
 
@@ -450,8 +490,8 @@ input[type="search"]:focus {
 
 .bp5-menu-item.bp5-active,
 .bp5-menu-item.bp5-selected {
-    background-color: var(--accent-primary) !important;
-    color: var(--bg-primary) !important;
+    background: var(--gradient-primary) !important;
+    color: white !important;
 }
 
 /* Dialogs/Modals */
@@ -508,7 +548,7 @@ input[type="search"]:focus {
 }
 
 .bp5-tab-indicator {
-    background-color: var(--accent-primary) !important;
+    background: var(--gradient-primary) !important;
 }
 
 /* Cards */
@@ -531,8 +571,8 @@ input[type="search"]:focus {
 }
 
 .bp5-tag.bp5-intent-primary {
-    background-color: var(--accent-primary) !important;
-    color: var(--bg-primary) !important;
+    background: var(--gradient-primary) !important;
+    color: white !important;
 }
 
 /* Forms */
@@ -570,7 +610,7 @@ input[type="search"]:focus {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--text-muted);
+    background: var(--accent-primary);
 }
 
 /* ===================================
@@ -608,7 +648,7 @@ input[type="search"]:focus {
 .polotno-element-item:hover {
     border-color: var(--accent-primary) !important;
     transform: translateY(-2px) !important;
-    box-shadow: var(--shadow-md) !important;
+    box-shadow: var(--shadow-glow) !important;
 }
 
 /* ===================================
@@ -619,8 +659,72 @@ input[type="search"]:focus {
     stroke: var(--accent-primary) !important;
 }
 
+.bp5-progress-bar {
+    background-color: var(--border-primary) !important;
+}
+
 .bp5-progress-bar .bp5-progress-meter {
-    background-color: var(--accent-primary) !important;
+    background: var(--gradient-primary) !important;
+}
+
+/* ===================================
+   BUTTON ACTIVE/SELECTED STATES
+   =================================== */
+
+/* Active/Selected button states */
+.bp5-button.bp5-active,
+.bp5-button[aria-pressed="true"] {
+    background: var(--gradient-primary) !important;
+    color: white !important;
+    border-color: var(--accent-primary) !important;
+}
+
+/* Button groups - alignment buttons, etc */
+.bp5-button-group .bp5-button.bp5-active,
+.bp5-button-group .bp5-button[aria-pressed="true"] {
+    background: var(--gradient-primary) !important;
+    color: white !important;
+}
+
+/* ===================================
+   APPSTORYS BRAND ELEMENTS
+   =================================== */
+
+/* Primary action buttons - like "Create Campaign" */
+.btn-primary,
+.create-btn,
+[class*="primary-action"] {
+    background: var(--gradient-primary) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+}
+
+.btn-primary:hover,
+.create-btn:hover,
+[class*="primary-action"]:hover {
+    background: var(--gradient-hover) !important;
+    box-shadow: var(--shadow-glow) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Selected/Active states with orange accent */
+.selected,
+.active,
+[data-selected="true"] {
+    border-color: var(--accent-primary) !important;
+}
+
+/* Links */
+a {
+    color: var(--accent-primary);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--accent-hover);
 }
 
 /* ===================================
@@ -649,4 +753,362 @@ input[type="search"]:focus {
 
 .dark-border {
     border-color: var(--border-primary) !important;
+}
+
+.gradient-primary {
+    background: var(--gradient-primary) !important;
+}
+
+.text-accent {
+    color: var(--accent-primary) !important;
+}
+
+.glow-accent {
+    box-shadow: var(--shadow-glow) !important;
+}
+
+/* ===================================
+   POLOTNO SPECIFIC OVERRIDES - ORANGE THEME
+   =================================== */
+
+/* Right sidebar alignment buttons - force orange */
+[class*="go"] button[class*="bp5-button"].bp5-active,
+[class*="go"] .bp5-button-group .bp5-button.bp5-active,
+[class*="go"] .bp5-button-group button.bp5-active,
+.bp5-button-group.bp5-minimal .bp5-button.bp5-active {
+    background: var(--gradient-primary) !important;
+    color: white !important;
+}
+
+/* Tab underline/indicator - force orange */
+[class*="go"] .bp5-tab[aria-selected="true"]::after,
+.bp5-tab-indicator-wrapper .bp5-tab-indicator,
+.bp5-tabs .bp5-tab-indicator {
+    background: var(--gradient-primary) !important;
+    background-color: var(--accent-primary) !important;
+}
+
+/* Text/My fonts tabs active state */
+[class*="go"] .bp5-tab[aria-selected="true"],
+.bp5-tabs .bp5-tab[aria-selected="true"] {
+    color: var(--accent-primary) !important;
+    box-shadow: inset 0 -3px 0 var(--accent-primary) !important;
+}
+
+/* Play button in duration section */
+[class*="go"] button[class*="play"],
+button[class*="PlayButton"],
+.bp5-button[class*="play"],
+[class*="duration"] button,
+[class*="Duration"] button {
+    background: var(--gradient-primary) !important;
+    color: white !important;
+    border: none !important;
+}
+
+[class*="go"] button[class*="play"]:hover,
+button[class*="PlayButton"]:hover {
+    background: var(--gradient-hover) !important;
+    box-shadow: var(--shadow-glow) !important;
+}
+
+/* NEW badge styling */
+[class*="NEW"],
+.bp5-tag.bp5-intent-success,
+span[class*="new"],
+span[class*="New"] {
+    background: var(--gradient-primary) !important;
+    color: white !important;
+}
+
+/* Any teal/cyan color override to orange */
+[style*="rgb(0, 212, 170)"],
+[style*="#00d4aa"],
+[style*="rgb(0, 184, 148)"],
+[style*="#00b894"] {
+    background-color: var(--accent-primary) !important;
+    color: var(--accent-primary) !important;
+}
+
+/* Generic active/selected states */
+.bp5-active,
+[aria-pressed="true"],
+[aria-selected="true"] .bp5-tab-indicator {
+    background: var(--gradient-primary) !important;
+}
+
+/* Ensure all button active states use orange */
+button.bp5-active,
+.bp5-button.bp5-active {
+    background: var(--gradient-primary) !important;
+    color: white !important;
+}
+
+/* Icon buttons when active */
+.bp5-button.bp5-minimal.bp5-active,
+.bp5-button.bp5-minimal[aria-pressed="true"] {
+    background: var(--gradient-primary) !important;
+    color: white !important;
+}
+
+/* Polotno specific class overrides */
+[class*="go"][class*="active"],
+[class*="go"][class*="selected"] {
+    background: var(--gradient-primary) !important;
+    border-color: var(--accent-primary) !important;
+}
+
+/* Duration/Timeline play button specific */
+[class*="go"] svg[class*="play"],
+[class*="go"] [class*="play"] svg {
+    fill: white !important;
+}
+
+/* Force orange on any remaining teal elements */
+.bp5-intent-success:not(.bp5-tag) {
+    background: var(--gradient-primary) !important;
+}
+
+/* Circular play button */
+[class*="go"] button[style*="border-radius: 50%"],
+button[style*="border-radius:50%"] {
+    background: var(--gradient-primary) !important;
+}
+
+/* Right panel controls active state */
+[class*="RightSidebar"] .bp5-button.bp5-active,
+[class*="right-sidebar"] .bp5-button.bp5-active,
+[class*="toolbar"] .bp5-button.bp5-active {
+    background: var(--gradient-primary) !important;
+    color: white !important;
+}
+
+/* ===================================
+   COMPREHENSIVE CYAN/TEAL TO ORANGE OVERRIDES
+   =================================== */
+
+/* Canvas selection handles - Polotno/Konva transformer */
+.konvajs-content rect[stroke],
+.konvajs-content circle[stroke] {
+    stroke: var(--accent-primary) !important;
+}
+
+/* Polotno transformer handles - force orange stroke */
+[class*="Transformer"] rect,
+[class*="transformer"] rect,
+[class*="_anchor"] {
+    stroke: var(--accent-primary) !important;
+    fill: var(--accent-primary) !important;
+}
+
+/* Toggle switch - override all states */
+.bp5-control.bp5-switch input:checked~.bp5-control-indicator,
+.bp5-switch input:checked~.bp5-control-indicator,
+.bp5-switch.bp5-checked .bp5-control-indicator,
+input[type="checkbox"]:checked+.bp5-control-indicator,
+.bp5-control input:checked~.bp5-control-indicator {
+    background: var(--gradient-primary) !important;
+    background-color: var(--accent-primary) !important;
+}
+
+/* Toggle switch knob/handle */
+.bp5-switch .bp5-control-indicator::before,
+.bp5-switch input:checked~.bp5-control-indicator::before {
+    background-color: white !important;
+}
+
+/* Slider progress bar - force orange */
+.bp5-slider .bp5-slider-progress,
+.bp5-slider-progress.bp5-intent-primary,
+.bp5-slider-progress.bp5-intent-success,
+[class*="go"] .bp5-slider-progress,
+div[class*="slider"] .bp5-slider-progress {
+    background: var(--gradient-primary) !important;
+    background-color: var(--accent-primary) !important;
+}
+
+/* Slider handle - force orange border */
+.bp5-slider .bp5-slider-handle,
+.bp5-slider-handle.bp5-active,
+[class*="go"] .bp5-slider-handle {
+    background-color: white !important;
+    border: 2px solid var(--accent-primary) !important;
+    box-shadow: 0 0 0 1px var(--accent-primary) !important;
+}
+
+.bp5-slider .bp5-slider-handle:hover,
+.bp5-slider .bp5-slider-handle:focus {
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.3) !important;
+}
+
+/* All intent-success and intent-primary elements - often teal */
+.bp5-intent-success,
+.bp5-intent-primary,
+[class*="intent-success"],
+[class*="intent-primary"] {
+    background: var(--gradient-primary) !important;
+    color: white !important;
+}
+
+/* Override any inline teal/cyan styles */
+[style*="rgb(0,212,170)"],
+[style*="rgb(0, 212, 170)"],
+[style*="#00d4aa"],
+[style*="rgb(0,184,148)"],
+[style*="rgb(0, 184, 148)"],
+[style*="#00b894"],
+[style*="rgb(32,201,151)"],
+[style*="rgb(32, 201, 151)"],
+[style*="#20c997"],
+[style*="rgb(56,178,172)"],
+[style*="rgb(56, 178, 172)"],
+[style*="#38b2ac"],
+[style*="teal"],
+[style*="cyan"] {
+    background-color: var(--accent-primary) !important;
+    border-color: var(--accent-primary) !important;
+    color: var(--accent-primary) !important;
+}
+
+/* Polotno resize section toggle */
+[class*="resize"] .bp5-switch input:checked~.bp5-control-indicator,
+[class*="Resize"] .bp5-switch input:checked~.bp5-control-indicator {
+    background: var(--gradient-primary) !important;
+}
+
+/* Active/pressed button states - comprehensive */
+button[aria-pressed="true"],
+button.bp5-active,
+.bp5-button[aria-pressed="true"],
+.bp5-button.bp5-active,
+[class*="go"] button[aria-pressed="true"],
+[class*="go"] button.bp5-active {
+    background: var(--gradient-primary) !important;
+    color: white !important;
+    border-color: var(--accent-primary) !important;
+}
+
+/* SVG icons in active buttons */
+button.bp5-active svg,
+.bp5-button.bp5-active svg,
+button[aria-pressed="true"] svg,
+.bp5-button[aria-pressed="true"] svg {
+    fill: white !important;
+    color: white !important;
+}
+
+/* Alignment and formatting buttons in right panel */
+.bp5-button-group .bp5-button.bp5-active,
+.bp5-button-group .bp5-button[aria-pressed="true"] {
+    background: var(--gradient-primary) !important;
+    color: white !important;
+}
+
+/* Canvas element selection border - override via CSS custom properties */
+:root {
+    --polotno-selection-color: #F97316 !important;
+    --konva-selection-color: #F97316 !important;
+}
+
+/* Polotno workspace selection styling */
+.polotno-workspace .konvajs-content,
+.go3742766498 .konvajs-content {
+    --selection-stroke: var(--accent-primary);
+    --transformer-border-stroke: var(--accent-primary);
+}
+
+/* Force orange on any remaining blue/teal focus states */
+*:focus {
+    outline-color: var(--accent-primary) !important;
+}
+
+/* Links with teal color */
+a[style*="teal"],
+a[style*="cyan"],
+span[style*="teal"],
+span[style*="cyan"] {
+    color: var(--accent-primary) !important;
+}
+
+/* Duration section text links */
+[class*="duration"] a,
+[class*="Duration"] a,
+[class*="timeline"] a,
+[class*="Timeline"] a {
+    color: var(--accent-primary) !important;
+}
+
+/* Time indicator text */
+[class*="starts at"],
+[class*="ends at"] {
+    color: var(--accent-primary) !important;
+}
+
+/* Polotno auto-generated classes with intent colors */
+[class*="go"][style*="background-color: rgb(0"],
+[class*="go"][style*="background: rgb(0"] {
+    background: var(--gradient-primary) !important;
+}
+
+/* Any SVG stroke in teal/cyan */
+svg [stroke="#00d4aa"],
+svg [stroke="#00b894"],
+svg [stroke="#20c997"],
+svg [stroke="teal"],
+svg [stroke="cyan"] {
+    stroke: var(--accent-primary) !important;
+}
+
+/* Any SVG fill in teal/cyan */
+svg [fill="#00d4aa"],
+svg [fill="#00b894"],
+svg [fill="#20c997"],
+svg [fill="teal"],
+svg [fill="cyan"] {
+    fill: var(--accent-primary) !important;
+}
+
+/* ===================================
+   RESIZE SECTION - SPECIFIC STYLING
+   =================================== */
+
+/* Reset - Ensure preset button text stays readable (white/light) */
+.polotno-panel-container button,
+.polotno-panel-container button span,
+.polotno-panel-container button div {
+    color: var(--text-primary) !important;
+}
+
+/* Dimension text below preset buttons (1080×1080 px, etc.) */
+.polotno-panel-container [style*="opacity: 0.6"],
+.polotno-panel-container [style*="opacity:0.6"],
+.polotno-panel-container [style*="opacity: 0.5"],
+.polotno-panel-container [style*="opacity:0.5"] {
+    color: var(--text-muted) !important;
+    opacity: 1 !important;
+}
+
+/* Platform category headers ONLY (Instagram, Facebook, LinkedIn, Youtube, Twitter) */
+/* These are DIVs with font-weight:600, display:flex, gap:6px that contain an SVG and text */
+.polotno-panel-container>div>div>div[style*="font-weight: 600"][style*="display: flex"][style*="gap"],
+.polotno-panel-container>div>div>div[style*="font-weight:600"][style*="display:flex"],
+.polotno-panel-container div[style*="padding-bottom: 15px"][style*="padding-top: 15px"][style*="font-weight: 600"] {
+    color: var(--accent-primary) !important;
+}
+
+/* SVG icons inside platform headers */
+.polotno-panel-container div[style*="padding-bottom: 15px"][style*="padding-top: 15px"][style*="font-weight: 600"] svg,
+.polotno-panel-container>div>div>div[style*="font-weight: 600"][style*="display: flex"][style*="gap"] svg {
+    fill: var(--accent-primary) !important;
+    stroke: var(--accent-primary) !important;
+}
+
+/* Alternative: Target headers by their specific padding pattern */
+.bp5-tab-panel div[style*="padding-bottom: 15px"][style*="padding-top: 15px"] {
+    color: var(--accent-primary) !important;
+}
+
+.bp5-tab-panel div[style*="padding-bottom: 15px"][style*="padding-top: 15px"] svg {
+    fill: var(--accent-primary) !important;
+    stroke: var(--accent-primary) !important;
 }

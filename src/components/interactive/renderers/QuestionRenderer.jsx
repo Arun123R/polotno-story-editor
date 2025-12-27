@@ -46,7 +46,7 @@ export const QuestionRenderer = ({ data, style, width, height }) => {
   const submitButtonStyle = {
     width: '100%',
     padding: '12px 16px',
-    background: style?.submitBgColor || '#00d4aa',
+    background: style?.submitBgColor || '#F97316',
     color: style?.submitTextColor || '#000000',
     border: 'none',
     borderRadius: 8,

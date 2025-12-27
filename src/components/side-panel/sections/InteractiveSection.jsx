@@ -492,7 +492,7 @@ function generatePromoSVG(data, style, width, height) {
   const codeBg = style?.codeBgColor || 'rgba(255,255,255,0.15)';
   const codeColor = style?.codeColor || '#ffffff';
   const titleColor = style?.titleColor || '#ffffff';
-  const buttonBg = style?.buttonBgColor || '#00d4aa';
+  const buttonBg = style?.buttonBgColor || '#F97316';
   const buttonText = style?.buttonTextColor || '#000000';
   const hasDashed = data?.dashedBorder !== false;
   const borderColor = style?.borderColor || 'rgba(255,255,255,0.3)';
@@ -517,7 +517,7 @@ function generateQuestionSVG(data, style, width, height) {
   const inputBg = style?.inputBgColor || 'rgba(255,255,255,0.15)';
   const inputText = style?.placeholderColor || 'rgba(255,255,255,0.5)';
   const titleColor = style?.titleColor || '#ffffff';
-  const buttonBg = style?.submitBgColor || '#00d4aa';
+  const buttonBg = style?.submitBgColor || '#F97316';
   const buttonText = style?.submitTextColor || '#000000';
   
   const padding = 16;

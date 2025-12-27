@@ -10,11 +10,20 @@ import {
 
 /**
  * Text element settings panel - Storyly-inspired dark theme
+ * Supports both single and multi-element selection
  */
-export const TextSettings = observer(({ store, element }) => {
+export const TextSettings = observer(({ store, element, elements = [], isMultiSelect = false }) => {
   const [activeTab, setActiveTab] = useState('general');
   
   if (!element) return null;
+
+  // Get all elements to modify (single or multiple)
+  const targetElements = isMultiSelect && elements.length > 0 ? elements : [element];
+  
+  // Helper to apply changes to all selected elements
+  const applyToAll = (changes) => {
+    targetElements.forEach(el => el.set(changes));
+  };
 
   const fontFamilies = [
     'Inter', 'Roboto', 'Open Sans', 'Lato', 'Montserrat',
@@ -47,38 +56,55 @@ export const TextSettings = observer(({ store, element }) => {
       </div>
 
       <div className="settings-content" style={{ padding: '16px' }}>
+        {/* Multi-select indicator */}
+        {isMultiSelect && (
+          <div style={{ 
+            padding: '8px 12px', 
+            background: 'var(--accent-subtle)', 
+            borderRadius: '6px', 
+            marginBottom: '12px',
+            fontSize: '12px',
+            color: 'var(--accent-primary)',
+            textAlign: 'center'
+          }}>
+            <strong>{targetElements.length}</strong> text elements selected
+          </div>
+        )}
+
         {activeTab === 'general' ? (
           <>
             {/* Style Section */}
             <div className="section">
               <div className="section-title">Style</div>
 
-              {/* Position */}
-              <div className="control-row">
-                <span className="control-label">Position</span>
-                <div className="control-value">
-                  <div className="position-row">
-                    <div className="position-field">
-                      <input
-                        type="number"
-                        className="position-input"
-                        value={Math.round(element.x)}
-                        onChange={(e) => element.set({ x: parseFloat(e.target.value) || 0 })}
-                      />
-                      <label>X</label>
-                    </div>
-                    <div className="position-field">
-                      <input
-                        type="number"
-                        className="position-input"
-                        value={Math.round(element.y)}
-                        onChange={(e) => element.set({ y: parseFloat(e.target.value) || 0 })}
-                      />
-                      <label>Y</label>
+              {/* Position - only show for single selection */}
+              {!isMultiSelect && (
+                <div className="control-row">
+                  <span className="control-label">Position</span>
+                  <div className="control-value">
+                    <div className="position-row">
+                      <div className="position-field">
+                        <input
+                          type="number"
+                          className="position-input"
+                          value={Math.round(element.x)}
+                          onChange={(e) => applyToAll({ x: parseFloat(e.target.value) || 0 })}
+                        />
+                        <label>X</label>
+                      </div>
+                      <div className="position-field">
+                        <input
+                          type="number"
+                          className="position-input"
+                          value={Math.round(element.y)}
+                          onChange={(e) => applyToAll({ y: parseFloat(e.target.value) || 0 })}
+                        />
+                        <label>Y</label>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Rotation */}
               <div className="control-row">
@@ -88,7 +114,7 @@ export const TextSettings = observer(({ store, element }) => {
                     type="number"
                     className="position-input"
                     value={Math.round(element.rotation || 0)}
-                    onChange={(e) => element.set({ rotation: parseFloat(e.target.value) || 0 })}
+                    onChange={(e) => applyToAll({ rotation: parseFloat(e.target.value) || 0 })}
                   />
                   <span style={{ color: 'var(--sidebar-text-muted)', fontSize: '11px' }}>°</span>
                 </div>
@@ -102,7 +128,7 @@ export const TextSettings = observer(({ store, element }) => {
                     type="number"
                     className="position-input"
                     value={Math.round(element.fontSize || 16)}
-                    onChange={(e) => element.set({ fontSize: parseFloat(e.target.value) || 16 })}
+                    onChange={(e) => applyToAll({ fontSize: parseFloat(e.target.value) || 16 })}
                   />
                 </div>
               </div>
@@ -115,7 +141,7 @@ export const TextSettings = observer(({ store, element }) => {
                     <select
                       className="select-input"
                       value={element.fontFamily || 'Inter'}
-                      onChange={(e) => element.set({ fontFamily: e.target.value })}
+                      onChange={(e) => applyToAll({ fontFamily: e.target.value })}
                     >
                       {fontFamilies.map(font => (
                         <option key={font} value={font}>{font}</option>
@@ -133,7 +159,7 @@ export const TextSettings = observer(({ store, element }) => {
                     <select
                       className="select-input"
                       value={element.fontWeight || '400'}
-                      onChange={(e) => element.set({ fontWeight: e.target.value })}
+                      onChange={(e) => applyToAll({ fontWeight: e.target.value })}
                     >
                       {fontWeights.map(w => (
                         <option key={w.value} value={w.value}>{w.label}</option>
@@ -152,7 +178,7 @@ export const TextSettings = observer(({ store, element }) => {
                       className={`text-style-btn ${element.fontWeight === 'bold' || element.fontWeight >= 700 ? 'active' : ''}`}
                       onClick={() => {
                         const isBold = element.fontWeight === 'bold' || element.fontWeight >= 700;
-                        element.set({ fontWeight: isBold ? '400' : '700' });
+                        applyToAll({ fontWeight: isBold ? '400' : '700' });
                       }}
                       title="Bold"
                     >
@@ -160,7 +186,7 @@ export const TextSettings = observer(({ store, element }) => {
                     </button>
                     <button
                       className={`text-style-btn ${element.fontStyle === 'italic' ? 'active' : ''}`}
-                      onClick={() => element.set({ fontStyle: element.fontStyle === 'italic' ? 'normal' : 'italic' })}
+                      onClick={() => applyToAll({ fontStyle: element.fontStyle === 'italic' ? 'normal' : 'italic' })}
                       title="Italic"
                       style={{ fontStyle: 'italic' }}
                     >
@@ -168,7 +194,7 @@ export const TextSettings = observer(({ store, element }) => {
                     </button>
                     <button
                       className={`text-style-btn ${element.textDecoration === 'underline' ? 'active' : ''}`}
-                      onClick={() => element.set({ textDecoration: element.textDecoration === 'underline' ? '' : 'underline' })}
+                      onClick={() => applyToAll({ textDecoration: element.textDecoration === 'underline' ? '' : 'underline' })}
                       title="Underline"
                       style={{ textDecoration: 'underline' }}
                     >
@@ -176,7 +202,7 @@ export const TextSettings = observer(({ store, element }) => {
                     </button>
                     <button
                       className={`text-style-btn ${element.textDecoration === 'line-through' ? 'active' : ''}`}
-                      onClick={() => element.set({ textDecoration: element.textDecoration === 'line-through' ? '' : 'line-through' })}
+                      onClick={() => applyToAll({ textDecoration: element.textDecoration === 'line-through' ? '' : 'line-through' })}
                       title="Strikethrough"
                       style={{ textDecoration: 'line-through' }}
                     >
@@ -207,21 +233,21 @@ export const TextSettings = observer(({ store, element }) => {
                   <div className="alignment-group">
                     <button
                       className={`align-btn ${element.align === 'left' ? 'active' : ''}`}
-                      onClick={() => element.set({ align: 'left' })}
+                      onClick={() => applyToAll({ align: 'left' })}
                       title="Align Left"
                     >
                       ☰
                     </button>
                     <button
                       className={`align-btn ${element.align === 'center' ? 'active' : ''}`}
-                      onClick={() => element.set({ align: 'center' })}
+                      onClick={() => applyToAll({ align: 'center' })}
                       title="Align Center"
                     >
                       ☰
                     </button>
                     <button
                       className={`align-btn ${element.align === 'right' ? 'active' : ''}`}
-                      onClick={() => element.set({ align: 'right' })}
+                      onClick={() => applyToAll({ align: 'right' })}
                       title="Align Right"
                     >
                       ☰
@@ -254,14 +280,14 @@ export const TextSettings = observer(({ store, element }) => {
                       <input
                         type="color"
                         value={element.fill || '#000000'}
-                        onChange={(e) => element.set({ fill: e.target.value })}
+                        onChange={(e) => applyToAll({ fill: e.target.value })}
                       />
                     </div>
                     <input
                       type="text"
                       className="color-input-text"
                       value={element.fill || '#000000'}
-                      onChange={(e) => element.set({ fill: e.target.value })}
+                      onChange={(e) => applyToAll({ fill: e.target.value })}
                       style={{ width: '80px' }}
                     />
                   </div>
@@ -274,8 +300,11 @@ export const TextSettings = observer(({ store, element }) => {
 
             {/* Action Buttons */}
             <div className="action-buttons">
-              <button className="action-btn delete" onClick={() => store.deleteElements([element.id])}>
-                <span>🗑</span> Delete
+              <button 
+                className="action-btn delete" 
+                onClick={() => store.deleteElements(targetElements.map(el => el.id))}
+              >
+                <span>🗑</span> {isMultiSelect ? 'Delete All' : 'Delete'}
               </button>
             </div>
           </>

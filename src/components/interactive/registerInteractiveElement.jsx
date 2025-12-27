@@ -304,7 +304,7 @@ const PromoPreview = ({ data, style }) => {
         </span>
         {data?.showCopyButton !== false && (
           <span style={{
-            background: style?.buttonBgColor || '#00d4aa',
+            background: style?.buttonBgColor || '#F97316',
             color: style?.buttonTextColor || '#000',
             padding: '6px 12px',
             borderRadius: 6,
@@ -361,7 +361,7 @@ const QuestionPreview = ({ data, style }) => {
         {data?.placeholder || 'Type your answer...'}
       </div>
       <div style={{
-        background: style?.submitBgColor || '#00d4aa',
+        background: style?.submitBgColor || '#F97316',
         color: style?.submitTextColor || '#000',
         padding: '10px 16px',
         borderRadius: 8,

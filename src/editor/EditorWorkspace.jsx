@@ -14,7 +14,7 @@ export const EditorWorkspace = ({ store }) => {
       <Workspace 
         store={store} 
         backgroundColor="var(--bg-primary)"
-        activePageBorderColor="#00d4aa"
+        activePageBorderColor="#F97316"
         layout="horizontal" 
       />
       

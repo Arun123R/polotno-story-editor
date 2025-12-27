@@ -1,4 +1,5 @@
 import { observer } from 'mobx-react-lite';
+import { useState, useEffect } from 'react';
 import { DurationSection } from '../shared/CommonControls';
 
 /**
@@ -6,7 +7,16 @@ import { DurationSection } from '../shared/CommonControls';
  */
 export const PageSettings = observer(({ store }) => {
   const activePage = store.activePage;
-  
+
+  // UI-only preset state (NO store change)
+  const [activePreset, setActivePreset] = useState('story');
+
+  // Ensure Story is pre-selected on load
+  useEffect(() => {
+    setActivePreset('story');
+    store.setSize(1080, 1920);
+  }, [store]);
+
   if (!activePage) return null;
 
   return (
@@ -26,21 +36,25 @@ export const PageSettings = observer(({ store }) => {
             <span className="control-label">Background</span>
             <div className="control-value">
               <div className="color-picker-row">
-                <div 
-                  className="color-swatch" 
+                <div
+                  className="color-swatch"
                   style={{ backgroundColor: activePage.background || '#ffffff' }}
                 >
                   <input
                     type="color"
                     value={activePage.background || '#ffffff'}
-                    onChange={(e) => activePage.set({ background: e.target.value })}
+                    onChange={(e) =>
+                      activePage.set({ background: e.target.value })
+                    }
                   />
                 </div>
                 <input
                   type="text"
                   className="color-input-text"
                   value={activePage.background || '#ffffff'}
-                  onChange={(e) => activePage.set({ background: e.target.value })}
+                  onChange={(e) =>
+                    activePage.set({ background: e.target.value })
+                  }
                   style={{ width: '80px' }}
                 />
               </div>
@@ -57,7 +71,13 @@ export const PageSettings = observer(({ store }) => {
                     type="number"
                     className="position-input"
                     value={store.width}
-                    onChange={(e) => store.setSize(parseInt(e.target.value) || 100, store.height)}
+                    onChange={(e) => {
+                      store.setSize(
+                        parseInt(e.target.value) || 100,
+                        store.height
+                      );
+                      setActivePreset(null); // manual size → custom
+                    }}
                   />
                   <label>W</label>
                 </div>
@@ -66,7 +86,13 @@ export const PageSettings = observer(({ store }) => {
                     type="number"
                     className="position-input"
                     value={store.height}
-                    onChange={(e) => store.setSize(store.width, parseInt(e.target.value) || 100)}
+                    onChange={(e) => {
+                      store.setSize(
+                        store.width,
+                        parseInt(e.target.value) || 100
+                      );
+                      setActivePreset(null); // manual size → custom
+                    }}
                   />
                   <label>H</label>
                 </div>
@@ -79,21 +105,38 @@ export const PageSettings = observer(({ store }) => {
             <span className="control-label">Presets</span>
             <div className="control-value">
               <div className="segment-group">
-                <button 
-                  className={`segment-btn ${store.width === 1080 && store.height === 1920 ? 'active' : ''}`}
-                  onClick={() => store.setSize(1080, 1920)}
+                <button
+                  className={`segment-btn ${
+                    activePreset === 'story' ? 'active' : ''
+                  }`}
+                  onClick={() => {
+                    setActivePreset('story');
+                    store.setSize(1080, 1920);
+                  }}
                 >
                   Story
                 </button>
-                <button 
-                  className={`segment-btn ${store.width === 1080 && store.height === 1080 ? 'active' : ''}`}
-                  onClick={() => store.setSize(1080, 1080)}
+
+                <button
+                  className={`segment-btn ${
+                    activePreset === 'square' ? 'active' : ''
+                  }`}
+                  onClick={() => {
+                    setActivePreset('square');
+                    store.setSize(1080, 1080);
+                  }}
                 >
                   Square
                 </button>
-                <button 
-                  className={`segment-btn ${store.width === 1920 && store.height === 1080 ? 'active' : ''}`}
-                  onClick={() => store.setSize(1920, 1080)}
+
+                <button
+                  className={`segment-btn ${
+                    activePreset === 'wide' ? 'active' : ''
+                  }`}
+                  onClick={() => {
+                    setActivePreset('wide');
+                    store.setSize(1920, 1080);
+                  }}
                 >
                   Wide
                 </button>
@@ -107,8 +150,8 @@ export const PageSettings = observer(({ store }) => {
 
         {/* Page Actions */}
         <div className="action-buttons">
-          <button 
-            className="action-btn delete" 
+          <button
+            className="action-btn delete"
             onClick={() => store.deletePages([activePage.id])}
             disabled={store.pages.length <= 1}
             style={{ opacity: store.pages.length <= 1 ? 0.5 : 1 }}
@@ -118,15 +161,18 @@ export const PageSettings = observer(({ store }) => {
         </div>
 
         {/* Page Info */}
-        <div style={{ 
-          marginTop: '16px', 
-          textAlign: 'center', 
-          fontSize: '11px', 
-          color: 'var(--sidebar-text-muted)' 
-        }}>
+        <div
+          style={{
+            marginTop: '16px',
+            textAlign: 'center',
+            fontSize: '11px',
+            color: 'var(--sidebar-text-muted)',
+          }}
+        >
           Page {store.pages.indexOf(activePage) + 1} of {store.pages.length}
         </div>
       </div>
     </div>
   );
 });
+PageSettings.displayName = 'PageSettings';

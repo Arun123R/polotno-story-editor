@@ -52,7 +52,7 @@ export const PromoRenderer = ({ data, style, width, height }) => {
   };
 
   const copyButtonStyle = {
-    background: style?.buttonBgColor || '#00d4aa',
+    background: style?.buttonBgColor || '#F97316',
     color: style?.buttonTextColor || '#000000',
     border: 'none',
     borderRadius: 6,

@@ -292,7 +292,7 @@ export const CtaSettings = observer(({ store, element }) => {
       {/* CTA Type Badge */}
       <div style={{
         padding: '10px 16px',
-        background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+        background: 'linear-gradient(90deg,#ff6b35,#f7931e)',
         color: '#ffffff',
         fontSize: '12px',
         fontWeight: '600',
@@ -608,6 +608,12 @@ export const CtaSettings = observer(({ store, element }) => {
                       max={100}
                     />
                     <div className="slider-track">
+                      <div 
+                        className="slider-fill" 
+                        style={{ width: `${Math.round((element.opacity ?? 1) * 100)}%` }}
+                      >
+                        <div className="slider-thumb" />
+                      </div>
                       <input
                         type="range"
                         min={0}

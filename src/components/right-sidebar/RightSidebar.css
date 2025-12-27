@@ -9,13 +9,13 @@
   --sidebar-text: #ffffff;
   --sidebar-text-secondary: #b8b8d0;
   --sidebar-text-muted: #7a7a9a;
-  --sidebar-accent: #00d4aa;
-  --sidebar-accent-hover: #00e6b8;
+  --sidebar-accent: #F97316;
+  --sidebar-accent-hover: #FB923C;
   --sidebar-input-bg: #252547;
   --sidebar-input-border: #3d3d6b;
   --sidebar-success: #10b981;
   --sidebar-danger: #ef4444;
-  --sidebar-new-badge: #6366f1;
+  --sidebar-new-badge: #F97316;
 }
 
 .right-sidebar {

@@ -52,10 +52,18 @@ const ProductCardIcon = () => (
 
 // ==================== CTA DIMENSIONS ====================
 const CTA_DIMENSIONS = {
-  classic: { width: 180, height: 50 },
-  swipe_up: { width: 120, height: 80 },
-  image: { width: 150, height: 120 },
-  product_card: { width: 180, height: 240 },
+  classic: { width: 500, height: 150 },
+  swipe_up: { width: 400, height: 280 },
+  image: { width: 350, height: 320 },
+  product_card: { width: 600, height: 900 },
+};
+
+// ==================== CTA DEFAULT POSITIONS ====================
+const CTA_POSITIONS = {
+  classic: { x: 300, y: 1050 },
+  swipe_up: { x: 350, y: 1600 },
+  image: { x: 370, y: 1250 },
+  product_card: { x: 250, y: 100 },
 };
 
 // ==================== CTA DEFAULT DATA ====================
@@ -68,19 +76,19 @@ const CTA_DEFAULTS = {
     borderRadius: 25,
     borderWidth: 0,
     borderColor: '#ffffff',
-    fontSize: 16,
+    fontSize: 50,
     fontWeight: 'bold',
   },
   swipe_up: {
     text: 'Swipe Up',
     redirectUrl: 'https://example.com',
     arrowColor: '#636363',
-    arrowSize: 28,
+    arrowSize: 50,
     arrowAnimation: true,
     textColor: '#ffffff',
     bgColor: '#636363',
     borderRadius: 20,
-    fontSize: 13,
+    fontSize: 50,
   },
   image: {
     redirectUrl: 'https://example.com',
@@ -300,17 +308,16 @@ export const CtaSectionPanel = observer(({ store }) => {
     const page = store.activePage;
     if (!page) return;
 
-    const pageWidth = store.width;
-    const pageHeight = store.height;
     const dims = CTA_DIMENSIONS.classic;
+    const pos = CTA_POSITIONS.classic;
     const defaults = CTA_DEFAULTS.classic;
 
     const svgContent = generateCtaSVG('classic', defaults, dims.width, dims.height);
 
     const element = page.addElement({
       type: 'svg',
-      x: (pageWidth - dims.width) / 2,
-      y: pageHeight - 100,
+      x: pos.x,
+      y: pos.y,
       width: dims.width,
       height: dims.height,
       src: svgContent,
@@ -329,17 +336,16 @@ export const CtaSectionPanel = observer(({ store }) => {
     const page = store.activePage;
     if (!page) return;
 
-    const pageWidth = store.width;
-    const pageHeight = store.height;
     const dims = CTA_DIMENSIONS.swipe_up;
+    const pos = CTA_POSITIONS.swipe_up;
     const defaults = CTA_DEFAULTS.swipe_up;
 
     const svgContent = generateCtaSVG('swipe_up', defaults, dims.width, dims.height);
 
     const element = page.addElement({
       type: 'svg',
-      x: (pageWidth - dims.width) / 2,
-      y: pageHeight - 120,
+      x: pos.x,
+      y: pos.y,
       width: dims.width,
       height: dims.height,
       src: svgContent,
@@ -361,17 +367,16 @@ export const CtaSectionPanel = observer(({ store }) => {
     const page = store.activePage;
     if (!page) return;
 
-    const pageWidth = store.width;
-    const pageHeight = store.height;
     const dims = CTA_DIMENSIONS.image;
+    const pos = CTA_POSITIONS.image;
 
     // Create object URL for the image
     const imageUrl = URL.createObjectURL(file);
 
     const element = page.addElement({
       type: 'image',
-      x: (pageWidth - dims.width) / 2,
-      y: pageHeight - 180,
+      x: pos.x,
+      y: pos.y,
       width: dims.width,
       height: dims.height,
       src: imageUrl,
@@ -401,9 +406,8 @@ export const CtaSectionPanel = observer(({ store }) => {
     const page = store.activePage;
     if (!page) return;
 
-    const pageWidth = store.width;
-    const pageHeight = store.height;
     const dims = CTA_DIMENSIONS.product_card;
+    const pos = CTA_POSITIONS.product_card;
     const defaults = CTA_DEFAULTS.product_card;
 
     // Create object URL for the image
@@ -413,8 +417,8 @@ export const CtaSectionPanel = observer(({ store }) => {
 
     const element = page.addElement({
       type: 'svg',
-      x: (pageWidth - dims.width) / 2,
-      y: (pageHeight - dims.height) / 2,
+      x: pos.x,
+      y: pos.y,
       width: dims.width,
       height: dims.height,
       src: svgContent,
@@ -435,17 +439,16 @@ export const CtaSectionPanel = observer(({ store }) => {
     const page = store.activePage;
     if (!page) return;
 
-    const pageWidth = store.width;
-    const pageHeight = store.height;
     const dims = CTA_DIMENSIONS.product_card;
+    const pos = CTA_POSITIONS.product_card;
     const defaults = CTA_DEFAULTS.product_card;
 
     const svgContent = generateCtaSVG('product_card', defaults, dims.width, dims.height);
 
     const element = page.addElement({
       type: 'svg',
-      x: (pageWidth - dims.width) / 2,
-      y: (pageHeight - dims.height) / 2,
+      x: pos.x,
+      y: pos.y,
       width: dims.width,
       height: dims.height,
       src: svgContent,

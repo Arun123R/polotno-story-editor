@@ -59,7 +59,7 @@ export const PollRenderer = ({ data, style, width, height }) => {
     top: 0,
     bottom: 0,
     width: `${percentage}%`,
-    background: style?.resultBarColor || '#00d4aa',
+    background: style?.resultBarColor || '#F97316',
     opacity: 0.3,
     borderRadius: style?.optionBorderRadius || 8,
     transition: 'width 0.3s ease',
