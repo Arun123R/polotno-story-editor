@@ -9,7 +9,7 @@ export const EditorLayout = ({ sidePanel, toolbar, canvas, footer, rightSidebar 
   <div className="h-screen overflow-hidden">
     {/* TOP TOOLBAR (fixed height) */}
     <div className=" flex flex-row justify-between">
-      <img src="\public\AppStorys_logo_white-Dy7IWqWA.png" alt="AppStorys_logo_white-Dy7IWqWA.png" className="p-2 h-12"></img>
+      <img src="AppStorys_logo_white-Dy7IWqWA.png" alt="AppStorys_logo_white-Dy7IWqWA.png" className="p-2 h-12"></img>
 
       {toolbar}
     </div>
