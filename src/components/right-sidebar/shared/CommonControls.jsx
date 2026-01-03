@@ -6,6 +6,13 @@ import { observer } from 'mobx-react-lite';
 export const PositionSection = observer(({ element }) => {
   if (!element) return null;
 
+  const handleNumericChange = (setter, value, minValue = null) => {
+    const numValue = parseFloat(value);
+    if (!isNaN(numValue) && (minValue === null || numValue >= minValue)) {
+      setter(numValue);
+    }
+  };
+
   return (
     <div className="section">
       <div className="section-title">Position & Size</div>
@@ -19,7 +26,7 @@ export const PositionSection = observer(({ element }) => {
                 type="number"
                 className="position-input"
                 value={Math.round(element.x)}
-                onChange={(e) => element.set({ x: parseFloat(e.target.value) || 0 })}
+                onChange={(e) => handleNumericChange((v) => element.set({ x: v }), e.target.value)}
               />
               <label>X</label>
             </div>
@@ -28,7 +35,7 @@ export const PositionSection = observer(({ element }) => {
                 type="number"
                 className="position-input"
                 value={Math.round(element.y)}
-                onChange={(e) => element.set({ y: parseFloat(e.target.value) || 0 })}
+                onChange={(e) => handleNumericChange((v) => element.set({ y: v }), e.target.value)}
               />
               <label>Y</label>
             </div>
@@ -45,7 +52,7 @@ export const PositionSection = observer(({ element }) => {
                 type="number"
                 className="position-input"
                 value={Math.round(element.width)}
-                onChange={(e) => element.set({ width: parseFloat(e.target.value) || 1 })}
+                onChange={(e) => handleNumericChange((v) => element.set({ width: v }), e.target.value, 1)}
               />
               <label>W</label>
             </div>
@@ -54,7 +61,7 @@ export const PositionSection = observer(({ element }) => {
                 type="number"
                 className="position-input"
                 value={Math.round(element.height)}
-                onChange={(e) => element.set({ height: parseFloat(e.target.value) || 1 })}
+                onChange={(e) => handleNumericChange((v) => element.set({ height: v }), e.target.value, 1)}
               />
               <label>H</label>
             </div>
@@ -68,8 +75,8 @@ export const PositionSection = observer(({ element }) => {
           <input
             type="number"
             className="position-input"
-            value={Math.round(element.rotation || 0)}
-            onChange={(e) => element.set({ rotation: parseFloat(e.target.value) || 0 })}
+            value={Math.round(element.rotation ?? 0)}
+            onChange={(e) => handleNumericChange((v) => element.set({ rotation: v }), e.target.value)}
           />
           <span style={{ color: 'var(--sidebar-text-muted)', fontSize: '11px' }}>°</span>
         </div>
@@ -87,6 +94,14 @@ export const OpacitySlider = observer(({ element }) => {
   const opacity = element.opacity ?? 1;
   const percentage = Math.round(opacity * 100);
 
+  const handleOpacityChange = (value) => {
+    const numValue = parseInt(value);
+    if (!isNaN(numValue)) {
+      const clamped = Math.max(0, Math.min(100, numValue));
+      element.set({ opacity: clamped / 100 });
+    }
+  };
+
   return (
     <div className="control-row">
       <span className="control-label">Opacity</span>
@@ -96,7 +111,7 @@ export const OpacitySlider = observer(({ element }) => {
             type="number"
             className="slider-input"
             value={percentage}
-            onChange={(e) => element.set({ opacity: (parseInt(e.target.value) || 0) / 100 })}
+            onChange={(e) => handleOpacityChange(e.target.value)}
             min={0}
             max={100}
           />
@@ -417,8 +432,11 @@ export const AnimationSection = observer(({ store, element }) => {
                 <input
                   type="number"
                   className="position-input"
-                  value={enterAnimation.delay || 0}
-                  onChange={(e) => updateAnimation('enter', { delay: parseInt(e.target.value) || 0 })}
+                  value={enterAnimation.delay ?? 0}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    updateAnimation('enter', { delay: isNaN(value) ? 0 : value });
+                  }}
                   style={{ width: '60px' }}
                   step={100}
                   min={0}
@@ -540,8 +558,11 @@ export const AnimationSection = observer(({ store, element }) => {
                 <input
                   type="number"
                   className="position-input"
-                  value={exitAnimation.delay || 0}
-                  onChange={(e) => updateAnimation('exit', { delay: parseInt(e.target.value) || 0 })}
+                  value={exitAnimation.delay ?? 0}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    updateAnimation('exit', { delay: isNaN(value) ? 0 : value });
+                  }}
                   style={{ width: '60px' }}
                   step={100}
                   min={0}
@@ -663,8 +684,11 @@ export const AnimationSection = observer(({ store, element }) => {
                 <input
                   type="number"
                   className="position-input"
-                  value={loopAnimation.delay || 0}
-                  onChange={(e) => updateAnimation('loop', { delay: parseInt(e.target.value) || 0 })}
+                  value={loopAnimation.delay ?? 0}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    updateAnimation('loop', { delay: isNaN(value) ? 0 : value });
+                  }}
                   style={{ width: '60px' }}
                   step={100}
                   min={0}

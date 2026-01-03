@@ -88,7 +88,10 @@ export const TextSettings = observer(({ store, element, elements = [], isMultiSe
                           type="number"
                           className="position-input"
                           value={Math.round(element.x)}
-                          onChange={(e) => applyToAll({ x: parseFloat(e.target.value) || 0 })}
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value);
+                            applyToAll({ x: isNaN(value) ? 0 : value });
+                          }}
                         />
                         <label>X</label>
                       </div>
@@ -97,7 +100,10 @@ export const TextSettings = observer(({ store, element, elements = [], isMultiSe
                           type="number"
                           className="position-input"
                           value={Math.round(element.y)}
-                          onChange={(e) => applyToAll({ y: parseFloat(e.target.value) || 0 })}
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value);
+                            applyToAll({ y: isNaN(value) ? 0 : value });
+                          }}
                         />
                         <label>Y</label>
                       </div>
@@ -113,8 +119,11 @@ export const TextSettings = observer(({ store, element, elements = [], isMultiSe
                   <input
                     type="number"
                     className="position-input"
-                    value={Math.round(element.rotation || 0)}
-                    onChange={(e) => applyToAll({ rotation: parseFloat(e.target.value) || 0 })}
+                    value={Math.round(element.rotation ?? 0)}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      applyToAll({ rotation: isNaN(value) ? 0 : value });
+                    }}
                   />
                   <span style={{ color: 'var(--sidebar-text-muted)', fontSize: '11px' }}>°</span>
                 </div>
@@ -127,8 +136,11 @@ export const TextSettings = observer(({ store, element, elements = [], isMultiSe
                   <input
                     type="number"
                     className="position-input"
-                    value={Math.round(element.fontSize || 16)}
-                    onChange={(e) => applyToAll({ fontSize: parseFloat(e.target.value) || 16 })}
+                    value={Math.round(element.fontSize ?? 16)}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      applyToAll({ fontSize: isNaN(value) ? 16 : value });
+                    }}
                   />
                 </div>
               </div>

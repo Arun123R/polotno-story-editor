@@ -110,7 +110,8 @@ export const MultiSelectSettings = observer(({ store }) => {
                   className="slider-input"
                   value={100}
                   onChange={(e) => {
-                    const opacity = (parseInt(e.target.value) || 0) / 100;
+                    const value = parseInt(e.target.value);
+                    const opacity = (isNaN(value) ? 0 : value) / 100;
                     selectedElements.forEach(el => el.set({ opacity }));
                   }}
                   min={0}

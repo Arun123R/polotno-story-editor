@@ -72,8 +72,9 @@ export const PageSettings = observer(({ store }) => {
                     className="position-input"
                     value={store.width}
                     onChange={(e) => {
+                      const value = parseInt(e.target.value);
                       store.setSize(
-                        parseInt(e.target.value) || 100,
+                        isNaN(value) ? 100 : Math.max(100, value),
                         store.height
                       );
                       setActivePreset(null); // manual size → custom
@@ -87,9 +88,10 @@ export const PageSettings = observer(({ store }) => {
                     className="position-input"
                     value={store.height}
                     onChange={(e) => {
+                      const value = parseInt(e.target.value);
                       store.setSize(
                         store.width,
-                        parseInt(e.target.value) || 100
+                        isNaN(value) ? 100 : Math.max(100, value)
                       );
                       setActivePreset(null); // manual size → custom
                     }}

@@ -69,7 +69,10 @@ export const SvgSettings = observer(({ store, element, elements = [], isMultiSel
                           type="number"
                           className="position-input"
                           value={Math.round(element.x)}
-                          onChange={(e) => applyToAll({ x: parseFloat(e.target.value) || 0 })}
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value);
+                            applyToAll({ x: isNaN(value) ? 0 : value });
+                          }}
                         />
                         <label>X</label>
                       </div>
@@ -78,7 +81,10 @@ export const SvgSettings = observer(({ store, element, elements = [], isMultiSel
                           type="number"
                           className="position-input"
                           value={Math.round(element.y)}
-                          onChange={(e) => applyToAll({ y: parseFloat(e.target.value) || 0 })}
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value);
+                            applyToAll({ y: isNaN(value) ? 0 : value });
+                          }}
                         />
                         <label>Y</label>
                       </div>
@@ -94,8 +100,11 @@ export const SvgSettings = observer(({ store, element, elements = [], isMultiSel
                   <input
                     type="number"
                     className="position-input"
-                    value={Math.round(element.rotation || 0)}
-                    onChange={(e) => applyToAll({ rotation: parseFloat(e.target.value) || 0 })}
+                    value={Math.round(element.rotation ?? 0)}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      applyToAll({ rotation: isNaN(value) ? 0 : value });
+                    }}
                   />
                   <span style={{ color: 'var(--sidebar-text-muted)', fontSize: '11px' }}>°</span>
                 </div>
@@ -135,18 +144,21 @@ export const SvgSettings = observer(({ store, element, elements = [], isMultiSel
                     <input
                       type="number"
                       className="slider-input"
-                      value={Math.round(element.strokeWidth || 0)}
-                      onChange={(e) => applyToAll({ strokeWidth: parseFloat(e.target.value) || 0 })}
+                      value={Math.round(element.strokeWidth ?? 0)}
+                      onChange={(e) => {
+                        const value = parseFloat(e.target.value);
+                        applyToAll({ strokeWidth: isNaN(value) ? 0 : value });
+                      }}
                     />
                     <div className="slider-track">
                       <input
                         type="range"
                         min={0}
                         max={20}
-                        value={element.strokeWidth || 0}
+                        value={element.strokeWidth ?? 0}
                         onChange={(e) => applyToAll({ strokeWidth: parseInt(e.target.value) })}
                       />
-                      <div className="slider-fill" style={{ width: `${((element.strokeWidth || 0) / 20) * 100}%` }}>
+                      <div className="slider-fill" style={{ width: `${((element.strokeWidth ?? 0) / 20) * 100}%` }}>
                         <div className="slider-thumb" />
                       </div>
                     </div>
@@ -155,7 +167,7 @@ export const SvgSettings = observer(({ store, element, elements = [], isMultiSel
               </div>
 
               {/* Border Color */}
-              {(element.strokeWidth || 0) > 0 && (
+              {(element.strokeWidth ?? 0) > 0 && (
                 <div className="control-row">
                   <span className="control-label">Border Color</span>
                   <div className="control-value">
@@ -184,7 +196,10 @@ export const SvgSettings = observer(({ store, element, elements = [], isMultiSel
                       type="number"
                       className="slider-input"
                       value={Math.round((element.opacity ?? 1) * 100)}
-                      onChange={(e) => applyToAll({ opacity: (parseInt(e.target.value) || 0) / 100 })}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value);
+                        applyToAll({ opacity: (isNaN(value) ? 0 : value) / 100 });
+                      }}
                       min={0}
                       max={100}
                     />

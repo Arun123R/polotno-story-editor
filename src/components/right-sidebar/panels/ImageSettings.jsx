@@ -69,7 +69,10 @@ export const ImageSettings = observer(({ store, element, elements = [], isMultiS
                           type="number"
                           className="position-input"
                           value={Math.round(element.x)}
-                          onChange={(e) => applyToAll({ x: parseFloat(e.target.value) || 0 })}
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value);
+                            applyToAll({ x: isNaN(value) ? 0 : value });
+                          }}
                         />
                         <label>X</label>
                       </div>
@@ -78,7 +81,10 @@ export const ImageSettings = observer(({ store, element, elements = [], isMultiS
                           type="number"
                           className="position-input"
                           value={Math.round(element.y)}
-                          onChange={(e) => applyToAll({ y: parseFloat(e.target.value) || 0 })}
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value);
+                            applyToAll({ y: isNaN(value) ? 0 : value });
+                          }}
                         />
                         <label>Y</label>
                       </div>
@@ -94,8 +100,11 @@ export const ImageSettings = observer(({ store, element, elements = [], isMultiS
                   <input
                     type="number"
                     className="position-input"
-                    value={Math.round(element.rotation || 0)}
-                    onChange={(e) => applyToAll({ rotation: parseFloat(e.target.value) || 0 })}
+                    value={Math.round(element.rotation ?? 0)}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      applyToAll({ rotation: isNaN(value) ? 0 : value });
+                    }}
                   />
                   <span style={{ color: 'var(--sidebar-text-muted)', fontSize: '11px' }}>°</span>
                 </div>
@@ -110,7 +119,10 @@ export const ImageSettings = observer(({ store, element, elements = [], isMultiS
                       type="number"
                       className="slider-input"
                       value={Math.round((element.opacity ?? 1) * 100)}
-                      onChange={(e) => applyToAll({ opacity: (parseInt(e.target.value) || 0) / 100 })}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value);
+                        applyToAll({ opacity: (isNaN(value) ? 0 : value) / 100 });
+                      }}
                       min={0}
                       max={100}
                     />
@@ -138,18 +150,21 @@ export const ImageSettings = observer(({ store, element, elements = [], isMultiS
                     <input
                       type="number"
                       className="slider-input"
-                      value={Math.round(element.cornerRadius || 0)}
-                      onChange={(e) => applyToAll({ cornerRadius: parseFloat(e.target.value) || 0 })}
+                      value={Math.round(element.cornerRadius ?? 0)}
+                      onChange={(e) => {
+                        const value = parseFloat(e.target.value);
+                        applyToAll({ cornerRadius: isNaN(value) ? 0 : value });
+                      }}
                     />
                     <div className="slider-track">
                       <input
                         type="range"
                         min={0}
                         max={200}
-                        value={element.cornerRadius || 0}
+                        value={element.cornerRadius ?? 0}
                         onChange={(e) => applyToAll({ cornerRadius: parseInt(e.target.value) })}
                       />
-                      <div className="slider-fill" style={{ width: `${((element.cornerRadius || 0) / 200) * 100}%` }}>
+                      <div className="slider-fill" style={{ width: `${((element.cornerRadius ?? 0) / 200) * 100}%` }}>
                         <div className="slider-thumb" />
                       </div>
                     </div>
@@ -189,7 +204,10 @@ export const ImageSettings = observer(({ store, element, elements = [], isMultiS
                       type="number"
                       className="slider-input"
                       value={Math.round((element.brightness ?? 0) * 100)}
-                      onChange={(e) => applyToAll({ brightness: (parseInt(e.target.value) || 0) / 100 })}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value);
+                        applyToAll({ brightness: (isNaN(value) ? 0 : value) / 100 });
+                      }}
                     />
                     <div className="slider-track">
                       <input
@@ -216,7 +234,10 @@ export const ImageSettings = observer(({ store, element, elements = [], isMultiS
                       type="number"
                       className="slider-input"
                       value={Math.round((element.contrast ?? 0) * 100)}
-                      onChange={(e) => applyToAll({ contrast: (parseInt(e.target.value) || 0) / 100 })}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value);
+                        applyToAll({ contrast: (isNaN(value) ? 0 : value) / 100 });
+                      }}
                     />
                     <div className="slider-track">
                       <input

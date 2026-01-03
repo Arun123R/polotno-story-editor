@@ -136,7 +136,7 @@ export const InteractiveSettings = observer(({ store, element }) => {
       <span className="control-label">{label}</span>
       <input
         type="text"
-        value={value || ''}
+        value={value ?? ''}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         style={{
@@ -156,7 +156,7 @@ export const InteractiveSettings = observer(({ store, element }) => {
     <div className="control-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 6 }}>
       <span className="control-label">{label}</span>
       <textarea
-        value={value || ''}
+        value={value ?? ''}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         rows={3}
@@ -181,8 +181,11 @@ export const InteractiveSettings = observer(({ store, element }) => {
         <input
           type="number"
           className="position-input"
-          value={value || 0}
-          onChange={(e) => onChange(parseInt(e.target.value) || 0)}
+          value={value ?? 0}
+          onChange={(e) => {
+            const numValue = parseInt(e.target.value);
+            onChange(isNaN(numValue) ? 0 : numValue);
+          }}
           min={min}
           max={max}
           style={{ width: 60 }}
@@ -241,7 +244,7 @@ export const InteractiveSettings = observer(({ store, element }) => {
         <div className="select-wrapper" style={{ width: 120 }}>
           <select
             className="select-input"
-            value={value || ''}
+            value={value ?? ''}
             onChange={(e) => onChange(e.target.value)}
           >
             {options.map(opt => (
@@ -278,7 +281,7 @@ export const InteractiveSettings = observer(({ store, element }) => {
             </span>
             <input
               type="text"
-              value={option.text || ''}
+              value={option.text ?? ''}
               onChange={(e) => updateOption(option.id, { text: e.target.value })}
               style={{
                 flex: 1,
@@ -364,7 +367,7 @@ export const InteractiveSettings = observer(({ store, element }) => {
             </button>
             <input
               type="text"
-              value={option.text || ''}
+              value={option.text ?? ''}
               onChange={(e) => updateOption(option.id, { text: e.target.value })}
               style={{
                 flex: 1,
@@ -528,7 +531,7 @@ export const InteractiveSettings = observer(({ store, element }) => {
         <span className="control-label">End Date</span>
         <input
           type="date"
-          value={data.endDate || ''}
+          value={data.endDate ?? ''}
           onChange={(e) => updateData('endDate', e.target.value)}
           style={{
             width: '100%',
@@ -646,7 +649,7 @@ export const InteractiveSettings = observer(({ store, element }) => {
               </div>
               <input
                 type="text"
-                value={option.label || ''}
+                value={option.label ?? ''}
                 onChange={(e) => updateOption(option.id, { label: e.target.value })}
                 placeholder="Label"
                 style={{
@@ -751,8 +754,11 @@ export const InteractiveSettings = observer(({ store, element }) => {
                   <input
                     type="number"
                     className="position-input"
-                    value={Math.round(element.x || 0)}
-                    onChange={(e) => element.set({ x: parseFloat(e.target.value) || 0 })}
+                    value={Math.round(element.x ?? 0)}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      element.set({ x: isNaN(value) ? 0 : value });
+                    }}
                   />
                   <label>X</label>
                 </div>
@@ -760,8 +766,11 @@ export const InteractiveSettings = observer(({ store, element }) => {
                   <input
                     type="number"
                     className="position-input"
-                    value={Math.round(element.y || 0)}
-                    onChange={(e) => element.set({ y: parseFloat(e.target.value) || 0 })}
+                    value={Math.round(element.y ?? 0)}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      element.set({ y: isNaN(value) ? 0 : value });
+                    }}
                   />
                   <label>Y</label>
                 </div>
@@ -777,9 +786,10 @@ export const InteractiveSettings = observer(({ store, element }) => {
                   <input
                     type="number"
                     className="position-input"
-                    value={Math.round(element.width || 0)}
+                    value={Math.round(element.width ?? 0)}
                     onChange={(e) => {
-                      const newWidth = parseFloat(e.target.value) || 100;
+                      const value = parseFloat(e.target.value);
+                      const newWidth = isNaN(value) ? 100 : Math.max(1, value);
                       element.set({ width: newWidth });
                       // Regenerate SVG with new dimensions
                       setTimeout(() => regenerateSVG(data, style), 0);
@@ -791,9 +801,10 @@ export const InteractiveSettings = observer(({ store, element }) => {
                   <input
                     type="number"
                     className="position-input"
-                    value={Math.round(element.height || 0)}
+                    value={Math.round(element.height ?? 0)}
                     onChange={(e) => {
-                      const newHeight = parseFloat(e.target.value) || 100;
+                      const value = parseFloat(e.target.value);
+                      const newHeight = isNaN(value) ? 100 : Math.max(1, value);
                       element.set({ height: newHeight });
                       // Regenerate SVG with new dimensions
                       setTimeout(() => regenerateSVG(data, style), 0);
@@ -811,8 +822,11 @@ export const InteractiveSettings = observer(({ store, element }) => {
               <input
                 type="number"
                 className="position-input"
-                value={Math.round(element.rotation || 0)}
-                onChange={(e) => element.set({ rotation: parseFloat(e.target.value) || 0 })}
+                value={Math.round(element.rotation ?? 0)}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value);
+                  element.set({ rotation: isNaN(value) ? 0 : value });
+                }}
               />
               <span style={{ color: 'var(--sidebar-text-muted)', fontSize: 11 }}>°</span>
             </div>
@@ -826,7 +840,10 @@ export const InteractiveSettings = observer(({ store, element }) => {
                   type="number"
                   className="slider-input"
                   value={Math.round((element.opacity ?? 1) * 100)}
-                  onChange={(e) => element.set({ opacity: (parseInt(e.target.value) || 0) / 100 })}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    element.set({ opacity: (isNaN(value) ? 0 : value) / 100 });
+                  }}
                   min={0}
                   max={100}
                 />
