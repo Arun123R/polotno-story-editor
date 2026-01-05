@@ -301,6 +301,9 @@ export const DurationSection = observer(({ store, element }) => {
   // Ensure we keep the active page selected even if store.currentTime is changed.
   useEffect(() => {
     if (!activePage) return;
+    if (typeof store.checkActivePage === 'function') {
+      store.checkActivePage();
+    }
   }, [store, activePage, store.currentTime]);
 
   // Apply timing visibility for the currently selected element (scoped to right sidebar + selection only).

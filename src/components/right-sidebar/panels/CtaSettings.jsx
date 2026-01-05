@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite';
 import { useState, useRef, useCallback } from 'react';
 import { AnimationSection } from '../shared/CommonControls';
 import { generateCtaSVG, CTA_DEFAULTS } from '../../side-panel/sections/CtaSection';
+import { toCanvas, toExport } from '../../../utils/scale';
 
 /**
  * CTA Settings Panel
@@ -43,11 +44,13 @@ export const CtaSettings = observer(({ store, element }) => {
   // Regenerate SVG when data changes
   const regenerateSVG = useCallback((newCustomData) => {
     if (isSvgElement) {
+      const exportWidth = toExport(element.width);
+      const exportHeight = toExport(element.height);
       const newSrc = generateCtaSVG(
         ctaType, 
         newCustomData, 
-        element.width, 
-        element.height
+        exportWidth, 
+        exportHeight
       );
       element.set({ src: newSrc });
     }
@@ -117,7 +120,8 @@ export const CtaSettings = observer(({ store, element }) => {
     } else if (isTextElement && !isNaN(radius)) {
       element.set({ backgroundCornerRadius: radius });
     } else if (isImageElement && !isNaN(radius)) {
-      element.set({ cornerRadius: radius });
+      // Persist in export-units, apply to canvas props.
+      element.set({ cornerRadius: toCanvas(radius) });
       updateCustomData('borderRadius', radius);
     }
   };
@@ -136,7 +140,8 @@ export const CtaSettings = observer(({ store, element }) => {
     if (isSvgElement) {
       updateCustomData('borderWidth', isNaN(width) ? value : width);
     } else if (isImageElement && !isNaN(width)) {
-      element.set({ strokeWidth: width });
+      // Persist in export-units, apply to canvas props.
+      element.set({ strokeWidth: toCanvas(width) });
       updateCustomData('borderWidth', width);
     }
   };
@@ -436,11 +441,6 @@ export const CtaSettings = observer(({ store, element }) => {
   const getPriceBadgeRadius = () => customData.priceBorderRadius ?? CTA_DEFAULTS[ctaType]?.priceBorderRadius ?? 8;
 
   // Arrow styling (for visit_product - uses arrowButtonIconColor in SVG)
-  const setArrowBgColor = (value) => {
-    updateCustomData('arrowButtonBgColor', value);
-  };
-  const getArrowBgColor = () => customData.arrowButtonBgColor ?? CTA_DEFAULTS[ctaType]?.arrowButtonBgColor ?? 'transparent';
-  
   const setArrowIconColor = (value) => {
     updateCustomData('arrowButtonIconColor', value);
   };

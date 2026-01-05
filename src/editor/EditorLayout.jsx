@@ -6,16 +6,16 @@ import {
 
 export const EditorLayout = ({ sidePanel, toolbar, canvas, footer, rightSidebar }) => {
   return (
-  <div className="h-screen overflow-hidden">
+  <div className="h-screen overflow-hidden flex flex-col">
     {/* TOP TOOLBAR (fixed height) */}
-    <div className=" flex flex-row justify-between">
+    <div className="shrink-0 flex flex-row justify-between">
       <img src="AppStorys_logo_white-Dy7IWqWA.png" alt="AppStorys_logo_white-Dy7IWqWA.png" className="p-2 h-12"></img>
 
       {toolbar}
     </div>
     <PolotnoContainer
       className="w-full overflow-hidden"
-      style={{ display: "flex", height: "100vh" }}
+      style={{ display: "flex", flex: 1, minHeight: 0 }}
     >
       {/* LEFT SIDEBAR */}
       <SidePanelWrap className="shrink-0" style={{ backgroundColor: 'var(--bg-secondary)', borderRight: '1px solid var(--border-primary)' }}>

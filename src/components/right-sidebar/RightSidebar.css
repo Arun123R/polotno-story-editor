@@ -433,16 +433,6 @@
   gap: 6px;
 }
 
-.new-badge {
-  background: var(--sidebar-new-badge);
-  color: white;
-  font-size: 9px;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 4px;
-  text-transform: uppercase;
-}
-
 .duration-controls {
   display: flex;
   align-items: center;
@@ -484,12 +474,51 @@
   height: 4px;
   background: var(--sidebar-input-border);
   border-radius: 2px;
-  overflow: hidden;
+  position: relative;
+  overflow: visible;
+  cursor: pointer;
+  touch-action: none;
 }
 
 .time-slider-fill {
   height: 100%;
   background: var(--sidebar-accent);
+  border-radius: 2px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  z-index: 2;
+}
+
+/* Selected element timing range */
+.time-slider-range {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: var(--sidebar-bg-hover);
+  opacity: 0.7;
+  border-radius: 2px;
+  z-index: 1;
+}
+
+/* Drag handles for element start/end */
+.time-handle {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: var(--sidebar-accent);
+  border: 2px solid var(--sidebar-bg-secondary);
+  cursor: ew-resize;
+  touch-action: none;
+  z-index: 3;
+}
+
+.time-handle:hover {
+  filter: brightness(1.1);
 }
 
 .duration-info {
@@ -680,6 +709,7 @@
   cursor: pointer;
   top: 0;
   left: 0;
+  cursor: pointer;
   right: 0;
   bottom: 0;
   background-color: var(--sidebar-input-border);

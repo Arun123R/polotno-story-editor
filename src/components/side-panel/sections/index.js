@@ -1,3 +1,3 @@
 export { CtaSection } from './CtaSection';
-export { InteractiveSection } from './InteractiveSection';
+export { InteractiveSection } from './InteractiveSectionEntry';
 export { AppsSection } from './AppsSection';

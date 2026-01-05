@@ -1,6 +1,8 @@
 import { observer } from 'mobx-react-lite';
 import { useState, useEffect } from 'react';
 import { DurationSection } from '../shared/CommonControls';
+import { getStorePresetName } from '../../../utils/scale';
+import { setStorePreset } from '../../../store/polotnoStore';
 
 /**
  * Page settings panel (when no element is selected) - Storyly-inspired dark theme
@@ -9,12 +11,11 @@ export const PageSettings = observer(({ store }) => {
   const activePage = store.activePage;
 
   // UI-only preset state (NO store change)
-  const [activePreset, setActivePreset] = useState('story');
+  const [activePreset, setActivePreset] = useState(getStorePresetName(store));
 
-  // Ensure Story is pre-selected on load
+  // Keep UI in sync with store preset.
   useEffect(() => {
-    setActivePreset('story');
-    store.setSize(1080, 1920);
+    setActivePreset(getStorePresetName(store));
   }, [store]);
 
   if (!activePage) return null;
@@ -71,14 +72,7 @@ export const PageSettings = observer(({ store }) => {
                     type="number"
                     className="position-input"
                     value={store.width}
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value);
-                      store.setSize(
-                        isNaN(value) ? 100 : Math.max(100, value),
-                        store.height
-                      );
-                      setActivePreset(null); // manual size → custom
-                    }}
+                    disabled
                   />
                   <label>W</label>
                 </div>
@@ -87,14 +81,7 @@ export const PageSettings = observer(({ store }) => {
                     type="number"
                     className="position-input"
                     value={store.height}
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value);
-                      store.setSize(
-                        store.width,
-                        isNaN(value) ? 100 : Math.max(100, value)
-                      );
-                      setActivePreset(null); // manual size → custom
-                    }}
+                    disabled
                   />
                   <label>H</label>
                 </div>
@@ -113,7 +100,7 @@ export const PageSettings = observer(({ store }) => {
                   }`}
                   onClick={() => {
                     setActivePreset('story');
-                    store.setSize(1080, 1920);
+                    setStorePreset(store, 'story', { rescaleExisting: true });
                   }}
                 >
                   Story
@@ -125,7 +112,7 @@ export const PageSettings = observer(({ store }) => {
                   }`}
                   onClick={() => {
                     setActivePreset('square');
-                    store.setSize(1080, 1080);
+                    setStorePreset(store, 'square', { rescaleExisting: true });
                   }}
                 >
                   Square
@@ -137,7 +124,7 @@ export const PageSettings = observer(({ store }) => {
                   }`}
                   onClick={() => {
                     setActivePreset('wide');
-                    store.setSize(1920, 1080);
+                    setStorePreset(store, 'wide', { rescaleExisting: true });
                   }}
                 >
                   Wide

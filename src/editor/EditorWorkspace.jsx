@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { Workspace } from "polotno/canvas/workspace";
-import { ZoomButtons } from "polotno/toolbar/zoom-buttons";
 import { InteractiveOverlay } from "../components/interactive/InteractiveOverlay";
+import { FitZoomButtons } from './FitZoomButtons';
 
 export const EditorWorkspace = ({ store }) => {
   const containerRef = useRef(null);
@@ -26,7 +26,7 @@ export const EditorWorkspace = ({ store }) => {
           or using the preview mode. */}
       {/* <InteractiveOverlay store={store} containerRef={containerRef} /> */}
       
-      <ZoomButtons store={store} />
+      <FitZoomButtons store={store} />
     </div>
   );
 };

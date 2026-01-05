@@ -1,6 +1,12 @@
 import React, { useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 import { SectionTab } from 'polotno/side-panel';
+import {
+  BASELINE_EXPORT,
+  getStoreExportScale,
+  getStoreExportSize,
+  toCanvas,
+} from '../../../utils/scale';
 
 // CTA Icon for tab
 const CtaIcon = () => (
@@ -826,6 +832,31 @@ export const CtaSectionPanel = observer(({ store }) => {
   const imageInputRef = useRef(null);
   const productImageInputRef = useRef(null);
 
+  const mapBaselineExportToCurrent = (rectOrPoint) => {
+    const exportSize = getStoreExportSize(store);
+    const sx = exportSize.width / BASELINE_EXPORT.width;
+    const sy = exportSize.height / BASELINE_EXPORT.height;
+
+    if (!rectOrPoint) return rectOrPoint;
+    const out = { ...rectOrPoint };
+    if (typeof out.x === 'number') out.x = out.x * sx;
+    if (typeof out.y === 'number') out.y = out.y * sy;
+    if (typeof out.width === 'number') out.width = out.width * sx;
+    if (typeof out.height === 'number') out.height = out.height * sy;
+    return out;
+  };
+
+  const toCanvasRect = (exportRect) => {
+    const exportScale = getStoreExportScale(store);
+    return {
+      ...exportRect,
+      x: toCanvas(exportRect.x, exportScale),
+      y: toCanvas(exportRect.y, exportScale),
+      width: toCanvas(exportRect.width, exportScale),
+      height: toCanvas(exportRect.height, exportScale),
+    };
+  };
+
   // Add Classic CTA element using SVG for proper height control
   const addClassicCta = () => {
     const page = store.activePage;
@@ -835,14 +866,18 @@ export const CtaSectionPanel = observer(({ store }) => {
     const pos = CTA_POSITIONS.classic;
     const defaults = CTA_DEFAULTS.classic;
 
+    const exportDims = mapBaselineExportToCurrent(dims);
+    const exportPos = mapBaselineExportToCurrent(pos);
+    const canvasRect = toCanvasRect({ ...exportPos, ...exportDims });
+
     const svgContent = generateCtaSVG('classic', defaults, dims.width, dims.height);
 
     const element = page.addElement({
       type: 'svg',
-      x: pos.x,
-      y: pos.y,
-      width: dims.width,
-      height: dims.height,
+      x: canvasRect.x,
+      y: canvasRect.y,
+      width: canvasRect.width,
+      height: canvasRect.height,
       src: svgContent,
       keepRatio: false,
       custom: {
@@ -863,14 +898,18 @@ export const CtaSectionPanel = observer(({ store }) => {
     const pos = CTA_POSITIONS.swipe_up;
     const defaults = CTA_DEFAULTS.swipe_up;
 
+    const exportDims = mapBaselineExportToCurrent(dims);
+    const exportPos = mapBaselineExportToCurrent(pos);
+    const canvasRect = toCanvasRect({ ...exportPos, ...exportDims });
+
     const svgContent = generateCtaSVG('swipe_up', defaults, dims.width, dims.height);
 
     const element = page.addElement({
       type: 'svg',
-      x: pos.x,
-      y: pos.y,
-      width: dims.width,
-      height: dims.height,
+      x: canvasRect.x,
+      y: canvasRect.y,
+      width: canvasRect.width,
+      height: canvasRect.height,
       src: svgContent,
       keepRatio: false,
       custom: {
@@ -893,18 +932,22 @@ export const CtaSectionPanel = observer(({ store }) => {
     const dims = CTA_DIMENSIONS.image;
     const pos = CTA_POSITIONS.image;
 
+    const exportDims = mapBaselineExportToCurrent(dims);
+    const exportPos = mapBaselineExportToCurrent(pos);
+    const canvasRect = toCanvasRect({ ...exportPos, ...exportDims });
+
     // Create object URL for the image
     const imageUrl = URL.createObjectURL(file);
 
     const element = page.addElement({
       type: 'image',
-      x: pos.x,
-      y: pos.y,
-      width: dims.width,
-      height: dims.height,
+      x: canvasRect.x,
+      y: canvasRect.y,
+      width: canvasRect.width,
+      height: canvasRect.height,
       src: imageUrl,
-      cornerRadius: CTA_DEFAULTS.image.borderRadius || 12,
-      strokeWidth: CTA_DEFAULTS.image.borderWidth || 0,
+      cornerRadius: toCanvas(CTA_DEFAULTS.image.borderRadius || 12, getStoreExportScale(store)),
+      strokeWidth: toCanvas(CTA_DEFAULTS.image.borderWidth || 0, getStoreExportScale(store)),
       stroke: CTA_DEFAULTS.image.borderColor || '#ffffff',
       custom: {
         ctaType: 'image',
@@ -933,6 +976,10 @@ export const CtaSectionPanel = observer(({ store }) => {
     const pos = CTA_POSITIONS.product_card;
     const defaults = CTA_DEFAULTS.product_card;
 
+    const exportDims = mapBaselineExportToCurrent(dims);
+    const exportPos = mapBaselineExportToCurrent(pos);
+    const canvasRect = toCanvasRect({ ...exportPos, ...exportDims });
+
     // Create object URL for the image
     const imageUrl = URL.createObjectURL(file);
 
@@ -940,10 +987,10 @@ export const CtaSectionPanel = observer(({ store }) => {
 
     const element = page.addElement({
       type: 'svg',
-      x: pos.x,
-      y: pos.y,
-      width: dims.width,
-      height: dims.height,
+      x: canvasRect.x,
+      y: canvasRect.y,
+      width: canvasRect.width,
+      height: canvasRect.height,
       src: svgContent,
       keepRatio: false,
       custom: {
@@ -966,14 +1013,18 @@ export const CtaSectionPanel = observer(({ store }) => {
     const pos = CTA_POSITIONS.product_card;
     const defaults = CTA_DEFAULTS.product_card;
 
+    const exportDims = mapBaselineExportToCurrent(dims);
+    const exportPos = mapBaselineExportToCurrent(pos);
+    const canvasRect = toCanvasRect({ ...exportPos, ...exportDims });
+
     const svgContent = generateCtaSVG('product_card', defaults, dims.width, dims.height);
 
     const element = page.addElement({
       type: 'svg',
-      x: pos.x,
-      y: pos.y,
-      width: dims.width,
-      height: dims.height,
+      x: canvasRect.x,
+      y: canvasRect.y,
+      width: canvasRect.width,
+      height: canvasRect.height,
       src: svgContent,
       keepRatio: false,
       custom: {
@@ -994,14 +1045,18 @@ export const CtaSectionPanel = observer(({ store }) => {
     const pos = CTA_POSITIONS.visit_product;
     const defaults = CTA_DEFAULTS.visit_product;
 
+    const exportDims = mapBaselineExportToCurrent(dims);
+    const exportPos = mapBaselineExportToCurrent(pos);
+    const canvasRect = toCanvasRect({ ...exportPos, ...exportDims });
+
     const svgContent = generateCtaSVG('visit_product', defaults, dims.width, dims.height);
 
     const element = page.addElement({
       type: 'svg',
-      x: pos.x,
-      y: pos.y,
-      width: dims.width,
-      height: dims.height,
+      x: canvasRect.x,
+      y: canvasRect.y,
+      width: canvasRect.width,
+      height: canvasRect.height,
       src: svgContent,
       keepRatio: false,
       custom: {
@@ -1022,14 +1077,18 @@ export const CtaSectionPanel = observer(({ store }) => {
     const pos = CTA_POSITIONS.describe_product;
     const defaults = CTA_DEFAULTS.describe_product;
 
+    const exportDims = mapBaselineExportToCurrent(dims);
+    const exportPos = mapBaselineExportToCurrent(pos);
+    const canvasRect = toCanvasRect({ ...exportPos, ...exportDims });
+
     const svgContent = generateCtaSVG('describe_product', defaults, dims.width, dims.height);
 
     const element = page.addElement({
       type: 'svg',
-      x: pos.x,
-      y: pos.y,
-      width: dims.width,
-      height: dims.height,
+      x: canvasRect.x,
+      y: canvasRect.y,
+      width: canvasRect.width,
+      height: canvasRect.height,
       src: svgContent,
       keepRatio: false,
       custom: {
@@ -1050,14 +1109,18 @@ export const CtaSectionPanel = observer(({ store }) => {
     const pos = CTA_POSITIONS.buy_product;
     const defaults = CTA_DEFAULTS.buy_product;
 
+    const exportDims = mapBaselineExportToCurrent(dims);
+    const exportPos = mapBaselineExportToCurrent(pos);
+    const canvasRect = toCanvasRect({ ...exportPos, ...exportDims });
+
     const svgContent = generateCtaSVG('buy_product', defaults, dims.width, dims.height);
 
     const element = page.addElement({
       type: 'svg',
-      x: pos.x,
-      y: pos.y,
-      width: dims.width,
-      height: dims.height,
+      x: canvasRect.x,
+      y: canvasRect.y,
+      width: canvasRect.width,
+      height: canvasRect.height,
       src: svgContent,
       keepRatio: false,
       custom: {
