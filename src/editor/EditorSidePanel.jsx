@@ -2,12 +2,13 @@ import { SidePanel } from 'polotno/side-panel';
 // Import default Polotno sections
 import {
   TextSection,
-  TemplatesSection,
   ElementsSection,
   UploadSection,
   BackgroundSection,
   SizeSection,
 } from 'polotno/side-panel';
+
+import { TemplatesSection } from '../components/side-panel/sections/TemplatesSection';
 
 // Import custom sections
 import { CtaSection } from '../components/side-panel/sections/CtaSection';

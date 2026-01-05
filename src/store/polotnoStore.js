@@ -1,15 +1,16 @@
 import { createStore } from 'polotno/model/store';
 // import { setAnimationsEnabled } from 'polotno/config';
 
+import { reaction } from 'mobx';
+
 import {
   DEFAULT_PRESET,
   getPreset,
   getPresetScale,
-  getStoreExportScale,
   getStorePresetName,
   getStoreWorkingSize,
 } from '../utils/scale';
-import { detectTemplatePreset, normalizeTemplateDesign } from '../utils/normalizeTemplate';
+import { detectPresetFromDimensions, getStoreExportScale } from '../utils/scale';
 
 export const store = createStore({
   key: 'TXsh4gxnlODn4eJrqeDi',
@@ -141,11 +142,21 @@ export const setStorePreset = (targetStore, presetName, options = {}) => {
   const rescaleExisting = options.rescaleExisting !== false;
 
   const currentPreset = getStorePresetName(targetStore);
-  const currentWorking = getStoreWorkingSize(targetStore);
 
-  if (rescaleExisting && (currentWorking.width !== preset.working.width || currentWorking.height !== preset.working.height)) {
+  // Important: after loading an export-sized template, the actual store canvas can be in export units
+  // even if preset metadata is still the same. Base rescaling on the real canvas size, not just metadata.
+  const currentCanvasW = Number(targetStore?.width);
+  const currentCanvasH = Number(targetStore?.height);
+  const needsCanvasResize =
+    Number.isFinite(currentCanvasW) &&
+    Number.isFinite(currentCanvasH) &&
+    (currentCanvasW !== preset.working.width || currentCanvasH !== preset.working.height);
+
+  const currentWorking = getStoreWorkingSize(targetStore);
+  const needsPresetResize = currentWorking.width !== preset.working.width || currentWorking.height !== preset.working.height;
+
+  if (rescaleExisting && (needsCanvasResize || needsPresetResize)) {
     // Rescale existing elements to fit+center into the new working canvas.
-    // Use store instance captured above (same singleton passed through app).
     rescaleAllPagesToNewCanvas(preset.working.width, preset.working.height);
   }
 
@@ -184,37 +195,13 @@ setStorePreset(store, DEFAULT_PRESET, { rescaleExisting: false });
 
 store.addPage();
 
-// Default exports to preset export size (pixelRatio=exportScale) unless caller overrides.
-const originalToDataURL = store.toDataURL?.bind(store);
-if (typeof originalToDataURL === 'function') {
-  store.toDataURL = (options = {}) => {
-    const pixelRatio = options.pixelRatio ?? getStoreExportScale(store);
-    return originalToDataURL({ ...options, pixelRatio });
-  };
-}
+// NOTE: Do not monkey-patch store methods (toDataURL/saveAsImage/loadJSON/deleteElements).
+// Some deployment environments / Polotno builds may not support overriding store instance methods.
+// Instead, we use MobX reactions for post-load normalization and duration recomputation.
 
-const originalSaveAsImage = store.saveAsImage?.bind(store);
-if (typeof originalSaveAsImage === 'function') {
-  store.saveAsImage = (options = {}) => {
-    const pixelRatio = options.pixelRatio ?? getStoreExportScale(store);
-    return originalSaveAsImage({ ...options, pixelRatio });
-  };
-}
-
-// Normalize incoming templates/designs into the current preset’s working canvas.
-const originalLoadJSON = store.loadJSON?.bind(store);
-if (typeof originalLoadJSON === 'function') {
-  store.loadJSON = (json, keepHistory = false) => {
-    const detected = detectTemplatePreset(json);
-    if (detected?.preset) {
-      // Switch canvas preset to match incoming design.
-      setStorePreset(store, detected.preset, { rescaleExisting: false });
-    }
-
-    const normalized = normalizeTemplateDesign(json, { preset: detected?.preset });
-    return originalLoadJSON(normalized, keepHistory);
-  };
-}
+export const getDefaultExportPixelRatio = (targetStore = store) => {
+  return getStoreExportScale(targetStore);
+};
 
 // setAnimationsEnabled(true);
 // NOTE: Do not auto-start playback on init.
@@ -282,20 +269,44 @@ const recomputeActivePageDuration = () => {
   }
 };
 
-const originalDeleteElements = store.deleteElements?.bind(store);
-if (typeof originalDeleteElements === 'function') {
-  store.deleteElements = (ids) => {
-    const result = originalDeleteElements(ids);
+// 1) Normalize templates loaded at export size back into working size.
+reaction(
+  () => {
+    const w = Number(store.width);
+    const h = Number(store.height);
+    return Number.isFinite(w) && Number.isFinite(h) ? `${w}x${h}` : 'unknown';
+  },
+  () => {
+    try {
+      const detected = detectPresetFromDimensions(store.width, store.height);
+      if (detected?.space !== 'export' || !detected?.preset) return;
 
-    // Let Polotno/MobX settle the deletion first.
-    queueMicrotask(() => {
-      try {
-        recomputeActivePageDuration();
-      } catch {
-        // ignore: never block deletion UX
-      }
-    });
+      // Loaded design is in export units. Switch to its preset and rescale down to working size.
+      setStorePreset(store, detected.preset, { rescaleExisting: true });
+    } catch {
+      // Never block UI.
+    }
+  }
+);
 
-    return result;
-  };
-}
+// 2) Recompute page duration when timed media is added/removed/changed.
+reaction(
+  () => {
+    const page = store.activePage;
+    if (!page) return 'no-page';
+
+    const children = Array.isArray(page.children) ? page.children : [];
+    // Track only timed media and their durations.
+    return children
+      .filter((el) => el?.type === 'video' || el?.type === 'audio')
+      .map((el) => `${el.id}:${el.type}:${getElementMediaDurationMs(el) ?? ''}`)
+      .join('|');
+  },
+  () => {
+    try {
+      recomputeActivePageDuration();
+    } catch {
+      // ignore
+    }
+  }
+);

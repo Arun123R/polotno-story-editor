@@ -12,7 +12,9 @@
   "dependencies": {
     "@blueprintjs/core": "^6.4.1",
     "@tailwindcss/vite": "^4.1.18",
+    "mobx": "^6.15.0",
     "mobx-react-lite": "^4.1.1",
+    "nanoid": "^5.0.9",
     "polotno": "^2.34.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

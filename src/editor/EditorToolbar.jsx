@@ -1,5 +1,17 @@
 import { Toolbar } from 'polotno/toolbar/toolbar';
 
+import React from 'react';
+import { observer } from 'mobx-react-lite';
+import { Button, Menu, MenuItem, Popover, Position } from '@blueprintjs/core';
+import { Document, Import, Media, Video } from '@blueprintjs/icons';
+import { t } from 'polotno/utils/l10n';
+import { downloadFile } from 'polotno/utils/download';
+import { getAPI } from 'polotno/utils/api';
+import { getKey } from 'polotno/utils/validate-key';
+import { flags } from 'polotno/utils/flags';
+
+import { getDefaultExportPixelRatio } from '../store/polotnoStore';
+
 // Null component to disable toolbar controls
 const None = () => null;
 
@@ -65,6 +77,111 @@ const toolbarComponents = {
   Remove: None,
 
   // History (Undo/Redo) - NOT overridden, keeps default behavior
+
+  // Download - override to ensure correct export pixelRatio without store monkey-patching.
+  DownloadButton: observer(({ store }) => {
+    const [loading, setLoading] = React.useState(false);
+
+    const baseName = React.useMemo(() => {
+      try {
+        const tokens = [];
+        store.pages.forEach((p) => {
+          (p.children || []).forEach((el) => {
+            if (el?.type === 'text' && typeof el.text === 'string') tokens.push(el.text);
+          });
+        });
+        const name = tokens
+          .join(' ')
+          .split(/\s+/)
+          .filter(Boolean)
+          .slice(0, 6)
+          .join(' ')
+          .replace(/\s/g, '-')
+          .toLowerCase();
+        return name || 'polotno';
+      } catch {
+        return 'polotno';
+      }
+    }, [store]);
+
+    const onSaveAsImage = () => {
+      const pixelRatio = getDefaultExportPixelRatio(store);
+      store.pages.forEach((p, idx) => {
+        const suffix = store.pages.length > 1 ? `-${idx + 1}` : '';
+        store.saveAsImage({ pageId: p.id, fileName: `${baseName}${suffix}.png`, pixelRatio });
+      });
+    };
+
+    const onSaveAsPDF = async () => {
+      setLoading(true);
+      try {
+        await store.saveAsPDF({ fileName: `${baseName}.pdf` });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const onSaveAsVideo = async () => {
+      setLoading(true);
+      try {
+        const design = store.toJSON();
+        const api = getAPI();
+        const key = getKey();
+
+        const createRes = await fetch(`${api}/renders?KEY=${key}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ design, pixelRatio: 1, format: 'mp4' }),
+        });
+        const created = await createRes.json();
+        const renderId = created?.id;
+        if (!renderId) throw new Error('Failed to start render');
+
+        // Poll render status.
+        // Keep it simple (same cadence as Polotno default behavior).
+        while (true) {
+          const statusRes = await fetch(`${api}/renders/${renderId}?KEY=${key}`);
+          const status = await statusRes.json();
+          if (status?.status === 'done') {
+            downloadFile(status.output, `${baseName}.mp4`);
+            break;
+          }
+          if (status?.status === 'error') {
+            throw new Error('Failed to render video');
+          }
+          // Wait a bit before next poll.
+          await new Promise((r) => setTimeout(r, 5000));
+        }
+      } catch (e) {
+        // Keep same UX as Polotno: log + alert.
+        console.error('Video export failed:', e);
+        alert('Failed to export video. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    return (
+      <Popover
+        position={Position.BOTTOM}
+        content={
+          <Menu>
+            <MenuItem icon={<Media />} text={t('toolbar.saveAsImage')} onClick={onSaveAsImage} />
+            <MenuItem icon={<Document />} text={t('toolbar.saveAsPDF')} onClick={onSaveAsPDF} />
+            {flags.animationsEnabled ? <MenuItem icon={<Video />} text="Save as Video" onClick={onSaveAsVideo} /> : null}
+          </Menu>
+        }
+      >
+        <Button
+          icon={<Import />}
+          className="polotno-download-button"
+          text={t('toolbar.download')}
+          minimal
+          loading={loading}
+        />
+      </Popover>
+    );
+  }),
 };
 
 export const EditorToolbar = ({ store }) => {
