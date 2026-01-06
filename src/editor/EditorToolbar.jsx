@@ -186,7 +186,7 @@ const toolbarComponents = {
 
 export const EditorToolbar = ({ store }) => {
   return (
-    <div style={{ backgroundColor: 'var(--bg-secondary)', borderBottom: '1px solid var(--border-primary)' }}>
+    <div style={{ backgroundColor: 'transparent', borderBottom: 'none' }}>
       <Toolbar store={store} components={toolbarComponents} />
     </div>
   );

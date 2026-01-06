@@ -4,14 +4,19 @@ import {
   WorkspaceWrap,
 } from "polotno";
 
+import { ThemeToggleButton } from './ThemeToggleButton';
+
 export const EditorLayout = ({ sidePanel, toolbar, canvas, footer, rightSidebar }) => {
   return (
-  <div className="h-screen overflow-hidden flex flex-col">
+  <div className="h-screen overflow-hidden flex flex-col appstorys-editor">
     {/* TOP TOOLBAR (fixed height) */}
-    <div className="shrink-0 flex flex-row justify-between">
-      <img src="AppStorys_logo_white-Dy7IWqWA.png" alt="AppStorys_logo_white-Dy7IWqWA.png" className="p-2 h-12"></img>
+    <div className="shrink-0 flex flex-row items-center justify-between appstorys-header">
+      <img src="AppStorys_logo_white-Dy7IWqWA.png" alt="AppStorys" className="p-2 h-12 appstorys-logo"></img>
 
-      {toolbar}
+      <div className="flex flex-row items-center gap-2 pr-2">
+        <ThemeToggleButton />
+        {toolbar}
+      </div>
     </div>
     <PolotnoContainer
       className="w-full overflow-hidden"

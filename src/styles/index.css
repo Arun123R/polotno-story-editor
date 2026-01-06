@@ -1,71 +1,99 @@
 @import "tailwindcss";
 
 /* ===================================
-   DARK THEME - AppStorys Brand Design
+   APPSTORYS THEME TOKENS (Light + Dark)
    =================================== */
 
-/* CSS Variables - Dark Theme with AppStorys Orange */
-:root {
-    /* Primary background colors - Dark Theme */
-    --bg-primary: #1a1a2e;
-    --bg-secondary: #16213e;
-    --bg-tertiary: #0f0f23;
-    --bg-elevated: #252547;
-    --bg-hover: #2a2a4a;
+/* Default theme: Dark (AppStorys-style blue-tinted dark) */
+:root,
+:root[data-theme="dark"] {
+    color-scheme: dark;
 
-    /* Surface colors */
-    --surface-dark: #1e1e3f;
-    --surface-light: #2d2d5a;
+    /* Brand Accent */
+    --accent-primary: #FF7A1A;
+    --accent-hover: #F1680D;
+    --accent-soft: rgba(255, 122, 26, 0.14);
 
-    /* Border colors */
-    --border-primary: #3d3d6b;
-    --border-secondary: #2a2a4f;
-    --border-accent: #4a4a7f;
+    /* AppStorys Dark Theme */
+    --bg-primary: #0E1626;   /* App background */
+    --bg-secondary: #141C2F; /* Panel background */
+    --bg-elevated: #1A2340;  /* Secondary panel BG */
+    --bg-tertiary: #1A1A2E;  /* Canvas background */
+    --bg-hover: #1A2340;
 
-    /* Text colors */
-    --text-primary: #ffffff;
-    --text-secondary: #b8b8d0;
-    --text-muted: #7a7a9a;
-    --text-disabled: #5a5a7a;
+    --border-primary: #25304A;
+    --border-secondary: #25304A;
 
-    /* AppStorys Orange Gradient Theme */
-    --accent-primary: #F97316;
-    /* Main AppStorys orange */
-    --accent-secondary: #EA580C;
-    /* Darker orange */
-    --accent-hover: #FB923C;
-    /* Lighter orange on hover */
-    --accent-light: #FDBA74;
-    /* Light orange for subtle highlights */
-    --accent-dark: #C2410C;
-    /* Deep orange */
+    --text-primary: #E5E7EB;
+    --text-secondary: #9CA3AF;
+    --text-muted: #6B7280;
+    --text-disabled: #6B7280;
 
-    /* Orange gradient */
-    --gradient-primary: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
-    --gradient-hover: linear-gradient(135deg, #FB923C 0%, #F97316 100%);
-    --gradient-subtle: linear-gradient(135deg, rgba(249, 115, 22, 0.2) 0%, rgba(234, 88, 12, 0.1) 100%);
+    /* Keep legacy vars but no gradients/glow */
+    --accent-subtle: rgba(255, 122, 26, 0.14);
+    --accent-glow: rgba(255, 122, 26, 0.0);
+    --gradient-primary: var(--accent-primary);
+    --gradient-hover: var(--accent-hover);
+    --gradient-subtle: var(--accent-soft);
 
-    /* Subtle orange for backgrounds */
-    --accent-subtle: rgba(249, 115, 22, 0.15);
-    --accent-glow: rgba(249, 115, 22, 0.4);
-
-    /* Status colors */
+    /* Status */
     --success: #10b981;
     --warning: #f59e0b;
     --danger: #ef4444;
     --info: #3b82f6;
 
-    /* Input colors */
-    --input-bg: #252547;
-    --input-border: #3d3d6b;
-    --input-focus: #F97316;
+    /* Inputs */
+    --input-bg: #141C2F;
+    --input-border: #2E3A59;
+    --input-focus: #FF7A1A;
 
-    /* Shadow */
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
-    --shadow-accent: 0 0 0 3px rgba(249, 115, 22, 0.3);
-    --shadow-glow: 0 0 20px rgba(249, 115, 22, 0.3);
+    /* Shadows (subtle) */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.20);
+    --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.25);
+    --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.30);
+    --shadow-accent: none;
+    --shadow-glow: none;
+}
+
+:root[data-theme="light"] {
+    color-scheme: light;
+
+    /* Brand Accent */
+    --accent-primary: #FF7A1A;
+    --accent-hover: #F1680D;
+    --accent-soft: #FFF3E8;
+
+    /* AppStorys Light Theme */
+    --bg-primary: #F8F9FB;   /* App background */
+    --bg-secondary: #FFFFFF; /* Panel background */
+    --bg-elevated: #F3F4F6;  /* Secondary panel BG */
+    --bg-tertiary: #F0F2F5;  /* Canvas background */
+    --bg-hover: #F3F4F6;
+
+    --border-primary: #E5E7EB;
+    --border-secondary: #E5E7EB;
+
+    --text-primary: #1F2937;
+    --text-secondary: #6B7280;
+    --text-muted: #9CA3AF;
+    --text-disabled: #9CA3AF;
+
+    /* Keep legacy vars but no gradients/glow */
+    --accent-subtle: rgba(255, 122, 26, 0.12);
+    --accent-glow: rgba(255, 122, 26, 0.0);
+    --gradient-primary: var(--accent-primary);
+    --gradient-hover: var(--accent-hover);
+    --gradient-subtle: var(--accent-soft);
+
+    --input-bg: #FFFFFF;
+    --input-border: #D1D5DB;
+    --input-focus: #FF7A1A;
+
+    --shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.06);
+    --shadow-md: 0 6px 16px rgba(17, 24, 39, 0.08);
+    --shadow-lg: 0 10px 24px rgba(17, 24, 39, 0.10);
+    --shadow-accent: none;
+    --shadow-glow: none;
 }
 
 /* Global Reset for Dark Theme */
@@ -82,6 +110,50 @@ body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+.appstorys-editor {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* Header + theme toggle (UI only) */
+.appstorys-header {
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.appstorys-theme-toggle {
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-primary);
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.appstorys-theme-toggle:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.appstorys-theme-toggle:focus-visible {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+.appstorys-logo {
+    /* Render PNG sharp and keep original pixels/colors */
+    filter: none;
+    height: 48px;
+    width: auto;
+    display: block;
+    object-fit: contain;
+    image-rendering: auto;
 }
 
 /* ===================================
@@ -135,8 +207,8 @@ body {
 .go2556403498[aria-selected="true"],
 .bp5-tab[aria-selected="true"],
 .bp5-tab.bp5-selected {
-    background-color: var(--accent-subtle) !important;
-    color: var(--accent-primary) !important;
+    background-color: transparent !important;
+    color: var(--text-primary) !important;
     border-left: 3px solid var(--accent-primary) !important;
 }
 
@@ -189,35 +261,66 @@ body {
 .polotno-toolbar .bp5-button {
     background-color: transparent !important;
     color: var(--text-secondary) !important;
-    border: none !important;
+    border: 1px solid transparent !important;
+    box-shadow: none !important;
 }
 
 .polotno-toolbar button:hover,
 .polotno-toolbar .bp5-button:hover {
     background-color: var(--bg-hover) !important;
     color: var(--text-primary) !important;
+    border-color: var(--border-primary) !important;
 }
 
 .polotno-toolbar button:active,
 .polotno-toolbar .bp5-button:active,
 .polotno-toolbar .bp5-button.bp5-active {
-    background: var(--gradient-primary) !important;
+    background-color: var(--bg-hover) !important;
     color: var(--text-primary) !important;
+    border-color: var(--border-primary) !important;
+}
+
+/* Keep only the primary action button orange */
+.polotno-toolbar .polotno-download-button.bp5-button {
+    background: var(--accent-primary) !important;
+    color: #FFFFFF !important;
+    border: 1px solid var(--accent-primary) !important;
+}
+
+.polotno-toolbar .polotno-download-button.bp5-button:hover {
+    background: var(--accent-hover) !important;
+    border-color: var(--accent-hover) !important;
+}
+
+.polotno-toolbar .polotno-download-button.bp5-button:active,
+.polotno-toolbar .polotno-download-button.bp5-button.bp5-active {
+    background: var(--accent-hover) !important;
+    border-color: var(--accent-hover) !important;
 }
 
 /* ===================================
-   WORKSPACE (CANVAS AREA) - DARK THEME
+   WORKSPACE (CANVAS AREA) - THEME AWARE
    =================================== */
+
+/* Workspace backdrop - this is the actual visible background */
+.workspace-backdrop {
+    background-color: var(--bg-tertiary) !important;
+}
 
 .polotno-workspace,
 .go3742766498,
 .go3845422651 {
-    background-color: var(--bg-tertiary) !important;
+    background-color: transparent !important;
 }
 
-/* Canvas background */
+/* Canvas background - make transparent so wrapper shows */
 .polotno-canvas-container {
-    background-color: var(--bg-tertiary) !important;
+    background-color: transparent !important;
+}
+
+/* Konva container - force transparent */
+.konvajs-content {
+    background-color: transparent !important;
 }
 
 /* Zoom buttons */
@@ -310,7 +413,7 @@ input[type="search"] {
 input[type="search"]:focus {
     border-color: var(--input-focus) !important;
     outline: none !important;
-    box-shadow: var(--shadow-accent) !important;
+    box-shadow: none !important;
 }
 
 /* Fix search icon and text overlap */
@@ -338,7 +441,7 @@ input[type="search"]:focus {
 
 /* Buttons */
 .bp5-button {
-    background-color: var(--bg-elevated) !important;
+    background-color: transparent !important;
     color: var(--text-secondary) !important;
     border: 1px solid var(--border-primary) !important;
     box-shadow: none !important;
@@ -350,15 +453,34 @@ input[type="search"]:focus {
 }
 
 .bp5-button.bp5-intent-primary {
-    background: var(--gradient-primary) !important;
-    color: white !important;
-    border: none !important;
-    font-weight: 500 !important;
+    background: var(--accent-primary) !important;
+    color: #FFFFFF !important;
+    border: 1px solid var(--accent-primary) !important;
+    font-weight: 600 !important;
 }
 
 .bp5-button.bp5-intent-primary:hover {
-    background: var(--gradient-hover) !important;
+    background: var(--accent-hover) !important;
+    border-color: var(--accent-hover) !important;
     box-shadow: var(--shadow-glow) !important;
+}
+
+/* Primary toolbar action (Download) */
+.polotno-download-button.bp5-button {
+    background: var(--accent-primary) !important;
+    color: #FFFFFF !important;
+    border: 1px solid var(--accent-primary) !important;
+    font-weight: 600 !important;
+}
+
+.polotno-download-button.bp5-button:hover {
+    background: var(--accent-hover) !important;
+    border-color: var(--accent-hover) !important;
+}
+
+.polotno-download-button.bp5-button.bp5-minimal {
+    background: var(--accent-primary) !important;
+    border: 1px solid var(--accent-primary) !important;
 }
 
 .bp5-button.bp5-minimal {
@@ -382,7 +504,7 @@ input[type="search"]:focus {
 .bp5-input:focus,
 .bp5-input-group .bp5-input:focus {
     border-color: var(--input-focus) !important;
-    box-shadow: var(--shadow-accent) !important;
+    box-shadow: none !important;
 }
 
 .bp5-input::placeholder {
@@ -414,7 +536,7 @@ input[type="search"]:focus {
 }
 
 .bp5-slider-progress {
-    background: var(--gradient-primary) !important;
+    background: var(--accent-primary) !important;
 }
 
 .bp5-slider-handle {
@@ -437,7 +559,7 @@ input[type="search"]:focus {
 }
 
 .bp5-switch input:checked~.bp5-control-indicator {
-    background: var(--gradient-primary) !important;
+    background: var(--accent-primary) !important;
 }
 
 /* Checkboxes */
@@ -447,7 +569,7 @@ input[type="search"]:focus {
 }
 
 .bp5-checkbox input:checked~.bp5-control-indicator {
-    background: var(--gradient-primary) !important;
+    background: var(--accent-primary) !important;
     border-color: var(--accent-primary) !important;
 }
 
@@ -458,7 +580,7 @@ input[type="search"]:focus {
 }
 
 .bp5-radio input:checked~.bp5-control-indicator {
-    background: var(--gradient-primary) !important;
+    background: var(--accent-primary) !important;
     border-color: var(--accent-primary) !important;
 }
 
@@ -490,8 +612,8 @@ input[type="search"]:focus {
 
 .bp5-menu-item.bp5-active,
 .bp5-menu-item.bp5-selected {
-    background: var(--gradient-primary) !important;
-    color: white !important;
+    background: var(--accent-soft) !important;
+    color: var(--accent-primary) !important;
 }
 
 /* Dialogs/Modals */
@@ -544,11 +666,11 @@ input[type="search"]:focus {
 
 .bp5-tab[aria-selected="true"],
 .bp5-tab.bp5-selected {
-    color: var(--accent-primary) !important;
+    color: var(--text-primary) !important;
 }
 
 .bp5-tab-indicator {
-    background: var(--gradient-primary) !important;
+    background: var(--accent-primary) !important;
 }
 
 /* Cards */
@@ -571,7 +693,7 @@ input[type="search"]:focus {
 }
 
 .bp5-tag.bp5-intent-primary {
-    background: var(--gradient-primary) !important;
+    background: var(--accent-primary) !important;
     color: white !important;
 }
 
@@ -647,8 +769,8 @@ input[type="search"]:focus {
 .polotno-template-item:hover,
 .polotno-element-item:hover {
     border-color: var(--accent-primary) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: var(--shadow-glow) !important;
+    transform: none !important;
+    box-shadow: var(--shadow-sm) !important;
 }
 
 /* ===================================
@@ -664,7 +786,7 @@ input[type="search"]:focus {
 }
 
 .bp5-progress-bar .bp5-progress-meter {
-    background: var(--gradient-primary) !important;
+    background: var(--accent-primary) !important;
 }
 
 /* ===================================
@@ -674,47 +796,16 @@ input[type="search"]:focus {
 /* Active/Selected button states */
 .bp5-button.bp5-active,
 .bp5-button[aria-pressed="true"] {
-    background: var(--gradient-primary) !important;
-    color: white !important;
+    background-color: var(--accent-soft) !important;
+    color: var(--accent-primary) !important;
     border-color: var(--accent-primary) !important;
 }
 
 /* Button groups - alignment buttons, etc */
 .bp5-button-group .bp5-button.bp5-active,
 .bp5-button-group .bp5-button[aria-pressed="true"] {
-    background: var(--gradient-primary) !important;
-    color: white !important;
-}
-
-/* ===================================
-   APPSTORYS BRAND ELEMENTS
-   =================================== */
-
-/* Primary action buttons - like "Create Campaign" */
-.btn-primary,
-.create-btn,
-[class*="primary-action"] {
-    background: var(--gradient-primary) !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 8px !important;
-    font-weight: 500 !important;
-    transition: all 0.2s ease !important;
-}
-
-.btn-primary:hover,
-.create-btn:hover,
-[class*="primary-action"]:hover {
-    background: var(--gradient-hover) !important;
-    box-shadow: var(--shadow-glow) !important;
-    transform: translateY(-1px) !important;
-}
-
-/* Selected/Active states with orange accent */
-.selected,
-.active,
-[data-selected="true"] {
-    border-color: var(--accent-primary) !important;
+    background-color: var(--accent-soft) !important;
+    color: var(--accent-primary) !important;
 }
 
 /* Links */
@@ -767,120 +858,10 @@ a:hover {
     box-shadow: var(--shadow-glow) !important;
 }
 
-/* ===================================
-   POLOTNO SPECIFIC OVERRIDES - ORANGE THEME
-   =================================== */
-
-/* Right sidebar alignment buttons - force orange */
-[class*="go"] button[class*="bp5-button"].bp5-active,
-[class*="go"] .bp5-button-group .bp5-button.bp5-active,
-[class*="go"] .bp5-button-group button.bp5-active,
-.bp5-button-group.bp5-minimal .bp5-button.bp5-active {
-    background: var(--gradient-primary) !important;
-    color: white !important;
-}
-
-/* Tab underline/indicator - force orange */
-[class*="go"] .bp5-tab[aria-selected="true"]::after,
+/* Keep tab underline orange (text stays neutral) */
 .bp5-tab-indicator-wrapper .bp5-tab-indicator,
 .bp5-tabs .bp5-tab-indicator {
-    background: var(--gradient-primary) !important;
-    background-color: var(--accent-primary) !important;
-}
-
-/* Text/My fonts tabs active state */
-[class*="go"] .bp5-tab[aria-selected="true"],
-.bp5-tabs .bp5-tab[aria-selected="true"] {
-    color: var(--accent-primary) !important;
-    box-shadow: inset 0 -3px 0 var(--accent-primary) !important;
-}
-
-/* Play button in duration section */
-[class*="go"] button[class*="play"],
-button[class*="PlayButton"],
-.bp5-button[class*="play"],
-[class*="duration"] button,
-[class*="Duration"] button {
-    background: var(--gradient-primary) !important;
-    color: white !important;
-    border: none !important;
-}
-
-[class*="go"] button[class*="play"]:hover,
-button[class*="PlayButton"]:hover {
-    background: var(--gradient-hover) !important;
-    box-shadow: var(--shadow-glow) !important;
-}
-
-/* NEW badge styling */
-[class*="NEW"],
-.bp5-tag.bp5-intent-success,
-span[class*="new"],
-span[class*="New"] {
-    background: var(--gradient-primary) !important;
-    color: white !important;
-}
-
-/* Any teal/cyan color override to orange */
-[style*="rgb(0, 212, 170)"],
-[style*="#00d4aa"],
-[style*="rgb(0, 184, 148)"],
-[style*="#00b894"] {
-    background-color: var(--accent-primary) !important;
-    color: var(--accent-primary) !important;
-}
-
-/* Generic active/selected states */
-.bp5-active,
-[aria-pressed="true"],
-[aria-selected="true"] .bp5-tab-indicator {
-    background: var(--gradient-primary) !important;
-}
-
-/* Ensure all button active states use orange */
-button.bp5-active,
-.bp5-button.bp5-active {
-    background: var(--gradient-primary) !important;
-    color: white !important;
-}
-
-/* Icon buttons when active */
-.bp5-button.bp5-minimal.bp5-active,
-.bp5-button.bp5-minimal[aria-pressed="true"] {
-    background: var(--gradient-primary) !important;
-    color: white !important;
-}
-
-/* Polotno specific class overrides */
-[class*="go"][class*="active"],
-[class*="go"][class*="selected"] {
-    background: var(--gradient-primary) !important;
-    border-color: var(--accent-primary) !important;
-}
-
-/* Duration/Timeline play button specific */
-[class*="go"] svg[class*="play"],
-[class*="go"] [class*="play"] svg {
-    fill: white !important;
-}
-
-/* Force orange on any remaining teal elements */
-.bp5-intent-success:not(.bp5-tag) {
-    background: var(--gradient-primary) !important;
-}
-
-/* Circular play button */
-[class*="go"] button[style*="border-radius: 50%"],
-button[style*="border-radius:50%"] {
-    background: var(--gradient-primary) !important;
-}
-
-/* Right panel controls active state */
-[class*="RightSidebar"] .bp5-button.bp5-active,
-[class*="right-sidebar"] .bp5-button.bp5-active,
-[class*="toolbar"] .bp5-button.bp5-active {
-    background: var(--gradient-primary) !important;
-    color: white !important;
+    background: var(--accent-primary) !important;
 }
 
 /* ===================================
@@ -938,7 +919,7 @@ div[class*="slider"] .bp5-slider-progress {
 
 .bp5-slider .bp5-slider-handle:hover,
 .bp5-slider .bp5-slider-handle:focus {
-    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.3) !important;
+    box-shadow: 0 0 0 4px rgba(255, 122, 26, 0.28) !important;
 }
 
 /* All intent-success and intent-primary elements - often teal */
@@ -1006,8 +987,8 @@ button[aria-pressed="true"] svg,
 
 /* Canvas element selection border - override via CSS custom properties */
 :root {
-    --polotno-selection-color: #F97316 !important;
-    --konva-selection-color: #F97316 !important;
+    --polotno-selection-color: var(--accent-primary) !important;
+    --konva-selection-color: var(--accent-primary) !important;
 }
 
 /* Polotno workspace selection styling */

@@ -1,21 +1,21 @@
 /* Right Sidebar Styles - Dark Theme (synced with global theme) */
 
-/* Sidebar-specific variables that inherit from global theme */
+/* Sidebar variables derived from global theme tokens */
 :root {
-  --sidebar-bg: #16213e;
-  --sidebar-bg-secondary: #252547;
-  --sidebar-bg-hover: #2a2a4a;
-  --sidebar-border: #3d3d6b;
-  --sidebar-text: #ffffff;
-  --sidebar-text-secondary: #b8b8d0;
-  --sidebar-text-muted: #7a7a9a;
-  --sidebar-accent: #F97316;
-  --sidebar-accent-hover: #FB923C;
-  --sidebar-input-bg: #252547;
-  --sidebar-input-border: #3d3d6b;
-  --sidebar-success: #10b981;
-  --sidebar-danger: #ef4444;
-  --sidebar-new-badge: #F97316;
+  --sidebar-bg: var(--bg-secondary);
+  --sidebar-bg-secondary: var(--bg-elevated);
+  --sidebar-bg-hover: var(--bg-hover);
+  --sidebar-border: var(--border-primary);
+  --sidebar-text: var(--text-primary);
+  --sidebar-text-secondary: var(--text-secondary);
+  --sidebar-text-muted: var(--text-muted);
+  --sidebar-accent: var(--accent-primary);
+  --sidebar-accent-hover: var(--accent-hover);
+  --sidebar-input-bg: var(--input-bg);
+  --sidebar-input-border: var(--input-border);
+  --sidebar-success: var(--success);
+  --sidebar-danger: var(--danger);
+  --sidebar-new-badge: var(--accent-primary);
 }
 
 .right-sidebar {

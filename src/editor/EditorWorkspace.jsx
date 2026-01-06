@@ -9,12 +9,13 @@ export const EditorWorkspace = ({ store }) => {
   return (
     <div 
       ref={containerRef}
+      className="workspace-backdrop"
       style={{ width: '100%', height: '100%', position: 'relative' }}
     >
       <Workspace 
         store={store} 
-        backgroundColor="var(--bg-primary)"
-        activePageBorderColor="#F97316"
+        backgroundColor="transparent"
+        activePageBorderColor="#FF7A1A"
         layout="horizontal" 
       />
       

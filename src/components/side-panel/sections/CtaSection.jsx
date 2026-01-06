@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 import { SectionTab } from 'polotno/side-panel';
@@ -662,6 +663,7 @@ function generateVisitProductSVG(data, width, height) {
   
   // Calculate positions
   const titleY = cardPaddingY + titleFontSize;
+  // eslint-disable-next-line no-unused-vars
   const priceAreaY = height - cardPaddingY - priceFontSize - pricePadding;
   
   // Arrow position (right side, vertically centered with title)
@@ -1005,6 +1007,7 @@ export const CtaSectionPanel = observer(({ store }) => {
   };
 
   // Add Product Card with default placeholder
+  // eslint-disable-next-line no-unused-vars
   const addDefaultProductCard = () => {
     const page = store.activePage;
     if (!page) return;
