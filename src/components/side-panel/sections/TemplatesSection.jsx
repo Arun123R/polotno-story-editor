@@ -106,12 +106,14 @@ const NormalizedTemplatesPanel = observer(({ store }) => {
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <InputGroup
-        leftIcon={
-          <span className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-full text-gray-400 pointer-events-none">
-            <Search size={16} />
-          </span>
-        }
-        placeholder="Search..."
+      
+        // leftIcon={
+        //   <span className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-full text-gray-400 pointer-events-none">
+        //     <Search size={16} />
+        //   </span>
+        // }
+      
+        placeholder="Search templates..."
         type="search"
         onChange={(e) => setQuery(e.target.value)}
         className="relative mb-5"
