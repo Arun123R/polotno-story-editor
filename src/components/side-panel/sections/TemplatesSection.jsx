@@ -110,14 +110,18 @@ const NormalizedTemplatesPanel = observer(({ store }) => {
         placeholder="Search templates"
         type="search"
         onChange={(e) => setQuery(e.target.value)}
-        style={{ marginBottom: '20px' }}
+        className="relative mb-5"
+        inputClassName="pl-10"
       />
+
+
+
 
       <Switch
         checked={sameSize}
         onChange={(e) => setSameSize(e.target.checked)}
         alignIndicator={Alignment.RIGHT}
-        style={{ marginTop: '8px', marginBottom: '25px' }}
+        style={{ marginTop: '8px', marginBottom: '8px' }}
       >
         {t('sidePanel.searchTemplatesWithSameSize')}{' '}
       </Switch>
