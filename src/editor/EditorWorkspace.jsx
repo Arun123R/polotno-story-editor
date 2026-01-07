@@ -7,8 +7,11 @@ export const EditorWorkspace = ({ store }) => {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    // Zoom out the card initially
-    store.setScale(1.1);
+    const id = requestAnimationFrame(() => {
+      const stf = store.scaleToFit;
+      store.setScale(typeof stf === 'number' && stf > 0 ? stf : 1);
+    });
+    return () => cancelAnimationFrame(id);
   }, [store]);
 
   return (
