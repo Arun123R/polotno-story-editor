@@ -3,7 +3,7 @@ import './Topbar.css';
 
 import { ThemeToggleButton } from './ThemeToggleButton';
 
-export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar }) => {
+export const Topbar = observer(({  projectName = 'Campaign Name', toolbar }) => {
     const handlePreview = () => {
         // Preview functionality - can be implemented based on your needs
         console.log('Preview clicked');
@@ -20,8 +20,11 @@ export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar 
             <div className="topbar-left">
                 {/* Logo */}
                 <div className="topbar-logo">
-                    <div className="logo-icon">AS</div>
-                    <span className="logo-text">AppStories</span>
+                    <img
+                      src="/AppStorys_logo_white-Dy7IWqWA.png"
+                      alt="AppStories Logo"
+                      style={{ height: "40px", width: "auto" }}
+                    />
                 </div>
 
                 {/* Breadcrumb Navigation */}

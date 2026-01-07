@@ -106,18 +106,26 @@ const NormalizedTemplatesPanel = observer(({ store }) => {
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <InputGroup
-        leftIcon={<Search/>}
-        placeholder={t('sidePanel.searchPlaceholder')}
+        leftIcon={
+          <span className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-full text-gray-400 pointer-events-none">
+            <Search size={16} />
+          </span>
+        }
+        placeholder="Search..."
         type="search"
         onChange={(e) => setQuery(e.target.value)}
-        style={{ marginBottom: '20px' }}
+        className="relative mb-5"
+        inputClassName="pl-10"
       />
+
+
+
 
       <Switch
         checked={sameSize}
         onChange={(e) => setSameSize(e.target.checked)}
         alignIndicator={Alignment.RIGHT}
-        style={{ marginTop: '8px', marginBottom: '25px' }}
+        style={{ marginTop: '8px', marginBottom: '8px' }}
       >
         {t('sidePanel.searchTemplatesWithSameSize')}{' '}
       </Switch>
