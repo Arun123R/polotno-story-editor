@@ -1,0 +1,225 @@
+/* Topbar Styles - Using Globally Defined Colors */
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    padding: 0 20px;
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-primary);
+    gap: 24px;
+}
+
+/* ==================== LEFT SECTION ==================== */
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex: 1;
+}
+
+/* Logo */
+.topbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.logo-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--gradient-primary);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: -0.5px;
+}
+
+.logo-text {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Breadcrumb */
+.topbar-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+}
+
+.breadcrumb-group-selector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.breadcrumb-group-selector:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent-primary);
+}
+
+.group-avatar-preview {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #5EEAD4;
+    /* Teal-ish border like in reference */
+    background: white;
+    flex-shrink: 0;
+}
+
+.group-avatar-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.group-chevron-static {
+    color: var(--text-primary);
+}
+
+.breadcrumb-item {
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.breadcrumb-item:hover {
+    color: var(--text-primary);
+}
+
+.breadcrumb-current {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.breadcrumb-separator {
+    color: var(--text-muted);
+    font-size: 18px;
+    user-select: none;
+}
+
+/* ==================== RIGHT SECTION ==================== */
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Status */
+.topbar-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    padding-right: 20px;
+    border-right: 1px solid var(--border-primary);
+}
+
+.status-text {
+    color: var(--text-secondary);
+}
+
+.status-muted {
+    color: var(--text-muted);
+}
+
+.status-dot {
+    color: var(--text-muted);
+    font-size: 16px;
+}
+
+/* Actions */
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.topbar-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.topbar-btn svg {
+    flex-shrink: 0;
+}
+
+/* Secondary Button (Preview, General) */
+.topbar-btn-secondary {
+    background-color: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-primary);
+}
+
+.topbar-btn-secondary:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+    border-color: var(--border-accent);
+}
+
+/* Primary Button (Publish) */
+.topbar-btn-primary {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    box-shadow: 0 2px 4px rgba(249, 115, 22, 0.2);
+}
+
+.topbar-btn-primary:hover {
+    background: var(--gradient-hover);
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-1px);
+}
+
+.topbar-btn-primary:active {
+    transform: translateY(0);
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 1024px) {
+    .topbar {
+        padding: 0 16px;
+    }
+
+    .topbar-status {
+        display: none;
+    }
+
+    .logo-text {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .topbar-breadcrumb {
+        display: none;
+    }
+}

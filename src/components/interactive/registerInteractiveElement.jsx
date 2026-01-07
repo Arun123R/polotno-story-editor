@@ -55,7 +55,7 @@ const CountdownPreview = ({ data, style, width, height }) => {
       boxSizing: 'border-box',
     }}>
       <div style={{
-        color: style?.titleColor || '#fff',
+        color: style?.titleColor || '#ffffff',
         fontSize: style?.titleFontSize || 14,
         fontWeight: 600,
         textTransform: 'uppercase',
@@ -71,7 +71,7 @@ const CountdownPreview = ({ data, style, width, height }) => {
           { val: timeLeft.seconds, label: 'Sec' },
         ].map((item, i) => (
           <React.Fragment key={item.label}>
-            {i > 0 && <span style={{ color: style?.separatorColor || '#fff', fontSize: 24, opacity: 0.5 }}>:</span>}
+            {i > 0 && <span style={{ color: style?.separatorColor || '#ffffff', fontSize: 24, opacity: 0.5 }}>:</span>}
             <div style={{
               background: style?.digitBgColor || 'rgba(255,255,255,0.15)',
               borderRadius: 8,
@@ -82,7 +82,7 @@ const CountdownPreview = ({ data, style, width, height }) => {
               gap: 2,
             }}>
               <span style={{
-                color: style?.digitColor || '#fff',
+                color: style?.digitColor || '#ffffff',
                 fontSize: style?.digitFontSize || 28,
                 fontWeight: 700,
                 fontFamily: 'monospace',
@@ -122,7 +122,7 @@ const PollPreview = ({ data, style, width, height }) => {
       gap: 10,
     }}>
       <div style={{
-        color: style?.questionColor || '#fff',
+        color: style?.questionColor || '#ffffff',
         fontSize: style?.questionFontSize || 16,
         fontWeight: 600,
         textAlign: 'center',
@@ -135,7 +135,7 @@ const PollPreview = ({ data, style, width, height }) => {
             background: style?.optionBgColor || 'rgba(255,255,255,0.2)',
             borderRadius: style?.optionBorderRadius || 8,
             padding: '10px 14px',
-            color: style?.optionTextColor || '#fff',
+            color: style?.optionTextColor || '#ffffff',
             fontSize: style?.optionFontSize || 14,
             fontWeight: 500,
             textAlign: 'center',
@@ -165,7 +165,7 @@ const QuizPreview = ({ data, style }) => {
       gap: 10,
     }}>
       <div style={{
-        color: style?.questionColor || '#fff',
+        color: style?.questionColor || '#ffffff',
         fontSize: style?.questionFontSize || 16,
         fontWeight: 600,
         textAlign: 'center',
@@ -180,7 +180,7 @@ const QuizPreview = ({ data, style }) => {
               : style?.optionBgColor || 'rgba(255,255,255,0.2)',
             borderRadius: style?.optionBorderRadius || 8,
             padding: '10px 14px',
-            color: style?.optionTextColor || '#fff',
+            color: style?.optionTextColor || '#ffffff',
             fontSize: style?.optionFontSize || 14,
             fontWeight: 500,
             textAlign: 'center',
@@ -194,10 +194,87 @@ const QuizPreview = ({ data, style }) => {
 };
 
 // Rating Preview Component
-const RatingPreview = ({ data, style }) => {
+const RatingPreview = ({ data, style, width, height }) => {
   const maxRating = data?.maxRating || 5;
   const currentRating = data?.currentRating || 0;
-  const emoji = data?.type === 'emoji' ? (data?.emoji || '⭐') : '⭐';
+  const emoji = data?.emoji || '😺';
+  const title = data?.title || 'Do you like my eyes?';
+  const type = data?.type || 'slider';
+  
+  if (type === 'slider') {
+    const padding = style?.containerPadding || 8;
+    const cardW = width - padding * 2;
+    const cardH = height - padding * 2;
+    const sliderW = cardW - 24;
+    const fillPercent = Math.min(1, currentRating / maxRating);
+    const fillW = sliderW * fillPercent;
+    const borderRadius = style?.containerBorderRadius || 12;
+    const titleColor = style?.titleColor || '#000000';
+    const titleFontSize = style?.titleFontSize || 12;
+    const emojiSize = style?.emojiSize || 18;
+    
+    return (
+      <div style={{
+        width: '100%',
+        height: '100%',
+        padding: `${padding}px`,
+        boxSizing: 'border-box',
+      }}>
+        <div style={{
+          width: '100%',
+          height: '100%',
+          background: '#ffffff',
+          borderRadius: borderRadius,
+          padding: '12px 16px',
+          boxSizing: 'border-box',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+        }}>
+          <div style={{
+            color: titleColor,
+            fontSize: titleFontSize,
+            fontWeight: 600,
+            textAlign: 'center',
+          }}>
+            {title}
+          </div>
+          <div style={{ position: 'relative', height: 20 }}>
+            <div style={{
+              position: 'absolute',
+              left: 12,
+              right: 12,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              height: 8,
+              borderRadius: 4,
+              background: style?.inactiveColor || '#e5e7eb',
+            }} />
+            <div style={{
+              position: 'absolute',
+              left: 12,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              height: 8,
+              borderRadius: 4,
+              width: `${fillPercent * 100}%`,
+              maxWidth: `calc(100% - 24px)`,
+              background: style?.activeColor || 'linear-gradient(90deg, #d946ef 0%, #f43f5e 50%, #fb923c 100%)',
+            }} />
+            <div style={{
+              position: 'absolute',
+              left: `calc(12px + ${fillPercent * 100}% * (100% - 24px) / 100%)`,
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+              fontSize: emojiSize,
+            }}>
+              {emoji}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div style={{
@@ -214,11 +291,11 @@ const RatingPreview = ({ data, style }) => {
       gap: 10,
     }}>
       <div style={{
-        color: style?.titleColor || '#fff',
+        color: style?.titleColor || '#ffffff',
         fontSize: style?.titleFontSize || 14,
         fontWeight: 600,
       }}>
-        {data?.title || 'Rate this!'}
+        {title}
       </div>
       <div style={{ display: 'flex', gap: 6 }}>
         {Array.from({ length: maxRating }).map((_, i) => (
@@ -279,7 +356,7 @@ const PromoPreview = ({ data, style }) => {
       border: data?.dashedBorder !== false ? `2px dashed ${style?.borderColor || 'rgba(255,255,255,0.3)'}` : 'none',
     }}>
       <div style={{
-        color: style?.titleColor || '#fff',
+        color: style?.titleColor || '#ffffff',
         fontSize: style?.titleFontSize || 14,
         fontWeight: 600,
       }}>
@@ -294,7 +371,7 @@ const PromoPreview = ({ data, style }) => {
         gap: 12,
       }}>
         <span style={{
-          color: style?.codeColor || '#fff',
+          color: style?.codeColor || '#ffffff',
           fontSize: style?.codeFontSize || 22,
           fontWeight: 700,
           letterSpacing: 2,
@@ -305,7 +382,7 @@ const PromoPreview = ({ data, style }) => {
         {data?.showCopyButton !== false && (
           <span style={{
             background: style?.buttonBgColor || '#F97316',
-            color: style?.buttonTextColor || '#000',
+            color: style?.buttonTextColor || '#000000',
             padding: '6px 12px',
             borderRadius: 6,
             fontSize: 11,
@@ -343,7 +420,7 @@ const QuestionPreview = ({ data, style }) => {
       gap: 10,
     }}>
       <div style={{
-        color: style?.titleColor || '#fff',
+        color: style?.titleColor || '#ffffff',
         fontSize: style?.titleFontSize || 16,
         fontWeight: 600,
         textAlign: 'center',
@@ -362,7 +439,7 @@ const QuestionPreview = ({ data, style }) => {
       </div>
       <div style={{
         background: style?.submitBgColor || '#F97316',
-        color: style?.submitTextColor || '#000',
+        color: style?.submitTextColor || '#000000',
         padding: '10px 16px',
         borderRadius: 8,
         fontSize: 14,
@@ -393,7 +470,7 @@ const ImageQuizPreview = ({ data, style }) => {
       gap: 10,
     }}>
       <div style={{
-        color: style?.questionColor || '#fff',
+        color: style?.questionColor || '#ffffff',
         fontSize: style?.questionFontSize || 14,
         fontWeight: 600,
         textAlign: 'center',
@@ -433,7 +510,7 @@ const ImageQuizPreview = ({ data, style }) => {
               ) : '🖼️'}
             </div>
             <span style={{
-              color: style?.labelColor || '#fff',
+              color: style?.labelColor || '#ffffff',
               fontSize: style?.labelFontSize || 11,
             }}>
               {opt.label}
@@ -454,6 +531,11 @@ const InteractiveElement = ({ element }) => {
   const data = getInteractiveData(element);
   const style = getInteractiveStyle(element);
   
+  // Force re-render when data or style changes
+  const renderKey = React.useMemo(() => {
+    return JSON.stringify({ data, style });
+  }, [data, style]);
+  
   const containerStyle = {
     width: '100%',
     height: '100%',
@@ -461,23 +543,39 @@ const InteractiveElement = ({ element }) => {
   };
 
   const renderPreview = () => {
+    // Safety check
+    if (!type) {
+      return (
+        <div style={{
+          width: '100%',
+          height: '100%',
+          background: '#f0f0f0',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <span>Loading...</span>
+        </div>
+      );
+    }
+
     switch (type) {
       case 'poll':
-        return <PollPreview data={data} style={style} />;
+        return <PollPreview key={renderKey} data={data} style={style} />;
       case 'quiz':
-        return <QuizPreview data={data} style={style} />;
+        return <QuizPreview key={renderKey} data={data} style={style} />;
       case 'rating':
-        return <RatingPreview data={data} style={style} />;
+        return <RatingPreview key={renderKey} data={data} style={style} width={element.width} height={element.height} />;
       case 'reaction':
-        return <ReactionPreview data={data} style={style} />;
+        return <ReactionPreview key={renderKey} data={data} style={style} />;
       case 'countdown':
-        return <CountdownPreview data={data} style={style} />;
+        return <CountdownPreview key={renderKey} data={data} style={style} />;
       case 'promo':
-        return <PromoPreview data={data} style={style} />;
+        return <PromoPreview key={renderKey} data={data} style={style} />;
       case 'question':
-        return <QuestionPreview data={data} style={style} />;
+        return <QuestionPreview key={renderKey} data={data} style={style} />;
       case 'imageQuiz':
-        return <ImageQuizPreview data={data} style={style} />;
+        return <ImageQuizPreview key={renderKey} data={data} style={style} />;
       default:
         return (
           <div style={{
@@ -490,7 +588,7 @@ const InteractiveElement = ({ element }) => {
             alignItems: 'center',
             justifyContent: 'center',
             gap: 8,
-            color: '#fff',
+            color: '#ffffff',
           }}>
             <span style={{ fontSize: 32 }}>{getInteractiveTypeIcon(type)}</span>
             <span style={{ fontSize: 14, fontWeight: 600 }}>{getInteractiveTypeLabel(type)}</span>

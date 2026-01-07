@@ -106,7 +106,7 @@ const NormalizedTemplatesPanel = observer(({ store }) => {
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <InputGroup
-        leftIcon={<Search />}
+        leftIcon={<Search/>}
         placeholder={t('sidePanel.searchPlaceholder')}
         type="search"
         onChange={(e) => setQuery(e.target.value)}

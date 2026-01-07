@@ -1,13 +1,18 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Workspace } from "polotno/canvas/workspace";
 import { InteractiveOverlay } from "../components/interactive/InteractiveOverlay";
 import { FitZoomButtons } from './FitZoomButtons';
 
 export const EditorWorkspace = ({ store }) => {
   const containerRef = useRef(null);
-  
+
+  useEffect(() => {
+    // Zoom out the card initially
+    store.setScale(1.1);
+  }, [store]);
+
   return (
-    <div 
+    <div
       ref={containerRef}
       className="workspace-backdrop"
       style={{ width: '100%', height: '100%', position: 'relative' }}
@@ -18,7 +23,7 @@ export const EditorWorkspace = ({ store }) => {
         activePageBorderColor="#FF7A1A"
         layout="horizontal" 
       />
-      
+
       {/* Interactive Preview Overlay - positioned on top of canvas */}
       {/* Note: This is disabled for now as Polotno handles its own rendering.
           The interactive elements use text type with custom metadata,

@@ -11,9 +11,19 @@ import {
 
 // CTA Icon for tab
 const CtaIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11 4" />
-    <path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 1 0 7.07 7.07L13 20" />
+  <svg
+    width="28"
+    height="28"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    style={{ fill: 'none', stroke: 'currentColor' }}
+  >
+    <circle cx="12" cy="12" r="10" />
+    <path d="M8 14l4-4 4 4" />
   </svg>
 );
 
@@ -288,7 +298,7 @@ const CTA_DEFAULTS = {
 const getPageCtas = (store) => {
   const page = store.activePage;
   if (!page) return [];
-  
+
   return page.children.filter(el => el.custom?.ctaType);
 };
 
@@ -345,13 +355,13 @@ function generateClassicCtaSVG(data, width, height) {
   const borderColor = data?.borderColor || '#ffffff';
   const fontSize = data?.fontSize || 16;
   const fontWeight = data?.fontWeight || 'bold';
-  
+
   // Adjust rect dimensions to account for border
   const rectX = borderWidth / 2;
   const rectY = borderWidth / 2;
   const rectWidth = width - borderWidth;
   const rectHeight = height - borderWidth;
-  
+
   return `data:image/svg+xml;utf8,${encodeURIComponent(`
     <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
       <defs>
@@ -360,7 +370,7 @@ function generateClassicCtaSVG(data, width, height) {
         </filter>
       </defs>
       <rect x="${rectX}" y="${rectY}" width="${rectWidth}" height="${rectHeight}" rx="${borderRadius}" fill="${bgColor}" stroke="${borderColor}" stroke-width="${borderWidth}" filter="url(#shadow)"/>
-      <text x="${width/2}" y="${height/2 + fontSize/3}" text-anchor="middle" fill="${textColor}" font-size="${fontSize}" font-weight="${fontWeight}" font-family="Inter, -apple-system, sans-serif">${escapeXml(text)}</text>
+      <text x="${width / 2}" y="${height / 2 + fontSize / 3}" text-anchor="middle" fill="${textColor}" font-size="${fontSize}" font-weight="${fontWeight}" font-family="Inter, -apple-system, sans-serif">${escapeXml(text)}</text>
     </svg>
   `)}`;
 }
@@ -373,24 +383,24 @@ function generateSwipeUpCtaSVG(data, width, height) {
   const bgColor = data?.bgColor || 'rgba(0,0,0,0.5)';
   const borderRadius = data?.borderRadius || 16;
   const fontSize = data?.fontSize || 13;
-  
+
   // Arrow positioning - centered horizontally, in upper portion
   const arrowCenterX = width / 2;
   const arrowCenterY = height * 0.28;
-  
+
   // Arrow dimensions based on arrowSize
   const arrowWidth = arrowSize * 0.9;
   const arrowHeight = arrowSize * 0.45;
   const strokeWidth = Math.max(2.5, arrowSize * 0.08);
-  
+
   // Text position
   const textY = height * 0.75;
-  
+
   // Storyly-style premium bounce animation
   // Uses custom cubic-bezier for natural, premium feel
   // Motion: rest → up → slight settle → return
   // Continuous loop, mobile-first (no hover needed)
-  
+
   return `data:image/svg+xml;utf8,${encodeURIComponent(`
     <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
       <style>
@@ -433,9 +443,9 @@ function generateSwipeUpCtaSVG(data, width, height) {
       <g class="swipe-arrow">
         <!-- Chevron up arrow using SVG paths -->
         <path 
-          d="M ${arrowCenterX - arrowWidth/2} ${arrowCenterY + arrowHeight/2} 
-             L ${arrowCenterX} ${arrowCenterY - arrowHeight/2} 
-             L ${arrowCenterX + arrowWidth/2} ${arrowCenterY + arrowHeight/2}"
+          d="M ${arrowCenterX - arrowWidth / 2} ${arrowCenterY + arrowHeight / 2} 
+             L ${arrowCenterX} ${arrowCenterY - arrowHeight / 2} 
+             L ${arrowCenterX + arrowWidth / 2} ${arrowCenterY + arrowHeight / 2}"
           stroke="${arrowColor}"
           stroke-width="${strokeWidth}"
           stroke-linecap="round"
@@ -445,7 +455,7 @@ function generateSwipeUpCtaSVG(data, width, height) {
       </g>
       
       <!-- Text label -->
-      <text x="${width/2}" y="${textY}" text-anchor="middle" fill="${textColor}" font-size="${fontSize}" font-weight="600" font-family="Inter, -apple-system, sans-serif">${escapeXml(text)}</text>
+      <text x="${width / 2}" y="${textY}" text-anchor="middle" fill="${textColor}" font-size="${fontSize}" font-weight="600" font-family="Inter, -apple-system, sans-serif">${escapeXml(text)}</text>
     </svg>
   `)}`;
 }
@@ -455,14 +465,14 @@ function generateDescribeProductSVG(data, width, height) {
   const title = data?.title || 'Eclipse Motion Pro';
   const price = data?.price || '$150';
   const imageUrl = data?.imageUrl || '';
-  
+
   // Card styling
   const cardBgColor = data?.cardBgColor || '#ffffff';
   const cardBorderRadius = data?.cardBorderRadius || 24;
   const cardShadow = data?.cardShadow !== false;
   const cardShadowBlur = data?.cardShadowBlur || 20;
   const cardShadowOpacity = data?.cardShadowOpacity || 0.15;
-  
+
   // Image styling
   const showImage = data?.showImage !== false;
   const imageHeightRatio = data?.imageHeightRatio || 0.68;
@@ -471,19 +481,19 @@ function generateDescribeProductSVG(data, width, height) {
   const imagePadding = 16;
   const imageWidth = width - (imagePadding * 2);
   const imageInnerHeight = imageHeight - imagePadding;
-  
+
   // Title styling
   const titleColor = data?.titleColor || '#1a1a2e';
   const titleFontSize = data?.titleFontSize || 42;
   const titleFontWeight = data?.titleFontWeight || '600';
   const titleFontFamily = data?.titleFontFamily || 'Inter';
-  
+
   // Price styling
   const priceColor = data?.priceColor || '#e67e22';
   const priceFontSize = data?.priceFontSize || 38;
   const priceFontWeight = data?.priceFontWeight || '700';
   const priceFontFamily = data?.priceFontFamily || 'Inter';
-  
+
   // Arrow button styling
   const arrowButtonSize = data?.arrowButtonSize || 80;
   const arrowButtonBgColor = data?.arrowButtonBgColor || '#f5f5f5';
@@ -491,85 +501,85 @@ function generateDescribeProductSVG(data, width, height) {
   const arrowButtonBorderRadius = data?.arrowButtonBorderRadius || 20;
   const arrowButtonPositionX = data?.arrowButtonPositionX || 0;
   const arrowButtonPositionY = data?.arrowButtonPositionY || 0;
-  
+
   // Favorite icon
   const showFavoriteIcon = data?.showFavoriteIcon !== false;
   const favoriteIconSize = data?.favoriteIconSize || 56;
   const favoriteIconBgColor = data?.favoriteIconBgColor || 'rgba(128,128,128,0.6)';
   const favoriteIconColor = data?.favoriteIconColor || '#ffffff';
-  
+
   // Carousel dots
   const showCarouselDots = data?.showCarouselDots !== false;
   const carouselDotsCount = data?.carouselDotsCount || 4;
   const carouselDotsActiveIndex = data?.carouselDotsActiveIndex || 0;
-  
+
   // Calculate positions
   const contentAreaY = imageHeight + 20;
   const titleY = contentAreaY + titleFontSize * 0.8;
   const priceY = titleY + priceFontSize + 8;
-  
+
   // Arrow button position (bottom right)
   const arrowButtonX = width - arrowButtonSize - 28 + arrowButtonPositionX;
   const arrowButtonY = height - arrowButtonSize - 28 + arrowButtonPositionY;
-  
+
   // Arrow icon dimensions
   const arrowIconSize = arrowButtonSize * 0.4;
   const arrowIconX = arrowButtonX + (arrowButtonSize - arrowIconSize) / 2;
   const arrowIconY = arrowButtonY + (arrowButtonSize - arrowIconSize) / 2;
-  
+
   // Favorite icon position (top right of image)
   const favIconX = width - favoriteIconSize - 28;
   const favIconY = imagePadding + 16;
-  
+
   // Carousel dots
   const dotSize = 10;
   const dotGap = 8;
   const dotsWidth = (dotSize * carouselDotsCount) + (dotGap * (carouselDotsCount - 1));
   const dotsStartX = (width - dotsWidth) / 2;
   const dotsY = imageHeight - 24;
-  
+
   // Image section with proper clipping
-  const imageSection = imageUrl 
+  const imageSection = imageUrl
     ? `<image href="${imageUrl}" x="${imagePadding}" y="${imagePadding}" width="${imageWidth}" height="${imageInnerHeight}" preserveAspectRatio="xMidYMid slice" clip-path="url(#imageClip)"/>`
     : `<rect x="${imagePadding}" y="${imagePadding}" width="${imageWidth}" height="${imageInnerHeight}" rx="${imageBorderRadius}" fill="#d4d4d8"/>
-       <g transform="translate(${width/2 - 40}, ${imageHeight/2 - 30})">
+       <g transform="translate(${width / 2 - 40}, ${imageHeight / 2 - 30})">
          <rect width="80" height="60" rx="8" fill="#a1a1aa"/>
          <circle cx="25" cy="22" r="10" fill="#d4d4d8"/>
          <path d="M10 50 L30 35 L50 45 L70 25 L70 50 Z" fill="#d4d4d8"/>
        </g>`;
-  
+
   // Carousel dots SVG
   const carouselDotsSvg = showCarouselDots ? Array.from({ length: carouselDotsCount }, (_, i) => {
     const dotX = dotsStartX + (i * (dotSize + dotGap));
     const isActive = i === carouselDotsActiveIndex;
-    return `<circle cx="${dotX + dotSize/2}" cy="${dotsY}" r="${dotSize/2}" fill="${isActive ? '#ffffff' : 'rgba(255,255,255,0.5)'}"/>`;
+    return `<circle cx="${dotX + dotSize / 2}" cy="${dotsY}" r="${dotSize / 2}" fill="${isActive ? '#ffffff' : 'rgba(255,255,255,0.5)'}"/>`;
   }).join('') : '';
-  
+
   // Favorite icon SVG (heart outline)
   const favoriteIconSvg = showFavoriteIcon ? `
     <g transform="translate(${favIconX}, ${favIconY})">
-      <rect width="${favoriteIconSize}" height="${favoriteIconSize}" rx="${favoriteIconSize/2}" fill="${favoriteIconBgColor}"/>
+      <rect width="${favoriteIconSize}" height="${favoriteIconSize}" rx="${favoriteIconSize / 2}" fill="${favoriteIconBgColor}"/>
       <path 
-        d="M${favoriteIconSize/2} ${favoriteIconSize * 0.7} 
+        d="M${favoriteIconSize / 2} ${favoriteIconSize * 0.7} 
            C${favoriteIconSize * 0.25} ${favoriteIconSize * 0.55} 
            ${favoriteIconSize * 0.18} ${favoriteIconSize * 0.35} 
            ${favoriteIconSize * 0.32} ${favoriteIconSize * 0.28}
            C${favoriteIconSize * 0.42} ${favoriteIconSize * 0.23} 
-           ${favoriteIconSize/2} ${favoriteIconSize * 0.28} 
-           ${favoriteIconSize/2} ${favoriteIconSize * 0.35}
-           C${favoriteIconSize/2} ${favoriteIconSize * 0.28} 
+           ${favoriteIconSize / 2} ${favoriteIconSize * 0.28} 
+           ${favoriteIconSize / 2} ${favoriteIconSize * 0.35}
+           C${favoriteIconSize / 2} ${favoriteIconSize * 0.28} 
            ${favoriteIconSize * 0.58} ${favoriteIconSize * 0.23} 
            ${favoriteIconSize * 0.68} ${favoriteIconSize * 0.28}
            C${favoriteIconSize * 0.82} ${favoriteIconSize * 0.35} 
            ${favoriteIconSize * 0.75} ${favoriteIconSize * 0.55} 
-           ${favoriteIconSize/2} ${favoriteIconSize * 0.7} Z"
+           ${favoriteIconSize / 2} ${favoriteIconSize * 0.7} Z"
         stroke="${favoriteIconColor}"
         stroke-width="2"
         fill="none"
       />
     </g>
   ` : '';
-  
+
   // Arrow icon path (diagonal arrow pointing up-right)
   const arrowPath = `
     M${arrowIconX + arrowIconSize * 0.25} ${arrowIconY + arrowIconSize * 0.75}
@@ -578,7 +588,7 @@ function generateDescribeProductSVG(data, width, height) {
     L${arrowIconX + arrowIconSize * 0.75} ${arrowIconY + arrowIconSize * 0.25}
     L${arrowIconX + arrowIconSize * 0.75} ${arrowIconY + arrowIconSize * 0.6}
   `;
-  
+
   return `data:image/svg+xml;utf8,${encodeURIComponent(`
     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
       <defs>
@@ -631,19 +641,19 @@ function generateVisitProductSVG(data, width, height) {
   const price = data?.price || '$59';
   const originalPrice = data?.originalPrice || '$99';
   const showOriginalPrice = data?.showOriginalPrice !== false;
-  
+
   // Card styling
   const cardBgColor = data?.cardBgColor || '#1e293b';
   const cardBorderRadius = data?.cardBorderRadius || 16;
   const cardPaddingX = data?.cardPaddingX || 24;
   const cardPaddingY = data?.cardPaddingY || 20;
-  
+
   // Title styling
   const titleColor = data?.titleColor || '#ffffff';
   const titleFontSize = data?.titleFontSize || 28;
   const titleFontWeight = data?.titleFontWeight || '600';
   const titleFontFamily = data?.titleFontFamily || 'Inter';
-  
+
   // Price styling
   const priceColor = data?.priceColor || '#ffffff';
   const priceFontSize = data?.priceFontSize || 24;
@@ -652,36 +662,36 @@ function generateVisitProductSVG(data, width, height) {
   const priceBgColor = data?.priceBgColor || '#334155';
   const priceBorderRadius = data?.priceBorderRadius || 8;
   const pricePadding = data?.pricePadding || 12;
-  
+
   // Original price styling
   const originalPriceColor = data?.originalPriceColor || '#64748b';
   const originalPriceFontSize = data?.originalPriceFontSize || 20;
-  
+
   // Arrow button styling
   const arrowButtonSize = data?.arrowButtonSize || 48;
   const arrowButtonIconColor = data?.arrowButtonIconColor || '#ffffff';
-  
+
   // Calculate positions
   const titleY = cardPaddingY + titleFontSize;
   // eslint-disable-next-line no-unused-vars
   const priceAreaY = height - cardPaddingY - priceFontSize - pricePadding;
-  
+
   // Arrow position (right side, vertically centered with title)
   const arrowX = width - cardPaddingX - arrowButtonSize / 2;
   const arrowY = cardPaddingY + titleFontSize / 2;
   const arrowIconSize = arrowButtonSize * 0.5;
-  
+
   // Price badge dimensions
   const priceBadgeHeight = priceFontSize + pricePadding * 2;
   const priceBadgeY = height - cardPaddingY - priceBadgeHeight;
-  
+
   // Arrow SVG path (chevron right >)
   const arrowPath = `
     M${arrowX - arrowIconSize * 0.3} ${arrowY - arrowIconSize * 0.4}
     L${arrowX + arrowIconSize * 0.3} ${arrowY}
     L${arrowX - arrowIconSize * 0.3} ${arrowY + arrowIconSize * 0.4}
   `;
-  
+
   return `data:image/svg+xml;utf8,${encodeURIComponent(`
     <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
       <!-- Card Container -->
@@ -725,7 +735,7 @@ function generateBuyProductSVG(data, width, height) {
   const description = data?.description || 'orange nike white cho...';
   const price = data?.price || '$125';
   const imageUrl = data?.imageUrl || '';
-  
+
   // Card styling
   const cardBgColor = data?.cardBgColor || '#ffffff';
   const cardBorderRadius = data?.cardBorderRadius || 16;
@@ -734,28 +744,28 @@ function generateBuyProductSVG(data, width, height) {
   const cardShadowOpacity = data?.cardShadowOpacity || 0.15;
   const cardPaddingX = data?.cardPaddingX || 16;
   const cardPaddingY = data?.cardPaddingY || 16;
-  
+
   // Image styling
   const showImage = data?.showImage !== false;
   const imageSize = data?.imageSize || 100;
   const imageBorderRadius = data?.imageBorderRadius || 12;
-  
+
   // Title styling
   const titleColor = data?.titleColor || '#1a1a2e';
   const titleFontSize = data?.titleFontSize || 22;
   const titleFontWeight = data?.titleFontWeight || '600';
   const titleFontFamily = data?.titleFontFamily || 'Inter';
-  
+
   // Description styling
   const descriptionColor = data?.descriptionColor || '#64748b';
   const descriptionFontSize = data?.descriptionFontSize || 16;
-  
+
   // Price styling
   const priceColor = data?.priceColor || '#1a1a2e';
   const priceFontSize = data?.priceFontSize || 20;
   const priceFontWeight = data?.priceFontWeight || '700';
   const priceFontFamily = data?.priceFontFamily || 'Inter';
-  
+
   // Buy button styling
   const buyButtonText = data?.buyButtonText || 'Buy now';
   const buyButtonBgColor = data?.buyButtonBgColor || '#1a1a2e';
@@ -765,33 +775,33 @@ function generateBuyProductSVG(data, width, height) {
   const buyButtonBorderRadius = data?.buyButtonBorderRadius || 8;
   const buyButtonPaddingX = data?.buyButtonPaddingX || 20;
   const buyButtonPaddingY = data?.buyButtonPaddingY || 10;
-  
+
   // Calculate positions
   const contentStartX = showImage ? cardPaddingX + imageSize + 16 : cardPaddingX;
   const titleY = cardPaddingY + titleFontSize;
   const descriptionY = titleY + descriptionFontSize + 8;
   const priceY = height - cardPaddingY - 8;
-  
+
   // Buy button dimensions
   const buyButtonWidth = buyButtonFontSize * buyButtonText.length * 0.55 + buyButtonPaddingX * 2;
   const buyButtonHeight = buyButtonFontSize + buyButtonPaddingY * 2;
   const buyButtonX = width - cardPaddingX - buyButtonWidth;
   const buyButtonY = height - cardPaddingY - buyButtonHeight;
-  
+
   // Image placeholder or actual image
   const imageSectionX = cardPaddingX;
   const imageSectionY = (height - imageSize) / 2;
-  
-  const imageSection = showImage ? (imageUrl 
+
+  const imageSection = showImage ? (imageUrl
     ? `<image href="${imageUrl}" x="${imageSectionX}" y="${imageSectionY}" width="${imageSize}" height="${imageSize}" preserveAspectRatio="xMidYMid slice" clip-path="url(#buyImageClip)"/>`
     : `<rect x="${imageSectionX}" y="${imageSectionY}" width="${imageSize}" height="${imageSize}" rx="${imageBorderRadius}" fill="#e2e8f0"/>
-       <g transform="translate(${imageSectionX + imageSize/2 - 20}, ${imageSectionY + imageSize/2 - 15})">
+       <g transform="translate(${imageSectionX + imageSize / 2 - 20}, ${imageSectionY + imageSize / 2 - 15})">
          <rect width="40" height="30" rx="4" fill="#94a3b8"/>
          <circle cx="12" cy="11" r="5" fill="#e2e8f0"/>
          <path d="M5 25 L15 18 L25 22 L35 12 L35 25 Z" fill="#e2e8f0"/>
        </g>`
   ) : '';
-  
+
   return `data:image/svg+xml;utf8,${encodeURIComponent(`
     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
       <defs>
@@ -824,7 +834,7 @@ function generateBuyProductSVG(data, width, height) {
       
       <!-- Buy Now Button -->
       <rect x="${buyButtonX}" y="${buyButtonY}" width="${buyButtonWidth}" height="${buyButtonHeight}" rx="${buyButtonBorderRadius}" fill="${buyButtonBgColor}"/>
-      <text x="${buyButtonX + buyButtonWidth/2}" y="${buyButtonY + buyButtonHeight/2 + buyButtonFontSize * 0.35}" text-anchor="middle" fill="${buyButtonTextColor}" font-size="${buyButtonFontSize}" font-weight="${buyButtonFontWeight}" font-family="${titleFontFamily}, -apple-system, sans-serif">${escapeXml(buyButtonText)}</text>
+      <text x="${buyButtonX + buyButtonWidth / 2}" y="${buyButtonY + buyButtonHeight / 2 + buyButtonFontSize * 0.35}" text-anchor="middle" fill="${buyButtonTextColor}" font-size="${buyButtonFontSize}" font-weight="${buyButtonFontWeight}" font-family="${titleFontFamily}, -apple-system, sans-serif">${escapeXml(buyButtonText)}</text>
     </svg>
   `)}`;
 }
@@ -887,7 +897,7 @@ export const CtaSectionPanel = observer(({ store }) => {
         ...defaults,
       }
     });
-    
+
     store.selectElements([element.id]);
   };
 
@@ -919,7 +929,7 @@ export const CtaSectionPanel = observer(({ store }) => {
         ...defaults,
       }
     });
-    
+
     store.selectElements([element.id]);
   };
 
@@ -1143,9 +1153,9 @@ export const CtaSectionPanel = observer(({ store }) => {
   // Get all CTAs on current page
   const pageCtas = getPageCtas(store);
   // Filter to only show main CTAs (not child elements)
-  const mainCtas = pageCtas.filter(el => 
-    el.custom?.ctaType && 
-    !el.custom?.parentCtaType && 
+  const mainCtas = pageCtas.filter(el =>
+    el.custom?.ctaType &&
+    !el.custom?.parentCtaType &&
     el.custom?.ctaType !== 'swipe_up_arrow'
   );
 
@@ -1213,7 +1223,7 @@ export const CtaSectionPanel = observer(({ store }) => {
       {/* CTA Types Grid */}
       <div style={{ marginBottom: '24px' }}>
         <p style={sectionLabelStyle}>Add CTA</p>
-        
+
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
           {/* Classic CTA */}
           <div
@@ -1274,16 +1284,16 @@ export const CtaSectionPanel = observer(({ store }) => {
               gap: '4px',
             }}>
               {/* SVG Arrow Icon with Storyly-style animation */}
-              <svg 
-                width="20" 
-                height="20" 
+              <svg
+                width="20"
+                height="20"
                 viewBox="0 0 24 24"
-                style={{ 
+                style={{
                   animation: 'storylyBouncePreview 1.8s cubic-bezier(0.35, 0, 0.25, 1) infinite',
                   color: 'var(--text-primary)',
                 }}
               >
-                <path 
+                <path
                   d="M6 15 L12 9 L18 15"
                   stroke="currentColor"
                   strokeWidth="2.5"
@@ -1342,7 +1352,7 @@ export const CtaSectionPanel = observer(({ store }) => {
         {/* Product Card Variants Section */}
         <p style={{ ...sectionLabelStyle, marginTop: '20px', marginBottom: '10px' }}>Product Cards</p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
-          
+
           {/* Visit Product CTA */}
           <div
             style={{
@@ -1377,7 +1387,7 @@ export const CtaSectionPanel = observer(({ store }) => {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ width: '24px', height: '4px', background: '#fff', borderRadius: '1px' }}></div>
                 <svg width="6" height="6" viewBox="0 0 6 6" fill="none">
-                  <path d="M2 1L4 3L2 5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 1L4 3L2 5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
               {/* Price row */}
@@ -1420,8 +1430,8 @@ export const CtaSectionPanel = observer(({ store }) => {
               boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
             }}>
               {/* Image area */}
-              <div style={{ 
-                flex: '0 0 65%', 
+              <div style={{
+                flex: '0 0 65%',
                 background: 'linear-gradient(135deg, #d4d4d8 0%, #a1a1aa 100%)',
                 borderRadius: '4px',
                 margin: '2px',
@@ -1504,7 +1514,7 @@ export const CtaSectionPanel = observer(({ store }) => {
       {mainCtas.length > 0 && (
         <div style={{ marginBottom: '16px' }}>
           <p style={sectionLabelStyle}>CTAs on this Slide</p>
-          
+
           {mainCtas.map((cta) => (
             <div
               key={cta.id}

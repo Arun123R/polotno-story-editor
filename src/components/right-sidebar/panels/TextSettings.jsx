@@ -2,7 +2,6 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import {
   PositionSection,
-  OpacitySlider,
   ActionButtons,
   DurationSection,
   AnimationSection,
@@ -14,12 +13,12 @@ import {
  */
 export const TextSettings = observer(({ store, element, elements = [], isMultiSelect = false }) => {
   const [activeTab, setActiveTab] = useState('general');
-  
+
   if (!element) return null;
 
   // Get all elements to modify (single or multiple)
   const targetElements = isMultiSelect && elements.length > 0 ? elements : [element];
-  
+
   // Helper to apply changes to all selected elements
   const applyToAll = (changes) => {
     targetElements.forEach(el => el.set(changes));
@@ -41,13 +40,13 @@ export const TextSettings = observer(({ store, element, elements = [], isMultiSe
     <div className="settings-panel text-settings">
       {/* Tab Navigation */}
       <div className="sidebar-tabs">
-        <button 
+        <button
           className={`sidebar-tab ${activeTab === 'general' ? 'active' : ''}`}
           onClick={() => setActiveTab('general')}
         >
           General
         </button>
-        <button 
+        <button
           className={`sidebar-tab ${activeTab === 'animation' ? 'active' : ''}`}
           onClick={() => setActiveTab('animation')}
         >
@@ -55,13 +54,13 @@ export const TextSettings = observer(({ store, element, elements = [], isMultiSe
         </button>
       </div>
 
-      <div className="settings-content" style={{ padding: '16px' }}>
+      <div className="settings-content">
         {/* Multi-select indicator */}
         {isMultiSelect && (
-          <div style={{ 
-            padding: '8px 12px', 
-            background: 'var(--accent-subtle)', 
-            borderRadius: '6px', 
+          <div style={{
+            padding: '8px 12px',
+            background: 'var(--accent-subtle)',
+            borderRadius: '6px',
             marginBottom: '12px',
             fontSize: '12px',
             color: 'var(--accent-primary)',
@@ -285,8 +284,8 @@ export const TextSettings = observer(({ store, element, elements = [], isMultiSe
                 <span className="control-label">Text Color</span>
                 <div className="control-value">
                   <div className="color-picker-row">
-                    <div 
-                      className="color-swatch" 
+                    <div
+                      className="color-swatch"
                       style={{ backgroundColor: element.fill || '#000000' }}
                     >
                       <input
@@ -312,8 +311,8 @@ export const TextSettings = observer(({ store, element, elements = [], isMultiSe
 
             {/* Action Buttons */}
             <div className="action-buttons">
-              <button 
-                className="action-btn delete" 
+              <button
+                className="action-btn delete"
                 onClick={() => store.deleteElements(targetElements.map(el => el.id))}
               >
                 <span>🗑</span> {isMultiSelect ? 'Delete All' : 'Delete'}

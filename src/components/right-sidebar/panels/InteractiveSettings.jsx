@@ -1,12 +1,15 @@
 import { observer } from 'mobx-react-lite';
 import { useState, useRef, useCallback } from 'react';
-import { AnimationSection } from '../shared/CommonControls';
+import {
+  PositionSection,
+  AppearanceSection,
+  AnimationSection,
+  DurationSection,
+} from '../shared/CommonControls';
 import {
   getInteractiveType,
   getInteractiveData,
   getInteractiveStyle,
-  getInteractiveTypeLabel,
-  getInteractiveTypeIcon,
   INTERACTIVE_STYLES,
   INTERACTIVE_DIMENSIONS,
 } from '../../interactive/schemas';
@@ -31,19 +34,17 @@ export const InteractiveSettings = observer(({ store, element }) => {
 
   // Regenerate SVG preview when data or style changes
   const regenerateSVG = useCallback((newData, newStyle) => {
-    if (element.type === 'svg') {
-      const dimensions = {
-        width: element.width || INTERACTIVE_DIMENSIONS[interactiveType]?.width || 280,
-        height: element.height || INTERACTIVE_DIMENSIONS[interactiveType]?.height || 160,
-      };
-      const styleDefaults = { ...INTERACTIVE_STYLES[interactiveType], ...newStyle };
-      const newSrc = generateInteractiveSVG(interactiveType, newData, styleDefaults, dimensions);
-      element.set({ src: newSrc });
-    }
+    const dimensions = {
+      width: element.width || INTERACTIVE_DIMENSIONS[interactiveType]?.width || 280,
+      height: element.height || INTERACTIVE_DIMENSIONS[interactiveType]?.height || 160,
+    };
+    const styleDefaults = { ...INTERACTIVE_STYLES[interactiveType], ...newStyle };
+    const newSrc = generateInteractiveSVG(interactiveType, newData, styleDefaults, dimensions);
+    element.set({ src: newSrc });
   }, [element, interactiveType]);
 
   // ==================== DATA UPDATE HELPERS ====================
-  
+
   const updateData = (key, value) => {
     const newData = { ...data, [key]: value };
     element.set({
@@ -75,10 +76,10 @@ export const InteractiveSettings = observer(({ store, element }) => {
 
   const addOption = () => {
     const options = data.options || [];
-    const newId = `opt${Date.now()}`;
-    const newOption = interactiveType === 'imageQuiz' 
-      ? { id: newId, imageUrl: '', label: `Option ${options.length + 1}` }
-      : { id: newId, text: `Option ${options.length + 1}`, votes: 0 };
+    const newId = `opt${Date.now()} `;
+    const newOption = interactiveType === 'imageQuiz'
+      ? { id: newId, imageUrl: '', label: `Option ${options.length + 1} ` }
+      : { id: newId, text: `Option ${options.length + 1} `, votes: 0 };
     updateOptions([...options, newOption]);
   };
 
@@ -91,7 +92,7 @@ export const InteractiveSettings = observer(({ store, element }) => {
 
   const updateOption = (id, updates) => {
     const options = data.options || [];
-    updateOptions(options.map(opt => 
+    updateOptions(options.map(opt =>
       opt.id === id ? { ...opt, ...updates } : opt
     ));
   };
@@ -126,14 +127,17 @@ export const InteractiveSettings = observer(({ store, element }) => {
   };
 
   // ==================== RENDER HELPERS ====================
-  
+
   const renderSectionTitle = (title) => (
     <div className="section-title">{title}</div>
   );
 
-  const renderTextInput = (label, value, onChange, placeholder = '') => (
-    <div className="control-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 6 }}>
-      <span className="control-label">{label}</span>
+  const renderTextInput = (label, value, onChange, placeholder = '', secondaryLabel = '') => (
+    <div className="control-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: 4 }}>
+        <span className="control-label" style={{ fontWeight: 500, color: '#333', fontSize: '13px' }}>{label}</span>
+        {secondaryLabel && <span style={{ color: '#a0aec0', fontSize: '12px' }}>{secondaryLabel}</span>}
+      </div>
       <input
         type="text"
         value={value ?? ''}
@@ -141,20 +145,20 @@ export const InteractiveSettings = observer(({ store, element }) => {
         placeholder={placeholder}
         style={{
           width: '100%',
-          padding: '10px 12px',
-          background: 'var(--sidebar-input-bg)',
-          border: '1px solid var(--sidebar-input-border)',
-          borderRadius: 6,
-          color: 'var(--sidebar-text)',
-          fontSize: 12,
+          padding: '10px 14px',
+          background: '#ffffff',
+          border: '1px solid #e2e8f0',
+          borderRadius: 8,
+          color: '#2d3748',
+          fontSize: '14px',
         }}
       />
     </div>
   );
 
   const renderTextArea = (label, value, onChange, placeholder = '') => (
-    <div className="control-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 6 }}>
-      <span className="control-label">{label}</span>
+    <div className="control-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }}>
+      <span className="control-label" style={{ fontWeight: 500, color: '#333', fontSize: '13px', marginBottom: 4 }}>{label}</span>
       <textarea
         value={value ?? ''}
         onChange={(e) => onChange(e.target.value)}
@@ -162,12 +166,12 @@ export const InteractiveSettings = observer(({ store, element }) => {
         rows={3}
         style={{
           width: '100%',
-          padding: '10px 12px',
-          background: 'var(--sidebar-input-bg)',
-          border: '1px solid var(--sidebar-input-border)',
-          borderRadius: 6,
-          color: 'var(--sidebar-text)',
-          fontSize: 12,
+          padding: '10px 14px',
+          background: '#ffffff',
+          border: '1px solid #e2e8f0',
+          borderRadius: 8,
+          color: '#2d3748',
+          fontSize: '14px',
           resize: 'vertical',
         }}
       />
@@ -175,46 +179,44 @@ export const InteractiveSettings = observer(({ store, element }) => {
   );
 
   const renderNumberInput = (label, value, onChange, min = 0, max = 100) => (
-    <div className="control-row">
-      <span className="control-label">{label}</span>
-      <div className="control-value">
-        <input
-          type="number"
-          className="position-input"
-          value={value ?? 0}
-          onChange={(e) => {
-            const numValue = parseInt(e.target.value);
-            onChange(isNaN(numValue) ? 0 : numValue);
-          }}
-          min={min}
-          max={max}
-          style={{ width: 60 }}
-        />
+    <div className="control-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+      <span className="control-label" style={{ fontWeight: 500, color: '#333', fontSize: '13px' }}>{label}</span>
+      <div className="select-wrapper" style={{ width: 80 }}>
+        <select
+          className="select-input"
+          value={value ?? ''}
+          onChange={(e) => onChange(parseInt(e.target.value))}
+          style={{ padding: '8px 12px', borderRadius: 8 }}
+        >
+          {Array.from({ length: max - min + 1 }, (_, i) => i + min).map(num => (
+            <option key={num} value={num}>{num}</option>
+          ))}
+        </select>
       </div>
     </div>
   );
 
   const renderColorPicker = (label, value, onChange, defaultColor = '#ffffff') => (
-    <div className="control-row">
-      <span className="control-label">{label}</span>
-      <div className="control-value">
-        <div className="color-picker-row">
-          <div 
-            className="color-swatch" 
-            style={{ backgroundColor: value || defaultColor }}
+    <div className="control-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }}>
+      <span className="control-label" style={{ fontWeight: 500, color: '#333', fontSize: '13px', marginBottom: 4 }}>{label}</span>
+      <div className="control-value" style={{ width: '100%' }}>
+        <div className="color-picker-row" style={{ width: '100%', background: '#fff', border: '1px solid #e2e8f0', borderRadius: 8, padding: '4px 8px', display: 'flex', alignItems: 'center' }}>
+          <div
+            className="color-swatch"
+            style={{ backgroundColor: value || defaultColor, border: '1px solid #ddd', width: 20, height: 20, borderRadius: 4, position: 'relative', overflow: 'hidden' }}
           >
             <input
               type="color"
               value={value || defaultColor}
               onChange={(e) => onChange(e.target.value)}
+              style={{ position: 'absolute', opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }}
             />
           </div>
           <input
             type="text"
-            className="color-input-text"
             value={value || defaultColor}
             onChange={(e) => onChange(e.target.value)}
-            style={{ width: 80 }}
+            style={{ border: 'none', background: 'transparent', paddingLeft: 12, flex: 1, fontSize: '13px', color: '#2d3748', fontFamily: 'SF Mono, Monaco, monospace' }}
           />
         </div>
       </div>
@@ -222,8 +224,8 @@ export const InteractiveSettings = observer(({ store, element }) => {
   );
 
   const renderToggle = (label, value, onChange) => (
-    <div className="control-row">
-      <span className="control-label">{label}</span>
+    <div className="control-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+      <span className="control-label" style={{ fontWeight: 500, color: '#333', fontSize: '13px' }}>{label}</span>
       <div className="control-value">
         <label className="toggle-switch">
           <input
@@ -238,19 +240,21 @@ export const InteractiveSettings = observer(({ store, element }) => {
   );
 
   const renderSelect = (label, value, onChange, options) => (
-    <div className="control-row">
-      <span className="control-label">{label}</span>
-      <div className="control-value">
-        <div className="select-wrapper" style={{ width: 120 }}>
+    <div className="control-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+      <span className="control-label" style={{ fontWeight: 500, color: '#333', fontSize: '13px' }}>{label}</span>
+      <div className="control-value" style={{ width: '140px' }}>
+        <div className="select-wrapper" style={{ position: 'relative' }}>
           <select
             className="select-input"
             value={value ?? ''}
             onChange={(e) => onChange(e.target.value)}
+            style={{ padding: '8px 32px 8px 12px', borderRadius: 8, width: '100%' }}
           >
             {options.map(opt => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
+          <div style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', fontSize: 10, color: '#718096' }}>▼</div>
         </div>
       </div>
     </div>
@@ -260,20 +264,22 @@ export const InteractiveSettings = observer(({ store, element }) => {
 
   const renderPollContent = () => (
     <>
-      {renderTextInput('Question', data.question, (v) => updateData('question', v), 'Enter your question')}
-      
+      <div className="section">
+        {renderTextInput('Question', data.question, (v) => updateData('question', v), 'Enter your question')}
+      </div>
+
       <div className="section" style={{ marginTop: 16 }}>
         {renderSectionTitle('Options')}
         {(data.options || []).map((option, index) => (
-          <div key={option.id} style={{ 
-            display: 'flex', 
-            gap: 8, 
+          <div key={option.id} style={{
+            display: 'flex',
+            gap: 8,
             marginBottom: 8,
-            alignItems: 'center' 
+            alignItems: 'center'
           }}>
-            <span style={{ 
-              width: 20, 
-              fontSize: 11, 
+            <span style={{
+              width: 20,
+              fontSize: 11,
               color: 'var(--text-muted)',
               textAlign: 'center'
             }}>
@@ -329,14 +335,18 @@ export const InteractiveSettings = observer(({ store, element }) => {
         </button>
       </div>
 
-      {renderToggle('Show Results', data.showResults, (v) => updateData('showResults', v))}
+      <div className="section" style={{ marginTop: 16 }}>
+        {renderToggle('Show Results', data.showResults, (v) => updateData('showResults', v))}
+      </div>
     </>
   );
 
   const renderQuizContent = () => (
     <>
-      {renderTextInput('Question', data.question, (v) => updateData('question', v), 'Enter your question')}
-      
+      <div className="section">
+        {renderTextInput('Question', data.question, (v) => updateData('question', v), 'Enter your question')}
+      </div>
+
       <div className="section" style={{ marginTop: 16 }}>
         {renderSectionTitle('Answer Options')}
         {(data.options || []).map((option) => (
@@ -344,7 +354,7 @@ export const InteractiveSettings = observer(({ store, element }) => {
             display: 'flex', 
             gap: 8, 
             marginBottom: 8,
-            alignItems: 'center' 
+            alignItems: 'center'
           }}>
             <button
               onClick={() => setCorrectAnswer(option.id)}
@@ -353,7 +363,7 @@ export const InteractiveSettings = observer(({ store, element }) => {
                 height: 24,
                 borderRadius: '50%',
                 background: data.correctAnswerId === option.id ? '#10b981' : 'transparent',
-                border: `2px solid ${data.correctAnswerId === option.id ? '#10b981' : 'var(--border-primary)'}`,
+                border: `2px solid ${data.correctAnswerId === option.id ? '#10b981' : 'var(--border-primary)'} `,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -413,44 +423,74 @@ export const InteractiveSettings = observer(({ store, element }) => {
         >
           + Add Option
         </button>
-        
+
         <p style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 8 }}>
           Click the circle to mark the correct answer
         </p>
       </div>
 
-      {renderToggle('Show Explanation', data.showExplanation, (v) => updateData('showExplanation', v))}
-      
-      {data.showExplanation && renderTextArea('Explanation', data.explanation, (v) => updateData('explanation', v), 'Explain the correct answer...')}
+      <div className="section" style={{ marginTop: 16 }}>
+        {renderToggle('Show Explanation', data.showExplanation, (v) => updateData('showExplanation', v))}
+
+        {data.showExplanation && renderTextArea('Explanation', data.explanation, (v) => updateData('explanation', v), 'Explain the correct answer...')}
+      </div>
     </>
   );
 
   const renderRatingContent = () => (
     <>
-      {renderTextInput('Title', data.title, (v) => updateData('title', v), 'Rate this!')}
-      
-      {renderSelect('Type', data.type, (v) => updateData('type', v), [
-        { value: 'star', label: 'Stars' },
-        { value: 'emoji', label: 'Emoji' },
-        { value: 'slider', label: 'Slider' },
-      ])}
-      
-      {renderNumberInput('Max Rating', data.maxRating, (v) => updateData('maxRating', v), 1, 10)}
-      
-      {data.type === 'emoji' && renderTextInput('Emoji', data.emoji, (v) => updateData('emoji', v), '⭐')}
+      <div className="section">
+        {renderTextInput('Title', data.title, (v) => updateData('title', v), 'Do you like my eyes?', 'Tagfic')}
+
+        {renderSelect('Type', data.type, (v) => updateData('type', v), [
+          { value: 'star', label: 'Stars' },
+          { value: 'emoji', label: 'Emoji' },
+          { value: 'slider', label: 'Slider' },
+        ])}
+
+        {renderNumberInput('Max Rating', data.maxRating, (v) => updateData('maxRating', v), 1, 10)}
+
+        {(data.type === 'emoji' || data.type === 'slider') && renderTextInput('Emoji', data.emoji, (v) => updateData('emoji', v), '😺')}
+      </div>
+
+      {data.type === 'slider' && (
+        <div className="section" style={{ marginTop: 16 }}>
+          <div className="control-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }}>
+            <span className="control-label" style={{ fontWeight: 500, color: '#333', fontSize: '13px', marginBottom: 4 }}>Current Rating</span>
+            <div className="control-value" style={{ width: '100%' }}>
+              <div className="slider-container">
+                <div className="slider-track" style={{ height: 6, background: '#edf2f7' }}>
+                  <input
+                    type="range"
+                    min={0}
+                    max={data.maxRating || 5}
+                    step={0.1}
+                    value={data.currentRating ?? 0}
+                    onChange={(e) => updateData('currentRating', parseFloat(e.target.value))}
+                    style={{ top: -14 }}
+                  />
+                  <div className="slider-fill" style={{ width: `${((data.currentRating ?? 0) / (data.maxRating || 5)) * 100}% `, height: '100%' }}>
+                    <div className="slider-thumb" style={{ width: 20, height: 20, top: -7, border: '2px solid white', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 
   const renderReactionContent = () => {
     const emojis = data.emojis || ['😍', '🔥', '😂', '😮', '😢'];
-    
+
     return (
       <>
         <div className="section">
           {renderSectionTitle('Emoji Reactions')}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
             {emojis.map((emoji, index) => (
-              <div 
+              <div
                 key={index}
                 style={{
                   display: 'flex',
@@ -518,49 +558,53 @@ export const InteractiveSettings = observer(({ store, element }) => {
           </button>
         </div>
 
-        {renderToggle('Show Count', data.showCount, (v) => updateData('showCount', v))}
+        <div className="section" style={{ marginTop: 16 }}>
+          {renderToggle('Show Count', data.showCount, (v) => updateData('showCount', v))}
+        </div>
       </>
     );
   };
 
   const renderCountdownContent = () => (
     <>
-      {renderTextInput('Title', data.title, (v) => updateData('title', v), 'Ends In')}
-      
-      <div className="control-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 6 }}>
-        <span className="control-label">End Date</span>
-        <input
-          type="date"
-          value={data.endDate ?? ''}
-          onChange={(e) => updateData('endDate', e.target.value)}
-          style={{
-            width: '100%',
-            padding: '10px 12px',
-            background: 'var(--sidebar-input-bg)',
-            border: '1px solid var(--sidebar-input-border)',
-            borderRadius: 6,
-            color: 'var(--sidebar-text)',
-            fontSize: 12,
-          }}
-        />
-      </div>
-      
-      <div className="control-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 6, marginTop: 12 }}>
-        <span className="control-label">End Time</span>
-        <input
-          type="time"
-          value={data.endTime || '23:59'}
-          onChange={(e) => updateData('endTime', e.target.value)}
-          style={{
-            width: '100%',
-            padding: '10px 12px',
-            background: 'var(--sidebar-input-bg)',
-            border: '1px solid var(--sidebar-input-border)',
-            borderRadius: 6,
-            color: 'var(--sidebar-text)',
-            fontSize: 12,
-          }}
-        />
+      <div className="section">
+        {renderTextInput('Title', data.title, (v) => updateData('title', v), 'Ends In')}
+
+        <div className="control-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 6 }}>
+          <span className="control-label">End Date</span>
+          <input
+            type="date"
+            value={data.endDate ?? ''}
+            onChange={(e) => updateData('endDate', e.target.value)}
+            style={{
+              width: '100%',
+              padding: '10px 12px',
+              background: 'var(--sidebar-input-bg)',
+              border: '1px solid var(--sidebar-input-border)',
+              borderRadius: 6,
+              color: 'var(--sidebar-text)',
+              fontSize: 12,
+            }}
+          />
+        </div>
+
+        <div className="control-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 6, marginTop: 12 }}>
+          <span className="control-label">End Time</span>
+          <input
+            type="time"
+            value={data.endTime || '23:59'}
+            onChange={(e) => updateData('endTime', e.target.value)}
+            style={{
+              width: '100%',
+              padding: '10px 12px',
+              background: 'var(--sidebar-input-bg)',
+              border: '1px solid var(--sidebar-input-border)',
+              borderRadius: 6,
+              color: 'var(--sidebar-text)',
+              fontSize: 12,
+            }}
+          />
+        </div>
       </div>
 
       <div className="section" style={{ marginTop: 16 }}>
@@ -575,20 +619,30 @@ export const InteractiveSettings = observer(({ store, element }) => {
 
   const renderPromoContent = () => (
     <>
-      {renderTextInput('Title', data.title, (v) => updateData('title', v), 'Special Offer')}
-      {renderTextInput('Coupon Code', data.couponCode, (v) => updateData('couponCode', v), 'SAVE20')}
-      {renderTextArea('Description', data.description, (v) => updateData('description', v), 'Get 20% off your order')}
-      {renderToggle('Show Copy Button', data.showCopyButton !== false, (v) => updateData('showCopyButton', v))}
-      {renderToggle('Dashed Border', data.dashedBorder !== false, (v) => updateData('dashedBorder', v))}
+      <div className="section">
+        {renderTextInput('Title', data.title, (v) => updateData('title', v), 'Special Offer')}
+        {renderTextInput('Coupon Code', data.couponCode, (v) => updateData('couponCode', v), 'SAVE20')}
+        {renderTextArea('Description', data.description, (v) => updateData('description', v), 'Get 20% off your order')}
+      </div>
+
+      <div className="section" style={{ marginTop: 16 }}>
+        {renderToggle('Show Copy Button', data.showCopyButton !== false, (v) => updateData('showCopyButton', v))}
+        {renderToggle('Dashed Border', data.dashedBorder !== false, (v) => updateData('dashedBorder', v))}
+      </div>
     </>
   );
 
   const renderQuestionContent = () => (
     <>
-      {renderTextInput('Title', data.title, (v) => updateData('title', v), 'Ask me anything')}
-      {renderTextInput('Placeholder', data.placeholder, (v) => updateData('placeholder', v), 'Type your answer...')}
-      {renderNumberInput('Max Length', data.maxLength, (v) => updateData('maxLength', v), 10, 500)}
-      {renderToggle('Allow Anonymous', data.allowAnonymous !== false, (v) => updateData('allowAnonymous', v))}
+      <div className="section">
+        {renderTextInput('Title', data.title, (v) => updateData('title', v), 'Ask me anything')}
+        {renderTextInput('Placeholder', data.placeholder, (v) => updateData('placeholder', v), 'Type your answer...')}
+        {renderNumberInput('Max Length', data.maxLength, (v) => updateData('maxLength', v), 10, 500)}
+      </div>
+
+      <div className="section" style={{ marginTop: 16 }}>
+        {renderToggle('Allow Anonymous', data.allowAnonymous !== false, (v) => updateData('allowAnonymous', v))}
+      </div>
     </>
   );
 
@@ -601,29 +655,31 @@ export const InteractiveSettings = observer(({ store, element }) => {
         onChange={handleImageUpload}
         style={{ display: 'none' }}
       />
-      
-      {renderTextInput('Question', data.question, (v) => updateData('question', v), 'Which one is correct?')}
-      
-      {renderSelect('Columns', data.columns, (v) => updateData('columns', parseInt(v)), [
-        { value: '2', label: '2 Columns' },
-        { value: '3', label: '3 Columns' },
-        { value: '4', label: '4 Columns' },
-      ])}
-      
+
+      <div className="section">
+        {renderTextInput('Question', data.question, (v) => updateData('question', v), 'Which one is correct?')}
+
+        {renderSelect('Columns', data.columns, (v) => updateData('columns', parseInt(v)), [
+          { value: '2', label: '2 Columns' },
+          { value: '3', label: '3 Columns' },
+          { value: '4', label: '4 Columns' },
+        ])}
+      </div>
+
       <div className="section" style={{ marginTop: 16 }}>
         {renderSectionTitle('Image Options')}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
           {(data.options || []).map((option) => (
-            <div 
+            <div
               key={option.id}
               style={{
                 padding: 8,
                 background: 'var(--sidebar-input-bg)',
                 borderRadius: 8,
-                border: `2px solid ${data.correctAnswerId === option.id ? '#10b981' : 'var(--sidebar-input-border)'}`,
+                border: `2px solid ${data.correctAnswerId === option.id ? '#10b981' : 'var(--sidebar-input-border)'} `,
               }}
             >
-              <div 
+              <div
                 onClick={() => triggerImageUpload(option.id)}
                 style={{
                   aspectRatio: '1',
@@ -638,8 +694,8 @@ export const InteractiveSettings = observer(({ store, element }) => {
                 }}
               >
                 {option.imageUrl ? (
-                  <img 
-                    src={option.imageUrl} 
+                  <img
+                    src={option.imageUrl}
                     alt={option.label}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
@@ -670,7 +726,7 @@ export const InteractiveSettings = observer(({ store, element }) => {
                     flex: 1,
                     padding: '4px 6px',
                     background: data.correctAnswerId === option.id ? '#10b981' : 'transparent',
-                    border: `1px solid ${data.correctAnswerId === option.id ? '#10b981' : 'var(--border-primary)'}`,
+                    border: `1px solid ${data.correctAnswerId === option.id ? '#10b981' : 'var(--border-primary)'} `,
                     borderRadius: 4,
                     color: data.correctAnswerId === option.id ? '#fff' : 'var(--text-muted)',
                     fontSize: 9,
@@ -738,137 +794,20 @@ export const InteractiveSettings = observer(({ store, element }) => {
   // ==================== STYLE TAB ====================
 
   const renderStyleTab = () => {
-    const defaults = INTERACTIVE_STYLES[interactiveType] || {};
-    
+    const { style } = element.custom;
+    const defaults = INTERACTIVE_STYLES[interactiveType];
+
     return (
       <>
-        {/* Position & Size Section */}
+        <PositionSection element={element} />
+        <AppearanceSection element={element} />
+
         <div className="section">
-          {renderSectionTitle('Position & Size')}
-          
-          <div className="control-row">
-            <span className="control-label">Position</span>
-            <div className="control-value">
-              <div className="position-row">
-                <div className="position-field">
-                  <input
-                    type="number"
-                    className="position-input"
-                    value={Math.round(element.x ?? 0)}
-                    onChange={(e) => {
-                      const value = parseFloat(e.target.value);
-                      element.set({ x: isNaN(value) ? 0 : value });
-                    }}
-                  />
-                  <label>X</label>
-                </div>
-                <div className="position-field">
-                  <input
-                    type="number"
-                    className="position-input"
-                    value={Math.round(element.y ?? 0)}
-                    onChange={(e) => {
-                      const value = parseFloat(e.target.value);
-                      element.set({ y: isNaN(value) ? 0 : value });
-                    }}
-                  />
-                  <label>Y</label>
-                </div>
-              </div>
-            </div>
-          </div>
+          {renderSectionTitle('Colors & Styling')}
 
-          <div className="control-row">
-            <span className="control-label">Size</span>
-            <div className="control-value">
-              <div className="position-row">
-                <div className="position-field">
-                  <input
-                    type="number"
-                    className="position-input"
-                    value={Math.round(element.width ?? 0)}
-                    onChange={(e) => {
-                      const value = parseFloat(e.target.value);
-                      const newWidth = isNaN(value) ? 100 : Math.max(1, value);
-                      element.set({ width: newWidth });
-                      // Regenerate SVG with new dimensions
-                      setTimeout(() => regenerateSVG(data, style), 0);
-                    }}
-                  />
-                  <label>W</label>
-                </div>
-                <div className="position-field">
-                  <input
-                    type="number"
-                    className="position-input"
-                    value={Math.round(element.height ?? 0)}
-                    onChange={(e) => {
-                      const value = parseFloat(e.target.value);
-                      const newHeight = isNaN(value) ? 100 : Math.max(1, value);
-                      element.set({ height: newHeight });
-                      // Regenerate SVG with new dimensions
-                      setTimeout(() => regenerateSVG(data, style), 0);
-                    }}
-                  />
-                  <label>H</label>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="control-row">
-            <span className="control-label">Rotation</span>
-            <div className="control-value">
-              <input
-                type="number"
-                className="position-input"
-                value={Math.round(element.rotation ?? 0)}
-                onChange={(e) => {
-                  const value = parseFloat(e.target.value);
-                  element.set({ rotation: isNaN(value) ? 0 : value });
-                }}
-              />
-              <span style={{ color: 'var(--sidebar-text-muted)', fontSize: 11 }}>°</span>
-            </div>
-          </div>
-
-          <div className="control-row">
-            <span className="control-label">Opacity</span>
-            <div className="control-value">
-              <div className="slider-container">
-                <input
-                  type="number"
-                  className="slider-input"
-                  value={Math.round((element.opacity ?? 1) * 100)}
-                  onChange={(e) => {
-                    const value = parseInt(e.target.value);
-                    element.set({ opacity: (isNaN(value) ? 0 : value) / 100 });
-                  }}
-                  min={0}
-                  max={100}
-                />
-                <div className="slider-track">
-                  <input
-                    type="range"
-                    min={0}
-                    max={100}
-                    value={Math.round((element.opacity ?? 1) * 100)}
-                    onChange={(e) => element.set({ opacity: parseInt(e.target.value) / 100 })}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Appearance Section */}
-        <div className="section">
-          {renderSectionTitle('Appearance')}
-          
           {renderColorPicker('Background', style.containerBgColor, (v) => updateStyle('containerBgColor', v), defaults.containerBgColor)}
-          {renderNumberInput('Border Radius', style.containerBorderRadius, (v) => updateStyle('containerBorderRadius', v), 0, 50)}
           {renderNumberInput('Padding', style.containerPadding, (v) => updateStyle('containerPadding', v), 0, 50)}
-          
+
           {/* Type-specific colors */}
           {(interactiveType === 'poll' || interactiveType === 'quiz' || interactiveType === 'question') && (
             <>
@@ -894,14 +833,6 @@ export const InteractiveSettings = observer(({ store, element }) => {
             </>
           )}
 
-          {interactiveType === 'rating' && (
-            <>
-              {renderColorPicker('Title Color', style.titleColor, (v) => updateStyle('titleColor', v), defaults.titleColor)}
-              {renderColorPicker('Active Color', style.activeColor, (v) => updateStyle('activeColor', v), defaults.activeColor)}
-              {renderColorPicker('Inactive Color', style.inactiveColor, (v) => updateStyle('inactiveColor', v), defaults.inactiveColor)}
-              {renderNumberInput('Emoji Size', style.emojiSize, (v) => updateStyle('emojiSize', v), 16, 64)}
-            </>
-          )}
 
           {interactiveType === 'reaction' && (
             <>
@@ -949,6 +880,17 @@ export const InteractiveSettings = observer(({ store, element }) => {
           )}
         </div>
 
+        {/* Additional Appearance for Rating */}
+        {interactiveType === 'rating' && (
+          <div className="section">
+            {renderSectionTitle('Additional Appearance')}
+            {renderColorPicker('Card Background', style.cardBgColor, (v) => updateStyle('cardBgColor', v), '#ffffff')}
+            {renderColorPicker('Title Color', style.titleColor, (v) => updateStyle('titleColor', v), '#000000')}
+            {renderNumberInput('Title Size', style.titleFontSize, (v) => updateStyle('titleFontSize', v), 8, 24)}
+            {renderNumberInput('Emoji Size', style.emojiSize, (v) => updateStyle('emojiSize', v), 16, 64)}
+          </div>
+        )}
+
         {/* Reset Default Styles Button */}
         <button
           onClick={() => {
@@ -982,7 +924,7 @@ export const InteractiveSettings = observer(({ store, element }) => {
   return (
     <div className="settings-panel interactive-settings">
       {/* Type Badge */}
-      <div style={{
+      {/* <div style={{
         padding: '10px 16px',
         background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
         color: '#ffffff',
@@ -996,23 +938,23 @@ export const InteractiveSettings = observer(({ store, element }) => {
       }}>
         <span style={{ fontSize: 16 }}>{getInteractiveTypeIcon(interactiveType)}</span>
         <span>{getInteractiveTypeLabel(interactiveType)}</span>
-      </div>
+      </div> */}
 
       {/* Tabs */}
       <div className="sidebar-tabs">
-        <button 
+        <button
           className={`sidebar-tab ${activeTab === 'content' ? 'active' : ''}`}
           onClick={() => setActiveTab('content')}
         >
           Content
         </button>
-        <button 
+        <button
           className={`sidebar-tab ${activeTab === 'style' ? 'active' : ''}`}
           onClick={() => setActiveTab('style')}
         >
           Style
         </button>
-        <button 
+        <button
           className={`sidebar-tab ${activeTab === 'animation' ? 'active' : ''}`}
           onClick={() => setActiveTab('animation')}
         >
@@ -1021,26 +963,19 @@ export const InteractiveSettings = observer(({ store, element }) => {
       </div>
 
       {/* Content */}
-      <div className="settings-content" style={{ padding: 16 }}>
-        {activeTab === 'content' && (
-          <>
-            {renderContentTab()}
-            
-            {/* Delete Button */}
-            <div className="action-buttons">
-              <button 
-                className="action-btn delete" 
-                onClick={() => store.deleteElements([element.id])}
-              >
-                <span>🗑</span> Delete
-              </button>
-            </div>
-          </>
-        )}
-        
+      <div className="settings-content">
+        {activeTab === 'content' && renderContentTab()}
+
         {activeTab === 'style' && renderStyleTab()}
-        
-        {activeTab === 'animation' && <AnimationSection store={store} element={element} />}
+
+        {activeTab === 'animation' && (
+          <AnimationSection store={store} element={element} />
+        )}
+      </div>
+
+      {/* Duration Section - At bottom, visible on all tabs */}
+      <div style={{ paddingBottom: 16 }}>
+        <DurationSection store={store} element={element} />
       </div>
     </div>
   );
