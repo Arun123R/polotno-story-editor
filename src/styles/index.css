@@ -256,7 +256,47 @@ body {
     background-color: var(--bg-secondary) !important;
     color: var(--text-primary) !important;
     border: none !important;
-    border-top: 1px solid #e0e0e0 !important;
+    border-top: 1px solid var(--border-primary) !important;
+}
+
+/* Ensure SidePanel text has proper contrast in both themes */
+.polotno-side-panel-content,
+.polotno-side-panel-content *,
+.bp5-tab-panel,
+.bp5-tab-panel * {
+    color: inherit;
+}
+
+.polotno-side-panel,
+.polotno-side-panel-content,
+.bp5-tab-panel {
+    color: var(--text-primary) !important;
+}
+
+.polotno-side-panel-content .bp5-label,
+.polotno-side-panel-content label,
+.polotno-side-panel-content .bp5-control,
+.polotno-side-panel-content .bp5-text {
+    color: var(--text-secondary) !important;
+}
+
+.polotno-side-panel-content .bp5-form-helper-text,
+.polotno-side-panel-content small {
+    color: var(--text-muted) !important;
+}
+
+/* Inputs/selects that may not be Blueprint components */
+.polotno-side-panel-content input,
+.polotno-side-panel-content select,
+.polotno-side-panel-content textarea {
+    background-color: var(--input-bg) !important;
+    border: 1px solid var(--input-border) !important;
+    color: var(--text-primary) !important;
+}
+
+.polotno-side-panel-content input::placeholder,
+.polotno-side-panel-content textarea::placeholder {
+    color: var(--text-muted) !important;
 }
 
 /* Remove box-shadow border effect from side panel container */
@@ -264,7 +304,7 @@ body {
 [class*="go"][class*="polotno-panel"] {
     box-shadow: none !important;
     border: none !important;
-    border-top: 1px solid #e0e0e0 !important;
+    border-top: 1px solid var(--border-primary) !important;
     background-color: var(--bg-secondary) !important;
     padding: 0 !important;
 }

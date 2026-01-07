@@ -117,7 +117,7 @@ const NormalizedTemplatesPanel = observer(({ store }) => {
         checked={sameSize}
         onChange={(e) => setSameSize(e.target.checked)}
         alignIndicator={Alignment.RIGHT}
-        style={{ marginTop: '8px', marginBottom: '25px' }}
+        style={{ marginTop: '8px', marginBottom: '8px' }}
       >
         {t('sidePanel.searchTemplatesWithSameSize')}{' '}
       </Switch>

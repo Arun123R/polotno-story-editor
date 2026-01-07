@@ -19,6 +19,29 @@
   --sidebar-new-badge: #F97316;
 }
 
+/* Sidebar-specific variables for dark theme */
+:root[data-theme="dark"] {
+  --sidebar-bg: #141C2F;
+  --sidebar-content-bg: #141C2F;
+  --sidebar-bg-secondary: #1A2340;
+  --sidebar-bg-hover: #1A2340;
+  --sidebar-border: #25304A;
+
+  --sidebar-text: #E5E7EB;
+  --sidebar-text-secondary: #9CA3AF;
+  --sidebar-text-muted: #6B7280;
+
+  --sidebar-accent: #F97316;
+  --sidebar-accent-hover: #FB923C;
+
+  --sidebar-input-bg: #141C2F;
+  --sidebar-input-border: #2E3A59;
+
+  --sidebar-success: #10B981;
+  --sidebar-danger: #EF4444;
+  --sidebar-new-badge: #F97316;
+}
+
 .right-sidebar {
   width: 280px;
   min-width: 280px;
@@ -104,8 +127,8 @@
 .settings-panel>.section,
 .duration-section,
 .section {
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--sidebar-bg-secondary);
+  border: 1px solid var(--sidebar-border);
   border-radius: 12px;
   padding: 12px;
   margin: 12px;
@@ -185,10 +208,10 @@
 .position-input {
   width: 60px;
   padding: 6px 4px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--sidebar-input-bg);
+  border: 1px solid var(--sidebar-input-border);
   border-radius: 6px;
-  color: #2d3748;
+  color: var(--sidebar-text);
   font-size: 12px;
   text-align: center;
   transition: border-color 0.2s;
@@ -210,7 +233,7 @@
   width: 20px;
   height: 20px;
   border-radius: 4px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--sidebar-input-border);
   cursor: pointer;
   position: relative;
   overflow: hidden;
@@ -230,10 +253,10 @@
 .color-input-text {
   flex: 1;
   padding: 8px 12px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--sidebar-input-bg);
+  border: 1px solid var(--sidebar-input-border);
   border-radius: 8px;
-  color: #2d3748;
+  color: var(--sidebar-text);
   font-size: 13px;
   font-family: inherit;
 }
@@ -241,7 +264,7 @@
 /* Segmented Control (Presets) */
 .segment-group {
   display: flex;
-  background: #f1f5f9;
+  background: var(--sidebar-bg-hover);
   border-radius: 8px;
   padding: 2px;
   width: 100%;
@@ -252,7 +275,7 @@
   padding: 6px 4px;
   border: none;
   background: transparent;
-  color: #64748b;
+  color: var(--sidebar-text-secondary);
   font-size: 11px;
   font-weight: 500;
   cursor: pointer;
@@ -262,11 +285,11 @@
 }
 
 .segment-btn:hover {
-  color: #1e293b;
+  color: var(--sidebar-text);
 }
 
 .segment-btn.active {
-  background: #ffffff;
+  background: var(--sidebar-bg-secondary);
   color: var(--sidebar-accent);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
@@ -282,7 +305,7 @@
 .slider-track {
   flex: 1;
   height: 2px;
-  background: #e2e8f0;
+  background: var(--sidebar-input-border);
   border-radius: 1px;
   position: relative;
   cursor: pointer;
@@ -316,7 +339,7 @@
   right: -9px;
   top: -7px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  border: 2.5px solid white;
+  border: 2.5px solid var(--sidebar-bg-secondary);
 }
 
 /* Select Dropdown */
@@ -328,10 +351,10 @@
 .select-input {
   width: 100%;
   padding: 8px 32px 8px 12px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--sidebar-input-bg);
+  border: 1px solid var(--sidebar-input-border);
   border-radius: 8px;
-  color: #2d3748;
+  color: var(--sidebar-text);
   font-size: 13px;
   cursor: pointer;
   appearance: none;
@@ -347,7 +370,7 @@
   height: 0;
   border-left: 4.5px solid transparent;
   border-right: 4.5px solid transparent;
-  border-top: 5px solid #a0aec0;
+  border-top: 5px solid var(--sidebar-text-muted);
   pointer-events: none;
 }
 
@@ -425,8 +448,8 @@
 
 /* Duration Section */
 .duration-section {
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--sidebar-bg-secondary);
+  border: 1px solid var(--sidebar-border);
   border-radius: 12px;
   padding: 16px;
   margin: 12px;
@@ -660,7 +683,7 @@
 }
 
 .right-sidebar .bp5-slider-handle {
-  background: white;
+  background: var(--sidebar-bg-secondary);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
@@ -742,7 +765,7 @@
   width: 18px;
   left: 3px;
   bottom: 3px;
-  background-color: white;
+  background-color: var(--sidebar-bg-secondary);
   transition: 0.3s;
   border-radius: 50%;
 }
