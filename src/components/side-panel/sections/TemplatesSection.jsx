@@ -106,8 +106,8 @@ const NormalizedTemplatesPanel = observer(({ store }) => {
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <InputGroup
-        leftIcon={<Search/>}
-        placeholder={t('sidePanel.searchPlaceholder')}
+        // leftIcon={<Search/>}
+        placeholder="Search templates"
         type="search"
         onChange={(e) => setQuery(e.target.value)}
         style={{ marginBottom: '20px' }}
@@ -129,5 +129,5 @@ const NormalizedTemplatesPanel = observer(({ store }) => {
 
 export const TemplatesSection = {
   ...PolotnoTemplatesSection,
-  Panel: ({ store }) => <NormalizedTemplatesPanel store={store} />, 
+  Panel: ({ store }) => <NormalizedTemplatesPanel store={store} />,
 };
