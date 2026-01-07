@@ -194,7 +194,7 @@ export const setStorePreset = (targetStore, presetName, options = {}) => {
 setStorePreset(store, DEFAULT_PRESET, { rescaleExisting: false });
 
 store.addPage();
-store.setSize(279, 496);
+store.setSize(360, 640);
 
 // NOTE: Do not monkey-patch store methods (toDataURL/saveAsImage/loadJSON/deleteElements).
 // Some deployment environments / Polotno builds may not support overriding store instance methods.
