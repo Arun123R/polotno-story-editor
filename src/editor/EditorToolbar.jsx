@@ -77,7 +77,7 @@ const toolbarComponents = {
   Remove: None,
 
   // History (Undo/Redo) - NOT overridden, keeps default behavior
-
+  // History Button is handled by Polotno, no override provided here.
   // Download - override to ensure correct export pixelRatio without store monkey-patching.
   DownloadButton: observer(({ store }) => {
     const [loading, setLoading] = React.useState(false);

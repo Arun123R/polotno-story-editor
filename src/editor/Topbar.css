@@ -11,6 +11,57 @@
     gap: 24px;
 }
 
+/* Make Toolbar container, button groups, and buttons transparent */
+.topbar .polotno-toolbar,
+.topbar [class*="polotno-toolbar"],
+.topbar .bp5-button-group,
+.topbar .bp4-button-group,
+.topbar .bp3-button-group {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.topbar .bp5-button,
+.topbar .bp4-button,
+.topbar .bp3-button,
+.topbar .bp5-button *,
+.topbar .bp4-button *,
+.topbar .bp3-button * {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.topbar .bp5-button:focus,
+.topbar .bp4-button:focus,
+.topbar .bp3-button:focus,
+.topbar .bp5-button:active,
+.topbar .bp4-button:active,
+.topbar .bp3-button:active,
+.topbar .bp5-button:focus-visible,
+.topbar .bp4-button:focus-visible,
+.topbar .bp3-button:focus-visible {
+    outline: none !important;
+    border: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+
+/* Hide the three-dots (more) menu in the toolbar while keeping Undo/Redo */
+.topbar .bp5-icon-more,
+.topbar .bp4-icon-more,
+.topbar button:has(.bp5-icon-more),
+.topbar button:has(.bp4-icon-more),
+.topbar .bp5-button:has([data-icon="more"]),
+.topbar .bp4-button:has([data-icon="more"]) {
+    display: none !important;
+}
+
 /* ==================== LEFT SECTION ==================== */
 
 .topbar-left {
@@ -146,11 +197,19 @@
     font-size: 16px;
 }
 
-/* Actions */
+/* Actions - Using grid to prevent toolbar expansion */
 .topbar-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+    display: grid !important;
+    grid-template-columns: auto 100px auto auto !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+
+/* Lock the toolbar in its grid cell */
+.topbar-actions .polotno-toolbar {
+    grid-column: 2 !important;
+    overflow: hidden !important;
+    max-width: 100px !important;
 }
 
 .topbar-btn {

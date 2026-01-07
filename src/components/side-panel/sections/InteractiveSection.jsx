@@ -1,7 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { SectionTab } from 'polotno/side-panel';
-import { BASELINE_EXPORT, getStoreExportScale, getStoreExportSize, toCanvas } from '../../../utils/scale';
 import {
   createInteractiveData,
   INTERACTIVE_DIMENSIONS,
@@ -24,7 +23,7 @@ const generateInteractiveSVG = (type, data, style, dimensions) => {
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
       <rect width="${width}" height="${height}" fill="#667eea" rx="12"/>
-      <text x="${width / 2}" y="${height / 2}" font-family="Arial" font-size="16" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">${type}</text>
+      <text x="${width / 2}" y="${height / 2}" font-family="Arial" font-size="16" fill="white" text-anchor="middle" dominant-baseline="middle">${type}</text>
     </svg>
   `)}`;
 };
@@ -283,20 +282,6 @@ export const InteractiveSectionPanel = observer(({ store }) => {
   const page = store?.activePage;
   if (!page) return null;
 
-  const mapBaselineExportToCurrent = (rectOrPoint) => {
-    const exportSize = getStoreExportSize(store);
-    const sx = exportSize.width / BASELINE_EXPORT.width;
-    const sy = exportSize.height / BASELINE_EXPORT.height;
-
-    if (!rectOrPoint) return rectOrPoint;
-    const out = { ...rectOrPoint };
-    if (typeof out.x === 'number') out.x = out.x * sx;
-    if (typeof out.y === 'number') out.y = out.y * sy;
-    if (typeof out.width === 'number') out.width = out.width * sx;
-    if (typeof out.height === 'number') out.height = out.height * sy;
-    return out;
-  };
-
   /**
    * Add an interactive element to the canvas
    * Uses 'svg' element type which:
@@ -305,30 +290,24 @@ export const InteractiveSectionPanel = observer(({ store }) => {
    * 3. Works well with Polotno's selection and manipulation
    */
   const addInteractive = (type) => {
-    const baselineDims = INTERACTIVE_DIMENSIONS[type];
-    const exportDims = mapBaselineExportToCurrent(baselineDims);
-    const exportScale = getStoreExportScale(store);
-    const canvasDims = {
-      width: toCanvas(exportDims.width, exportScale),
-      height: toCanvas(exportDims.height, exportScale),
-    };
+    const dimensions = INTERACTIVE_DIMENSIONS[type];
     const customData = createInteractiveData(type);
     const styleDefaults = INTERACTIVE_STYLES[type] || {};
 
     // Center the element on the page
-    const x = (store.width - canvasDims.width) / 2;
-    const y = (store.height - canvasDims.height) / 2;
+    const x = (store.width - dimensions.width) / 2;
+    const y = (store.height - dimensions.height) / 2;
 
     // Generate SVG preview based on interactive type
-    const svgContent = generateInteractiveSVG(type, customData.data, styleDefaults, canvasDims);
+    const svgContent = generateInteractiveSVG(type, customData.data, styleDefaults, dimensions);
 
     // Create element with 'svg' type - this allows height control and custom rendering
     const element = page.addElement({
       type: 'svg',
       x,
       y,
-      width: canvasDims.width,
-      height: canvasDims.height,
+      width: dimensions.width,
+      height: dimensions.height,
       src: svgContent,
       keepRatio: false, // Allow independent width/height control
 
@@ -496,7 +475,7 @@ export const InteractiveSectionPanel = observer(({ store }) => {
 
 /* ================= SVG GENERATORS ================= */
 
-function _generatePollSVG(data, style, width, height) {
+function generatePollSVG(data, style, width, height) {
   const bgColor = style?.containerBgColor || 'linear-gradient(135deg, #667eea, #764ba2)';
   const radius = style?.containerBorderRadius || 12;
   const question = data?.question || 'Are you excited for the grand sale?';
@@ -540,7 +519,7 @@ function _generatePollSVG(data, style, width, height) {
   `;
 }
 
-function _generateQuizSVG(data, style, width, height) {
+function generateQuizSVG(data, style, width, height) {
   const bgColor = style?.containerBgColor || 'rgba(0,0,0,0.7)';
   const radius = style?.containerBorderRadius || 12;
   const question = data?.question || 'What is the answer?';
@@ -613,7 +592,7 @@ function generateRatingSVG(data, style, width, height) {
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgContent)}`;
 }
 
-function _generateReactionSVG(data, style, width, height) {
+function generateReactionSVG(data, style, width, height) {
   const emojis = data?.emojis || ['😍', '🔥', '😂', '😮', '😢'];
   const emojiSize = style?.emojiSize || 40;
   const emojiGap = 16;
@@ -632,7 +611,7 @@ function _generateReactionSVG(data, style, width, height) {
   `;
 }
 
-function _generateCountdownSVG(data, style, width, height) {
+function generateCountdownSVG(data, style, width, height) {
   const bgColor = style?.containerBgColor || 'rgba(0,0,0,0.7)';
   const radius = style?.containerBorderRadius || 16;
   const title = data?.title || 'Ends In';
@@ -672,7 +651,7 @@ function _generateCountdownSVG(data, style, width, height) {
   `;
 }
 
-function _generatePromoSVG(data, style, width, height) {
+function generatePromoSVG(data, style, width, height) {
   const bgColor = style?.containerBgColor || 'rgba(0,0,0,0.7)';
   const radius = style?.containerBorderRadius || 12;
   const title = data?.title || 'Special Offer';
@@ -697,7 +676,7 @@ function _generatePromoSVG(data, style, width, height) {
   `;
 }
 
-function _generateQuestionSVG(data, style, width, height) {
+function generateQuestionSVG(data, style, width, height) {
   const bgColor = style?.containerBgColor || 'rgba(0,0,0,0.7)';
   const radius = style?.containerBorderRadius || 12;
   const title = data?.title || 'Ask me anything';
@@ -722,7 +701,7 @@ function _generateQuestionSVG(data, style, width, height) {
   `;
 }
 
-function _generateImageQuizSVG(data, style, width, height) {
+function generateImageQuizSVG(data, style, width, height) {
   const bgColor = style?.containerBgColor || 'rgba(0,0,0,0.7)';
   const radius = style?.containerBorderRadius || 12;
   const question = data?.question || 'Which one?';
@@ -799,10 +778,11 @@ function escapeXml(text) {
 
 /* ================= EXPORT ================= */
 
-/* eslint-disable react-refresh/only-export-components */
-// Export only components for fast refresh compatibility
 export const InteractiveSection = {
   name: 'interactive',
   Tab: InteractiveSectionTab,
   Panel: InteractiveSectionPanel,
 };
+
+// Export helper for updating SVG when data changes
+export { generateInteractiveSVG };
