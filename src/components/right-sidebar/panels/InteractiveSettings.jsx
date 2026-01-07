@@ -36,13 +36,50 @@ export const InteractiveSettings = observer(({ store, element }) => {
 
   // Regenerate SVG preview when data or style changes
   const regenerateSVG = useCallback((newData, newStyle) => {
-    const dimensions = {
-      width: element.width || INTERACTIVE_DIMENSIONS[interactiveType]?.width || 280,
-      height: element.height || INTERACTIVE_DIMENSIONS[interactiveType]?.height || 160,
-    };
+    let width = element.width || INTERACTIVE_DIMENSIONS[interactiveType]?.width || 280;
+    let height = element.height || INTERACTIVE_DIMENSIONS[interactiveType]?.height || 160;
+
+    // Calculate dynamic height for polls based on options and layout
+    if (interactiveType === 'poll' && newData.options) {
+      const optionCount = newData.options.length;
+      const layout = newData.layout || 'horizontal';
+      const padding = 16;
+      const questionHeight = 24;
+      const buttonHeight = 26;
+      const buttonGap = 6;
+
+      if (layout === 'horizontal') {
+        const rows = Math.ceil(optionCount / 2);
+        height = padding + questionHeight + padding + (rows * buttonHeight) + ((rows - 1) * buttonGap) + padding;
+      } else {
+        height = padding + questionHeight + padding + (optionCount * buttonHeight) + ((optionCount - 1) * buttonGap) + padding;
+      }
+    }
+
+    // Calculate dynamic height for quiz based on options
+    if (interactiveType === 'quiz' && newData.options) {
+      const optionCount = newData.options.length;
+      const padding = 12;
+      const questionHeight = 20;
+      const optionHeight = 28; // Increased to account for padding and borders
+      const optionGap = 6;
+      const bottomPadding = 24; // Extra padding at bottom to prevent cutoff
+
+      height = padding + questionHeight + 10 + (optionCount * optionHeight) + ((optionCount - 1) * optionGap) + bottomPadding;
+    }
+
+    // Dynamic height for reaction
+    if (interactiveType === 'reaction') {
+      const padding = 12;
+      const buttonSize = 40;
+      const pillHeight = 65;
+      height = newData.showCount ? (pillHeight + padding * 2) : (buttonSize + padding * 2);
+    }
+
+    const dimensions = { width, height };
     const styleDefaults = { ...INTERACTIVE_STYLES[interactiveType], ...newStyle };
     const newSrc = generateInteractiveSVG(interactiveType, newData, styleDefaults, dimensions);
-    element.set({ src: newSrc });
+    element.set({ src: newSrc, height });
   }, [element, interactiveType]);
 
   // ==================== DATA UPDATE HELPERS ====================
@@ -80,8 +117,8 @@ export const InteractiveSettings = observer(({ store, element }) => {
     const options = data.options || [];
     const newId = `opt${Date.now()} `;
     const newOption = interactiveType === 'imageQuiz'
-      ? { id: newId, imageUrl: '', label: `Option ${options.length + 1} ` }
-      : { id: newId, text: `Option ${options.length + 1} `, votes: 0 };
+      ? { id: newId, imageUrl: '', label: `Option ${options.length + 1}` }
+      : { id: newId, label: `Option ${options.length + 1}`, votes: 0 };
     updateOptions([...options, newOption]);
   };
 
@@ -183,17 +220,37 @@ export const InteractiveSettings = observer(({ store, element }) => {
   const renderNumberInput = (label, value, onChange, min = 0, max = 100) => (
     <div className="control-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
       <span className="control-label" style={{ fontWeight: 500, color: '#333', fontSize: '13px' }}>{label}</span>
-      <div className="select-wrapper" style={{ width: 80 }}>
-        <select
-          className="select-input"
-          value={value ?? ''}
-          onChange={(e) => onChange(parseInt(e.target.value))}
-          style={{ padding: '8px 12px', borderRadius: 8 }}
-        >
-          {Array.from({ length: max - min + 1 }, (_, i) => i + min).map(num => (
-            <option key={num} value={num}>{num}</option>
-          ))}
-        </select>
+      <div style={{ width: 80 }}>
+        <input
+          type="number"
+          value={value ?? min}
+          onChange={(e) => {
+            const val = parseInt(e.target.value);
+            if (!isNaN(val) && val >= min && val <= max) {
+              onChange(val);
+            }
+          }}
+          onBlur={(e) => {
+            const val = parseInt(e.target.value);
+            if (isNaN(val) || val < min) {
+              onChange(min);
+            } else if (val > max) {
+              onChange(max);
+            }
+          }}
+          min={min}
+          max={max}
+          style={{
+            width: '100%',
+            padding: '8px 12px',
+            borderRadius: 8,
+            border: '1px solid var(--sidebar-input-border)',
+            background: 'var(--sidebar-input-bg)',
+            color: 'var(--sidebar-text)',
+            fontSize: '13px',
+            textAlign: 'center'
+          }}
+        />
       </div>
     </div>
   );
@@ -289,8 +346,8 @@ export const InteractiveSettings = observer(({ store, element }) => {
             </span>
             <input
               type="text"
-              value={option.text ?? ''}
-              onChange={(e) => updateOption(option.id, { text: e.target.value })}
+              value={option.label ?? option.text ?? ''}
+              onChange={(e) => updateOption(option.id, { label: e.target.value })}
               style={{
                 flex: 1,
                 padding: '8px 10px',
@@ -335,6 +392,13 @@ export const InteractiveSettings = observer(({ store, element }) => {
         >
           + Add Option
         </button>
+      </div>
+
+      <div className="section" style={{ marginTop: 16 }}>
+        {renderSelect('Layout', data.layout || 'horizontal', (v) => updateData('layout', v), [
+          { value: 'horizontal', label: 'Horizontal (2 columns)' },
+          { value: 'vertical', label: 'Vertical (full width)' },
+        ])}
       </div>
 
       <div className="section" style={{ marginTop: 16 }}>
@@ -838,7 +902,8 @@ export const InteractiveSettings = observer(({ store, element }) => {
 
           {interactiveType === 'reaction' && (
             <>
-              {renderColorPicker('Background', style.bgColor, (v) => updateStyle('bgColor', v), defaults.bgColor)}
+              {renderToggle('Transparent Background', style.transparentBg, (v) => updateStyle('transparentBg', v))}
+              {!style.transparentBg && renderColorPicker('Background', style.containerBgColor, (v) => updateStyle('containerBgColor', v), defaults.containerBgColor)}
               {renderNumberInput('Emoji Size', style.emojiSize, (v) => updateStyle('emojiSize', v), 24, 80)}
             </>
           )}

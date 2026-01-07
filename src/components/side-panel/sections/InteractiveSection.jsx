@@ -19,11 +19,332 @@ const generateInteractiveSVG = (type, data, style, dimensions) => {
     return generateRatingSVG(data, style, width, height);
   }
 
+  if (type === 'poll') {
+    return generatePollSVG(data, style, width, height);
+  }
+
+  if (type === 'quiz') {
+    return generateQuizSVG(data, style, width, height);
+  }
+
+  if (type === 'reaction') {
+    return generateReactionSVG(data, style, width, height);
+  }
+
+  if (type === 'countdown') {
+    return generateCountdownSVG(data, style, width, height);
+  }
+
+  if (type === 'promo') {
+    return generatePromoSVG(data, style, width, height);
+  }
+
+  if (type === 'question') {
+    return generateQuestionSVG(data, style, width, height);
+  }
+
+  if (type === 'imageQuiz') {
+    return generateImageQuizSVG(data, style, width, height);
+  }
+
   // Default fallback for other types
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
       <rect width="${width}" height="${height}" fill="#667eea" rx="12"/>
       <text x="${width / 2}" y="${height / 2}" font-family="Arial" font-size="16" fill="white" text-anchor="middle" dominant-baseline="middle">${type}</text>
+    </svg>
+  `)}`;
+};
+
+// Generate Poll SVG
+const generatePollSVG = (data, style, width, height) => {
+  const question = data?.question || 'Are you excited for the grand sale?';
+  const options = data?.options || [{ id: '1', label: 'YES' }, { id: '2', label: 'NO' }];
+  const layout = data?.layout || 'horizontal'; // 'horizontal' or 'vertical'
+
+  // Use style properties
+  const bgColor = style?.containerBgColor || '#ffffff';
+  const questionColor = style?.questionColor || '#1f2937';
+  const buttonBg = style?.optionBgColor || '#ffffff';
+  const buttonBorder = '#e5e7eb';
+  const buttonTextColor = style?.optionTextColor || '#1f2937';
+  const questionFontSize = style?.questionFontSize || 9;
+  const optionFontSize = style?.optionFontSize || 9;
+
+  const padding = 16;
+  const questionY = padding + 12;
+  const buttonHeight = 26;
+  const buttonGap = 6;
+
+  let optionsSVG = '';
+
+  if (layout === 'horizontal') {
+    // Horizontal layout - 2 columns
+    const buttonsPerRow = 2;
+    const buttonWidth = (width - padding * 2 - buttonGap) / buttonsPerRow;
+    let buttonY = padding + 32;
+
+    options.forEach((opt, i) => {
+      const col = i % buttonsPerRow;
+      const row = Math.floor(i / buttonsPerRow);
+      const x = padding + col * (buttonWidth + buttonGap);
+      const y = buttonY + row * (buttonHeight + buttonGap);
+
+      optionsSVG += `
+        <rect x="${x}" y="${y}" width="${buttonWidth}" height="${buttonHeight}" rx="8" fill="${buttonBg}" stroke="${buttonBorder}" stroke-width="1"/>
+        <text x="${x + buttonWidth / 2}" y="${y + buttonHeight / 2 + 4}" text-anchor="middle" fill="${buttonTextColor}" font-size="${optionFontSize}" font-weight="600">${opt.label || opt.text || 'Option'}</text>
+      `;
+    });
+  } else {
+    // Vertical layout - full width
+    const buttonWidth = width - padding * 2;
+    let buttonY = padding + 32;
+
+    options.forEach((opt, i) => {
+      const y = buttonY + i * (buttonHeight + buttonGap);
+
+      optionsSVG += `
+        <rect x="${padding}" y="${y}" width="${buttonWidth}" height="${buttonHeight}" rx="8" fill="${buttonBg}" stroke="${buttonBorder}" stroke-width="1"/>
+        <text x="${width / 2}" y="${y + buttonHeight / 2 + 4}" text-anchor="middle" fill="${buttonTextColor}" font-size="${optionFontSize}" font-weight="600">${opt.label || opt.text || 'Option'}</text>
+      `;
+    });
+  }
+
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+      <!-- Main background -->
+      <rect width="${width}" height="${height}" fill="${bgColor}" rx="12"/>
+      
+      <!-- Question with text wrapping -->
+      <foreignObject x="${padding}" y="${padding}" width="${width - padding * 2}" height="40">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="
+          color: ${questionColor};
+          font-size: ${questionFontSize}px;
+          font-weight: 600;
+          text-align: center;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          line-height: 1.3;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+        ">${question}</div>
+      </foreignObject>
+      
+      <!-- Options -->
+      ${optionsSVG}
+    </svg>
+  `)}`;
+};
+
+// Generate Rating SVG
+const generateRatingSVG = (data, style, width, height) => {
+  const padding = 8;
+  const cardW = width - padding * 2;
+  const cardH = height - padding * 2;
+  const textY = padding + 18;
+  const sliderY = padding + 38;
+  const sliderW = cardW - 24;
+  const sliderX = padding + 12;
+  const title = data?.title || 'Do you like my eyes?';
+  const emoji = data?.emoji || '😺';
+  const maxRating = data?.maxRating || 5;
+  const currentRating = data?.currentRating || 3;
+  const fillPercent = Math.min(1, currentRating / maxRating);
+  const fillW = sliderW * fillPercent;
+  const cardBg = style?.cardBgColor || '#ffffff';
+  const titleColor = style?.titleColor || '#000000';
+  const titleFontSize = style?.titleFontSize || 12;
+  const emojiSize = style?.emojiSize || 18;
+
+  const gradId = 'grad' + Math.random().toString(36).substr(2, 9);
+  const svgContent = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="${gradId}" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0%" stop-color="#d946ef"/>
+        <stop offset="50%" stop-color="#f43f5e"/>
+        <stop offset="100%" stop-color="#fb923c"/>
+      </linearGradient>
+    </defs>
+    <rect x="${padding}" y="${padding}" width="${cardW}" height="${cardH}" fill="${cardBg}" rx="12"/>
+    <text x="${width / 2}" y="${textY}" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="${titleFontSize}" font-weight="600" fill="${titleColor}">
+      ${title}
+    </text>
+    <rect x="${sliderX}" y="${sliderY}" width="${sliderW}" height="8" rx="4" fill="#e5e7eb"/>
+    <rect x="${sliderX}" y="${sliderY}" width="${fillW}" height="8" rx="4" fill="url(#${gradId})"/>
+    <text x="${sliderX + fillW}" y="${sliderY + 14}" text-anchor="middle" font-size="${emojiSize}">${emoji}</text>
+  </svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgContent)}`;
+};
+
+// Generate Quiz SVG
+const generateQuizSVG = (data, style, width, height) => {
+  const question = data?.question || 'What is the largest...';
+  const options = data?.options || [{ id: '1', text: 'Option 1' }, { id: '2', text: 'Option 2' }];
+
+  const bgColor = style?.containerBgColor || '#ffffff';
+  const questionColor = style?.questionColor || '#1f2937';
+  const optionBg = style?.optionBgColor || '#f9fafb';
+  const optionBorder = '#e5e7eb';
+  const optionTextColor = style?.optionTextColor || '#374151';
+  const letterBg = '#f3f4f6';
+  const letterColor = '#6b7280';
+  const questionFontSize = style?.questionFontSize || 10;
+  const optionFontSize = style?.optionFontSize || 10;
+  const padding = style?.containerPadding || 12;
+  const borderRadius = style?.optionBorderRadius || 4;
+
+  const questionY = padding + 10;
+  const optionStartY = padding + 30;
+  const optionHeight = 20;
+  const optionGap = 6;
+
+  let optionsSVG = '';
+  options.forEach((option, idx) => {
+    const y = optionStartY + idx * (optionHeight + optionGap);
+    const letter = String.fromCharCode(65 + idx); // A, B, C...
+
+    optionsSVG += `
+      <rect x="${padding}" y="${y}" width="${width - padding * 2}" height="${optionHeight}" fill="${optionBg}" stroke="${optionBorder}" stroke-width="1" rx="${borderRadius}"/>
+      <circle cx="${padding + 10}" cy="${y + 10}" r="6" fill="${letterBg}" stroke="${optionBorder}" stroke-width="1"/>
+      <text x="${padding + 10}" y="${y + 10}" font-family="Arial, sans-serif" font-size="9" font-weight="600" fill="${letterColor}" text-anchor="middle" dominant-baseline="middle">${letter}</text>
+      <text x="${padding + 24}" y="${y + 10}" font-family="Arial, sans-serif" font-size="${optionFontSize}" font-weight="500" fill="${optionTextColor}" dominant-baseline="middle">${option.text || option.label || 'Option'}</text>
+    `;
+  });
+
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+      <rect width="${width}" height="${height}" fill="${bgColor}" rx="12"/>
+      
+      <!-- Question -->
+      <text x="${padding}" y="${questionY}" font-family="Arial, sans-serif" font-size="${questionFontSize}" font-weight="600" fill="${questionColor}">${question}</text>
+      
+      <!-- Options -->
+      ${optionsSVG}
+    </svg>
+  `)}`;
+};
+
+// Generate Reaction SVG
+const generateReactionSVG = (data, style, width, height) => {
+  const emojis = data?.emojis || ['👍', '👎'];
+  const showCount = data?.showCount || false;
+  const transparentBg = style?.transparentBg || data?.transparentBg || false;
+  const bgColor = style?.containerBgColor || '#ffffff';
+  const buttonBg = '#f9fafb';
+  const buttonBorder = '#e5e7eb';
+
+  const padding = 12;
+  const buttonCount = emojis.length;
+  const buttonGap = 8;
+
+  // Calculate button dimensions - if showing count, buttons are taller (vertical pills)
+  const buttonWidth = Math.min(50, (width - padding * 2 - (buttonCount - 1) * buttonGap) / buttonCount);
+  const buttonHeight = showCount ? Math.min(65, height - padding * 2) : buttonWidth;
+  const buttonY = (height - buttonHeight) / 2;
+  const totalWidth = buttonCount * buttonWidth + (buttonCount - 1) * buttonGap;
+  const startX = (width - totalWidth) / 2;
+
+  let buttonsSVG = '';
+  emojis.forEach((emoji, idx) => {
+    const x = startX + idx * (buttonWidth + buttonGap);
+
+    if (showCount) {
+      // Tall pill shape with emoji and count
+      buttonsSVG += `
+        <rect x="${x}" y="${buttonY}" width="${buttonWidth}" height="${buttonHeight}" rx="${buttonWidth / 2}" fill="${buttonBg}" stroke="${buttonBorder}" stroke-width="1"/>
+        <text x="${x + buttonWidth / 2}" y="${buttonY + buttonHeight * 0.35}" text-anchor="middle" font-size="${buttonWidth * 0.5}" dominant-baseline="middle">${emoji}</text>
+        <text x="${x + buttonWidth / 2}" y="${buttonY + buttonHeight * 0.75}" text-anchor="middle" font-family="Arial, sans-serif" font-size="${buttonWidth * 0.35}" font-weight="600" fill="#000000" dominant-baseline="middle">2k</text>
+      `;
+    } else {
+      // Standard circle shape
+      buttonsSVG += `
+        <circle cx="${x + buttonWidth / 2}" cy="${buttonY + buttonWidth / 2}" r="${buttonWidth / 2}" fill="${buttonBg}" stroke="${buttonBorder}" stroke-width="1"/>
+        <text x="${x + buttonWidth / 2}" y="${buttonY + buttonWidth / 2 + buttonWidth * 0.05}" text-anchor="middle" font-size="${buttonWidth * 0.6}" dominant-baseline="middle">${emoji}</text>
+      `;
+    }
+  });
+
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+      <!-- Background -->
+      ${transparentBg ? '' : `<rect width="${width}" height="${height}" fill="${bgColor}" rx="12"/>`}
+      
+      <!-- Emoji buttons -->
+      ${buttonsSVG}
+    </svg>
+  `)}`;
+};
+
+// Generate Countdown SVG
+const generateCountdownSVG = (data, style, width, height) => {
+  const title = data?.title || 'Ends In';
+  const containerBg = style?.containerBgColor || '#ffffff';
+  const textColor = style?.titleColor || '#000000';
+
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+      <rect width="${width}" height="${height}" fill="${containerBg}" rx="12"/>
+      
+      <text x="${width / 2}" y="30" font-family="Arial, sans-serif" font-size="14" font-weight="600" fill="${textColor}" text-anchor="middle">${title}</text>
+      
+      <!-- Time Display -->
+      <text x="${width / 2}" y="${height / 2 + 10}" font-family="Arial, sans-serif" font-size="32" font-weight="700" fill="${textColor}" text-anchor="middle">00:00:00</text>
+      <text x="${width / 2}" y="${height / 2 + 30}" font-family="Arial, sans-serif" font-size="10" fill="#9ca3af" text-anchor="middle">days : hours : minutes</text>
+    </svg>
+  `)}`;
+};
+
+// Generate Promo SVG  
+const generatePromoSVG = (data, style, width, height) => {
+  const title = data?.title || 'Special Offer';
+  const code = data?.code || 'SAVE20';
+  const containerBg = style?.containerBgColor || '#ffffff';
+  const titleColor = style?.titleColor || '#000000';
+  const codeColor = style?.codeColor || '#f97316';
+
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+      <rect width="${width}" height="${height}" fill="${containerBg}" rx="12"/>
+      
+      <text x="${width / 2}" y="30" font-family="Arial, sans-serif" font-size="14" font-weight="600" fill="${titleColor}" text-anchor="middle">${title}</text>
+      
+      <!-- Code Box -->
+      <rect x="20" y="45" width="${width - 40}" height="45" fill="#fef3c7" rx="8" stroke="#fb923c" stroke-width="2" stroke-dasharray="5,3"/>
+      <text x="${width / 2}" y="72" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="${codeColor}" text-anchor="middle">${code}</text>
+    </svg>
+  `)}`;
+};
+
+// Generate Question SVG
+const generateQuestionSVG = (data, style, width, height) => {
+  const question = data?.question || 'Ask me anything!';
+  const containerBg = style?.containerBgColor || 'rgba(0,0,0,0.6)';
+  const textColor = style?.questionColor || '#ffffff';
+
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+      <rect width="${width}" height="${height}" fill="${containerBg}" rx="12"/>
+      
+      <text x="${width / 2}" y="${height / 2 - 10}" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="${textColor}" text-anchor="middle">${question}</text>
+      <text x="${width / 2}" y="${height / 2 + 15}" font-family="Arial, sans-serif" font-size="12" fill="rgba(255,255,255,0.7)" text-anchor="middle">Tap to ask</text>
+    </svg>
+  `)}`;
+};
+
+// Generate Image Quiz SVG
+const generateImageQuizSVG = (data, style, width, height) => {
+  const question = data?.question || 'Which one?';
+  const containerBg = style?.containerBgColor || 'rgba(0,0,0,0.6)';
+  const textColor = style?.questionColor || '#ffffff';
+
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+      <rect width="${width}" height="${height}" fill="${containerBg}" rx="12"/>
+      
+      <text x="${width / 2}" y="30" font-family="Arial, sans-serif" font-size="14" font-weight="600" fill="${textColor}" text-anchor="middle">${question}</text>
+      
+      <!-- Image Placeholders -->
+      <rect x="20" y="50" width="${(width - 52) / 2}" height="${(width - 52) / 2}" fill="rgba(255,255,255,0.1)" rx="8" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+      <rect x="${32 + (width - 52) / 2}" y="50" width="${(width - 52) / 2}" height="${(width - 52) / 2}" fill="rgba(255,255,255,0.1)" rx="8" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
     </svg>
   `)}`;
 };
@@ -290,9 +611,46 @@ export const InteractiveSectionPanel = observer(({ store }) => {
    * 3. Works well with Polotno's selection and manipulation
    */
   const addInteractive = (type) => {
-    const dimensions = INTERACTIVE_DIMENSIONS[type];
+    const dimensions = { ...INTERACTIVE_DIMENSIONS[type] };
     const customData = createInteractiveData(type);
     const styleDefaults = INTERACTIVE_STYLES[type] || {};
+
+    // Calculate dynamic height for poll based on options
+    if (type === 'poll' && customData.data.options) {
+      const optionCount = customData.data.options.length;
+      const layout = customData.data.layout || 'horizontal';
+      const padding = 16;
+      const questionHeight = 24;
+      const buttonHeight = 26;
+      const buttonGap = 6;
+
+      if (layout === 'horizontal') {
+        const rows = Math.ceil(optionCount / 2);
+        dimensions.height = padding + questionHeight + padding + (rows * buttonHeight) + ((rows - 1) * buttonGap) + padding;
+      } else {
+        dimensions.height = padding + questionHeight + padding + (optionCount * buttonHeight) + ((optionCount - 1) * buttonGap) + padding;
+      }
+    }
+
+    // Calculate dynamic height for quiz based on options
+    if (type === 'quiz' && customData.data.options) {
+      const optionCount = customData.data.options.length;
+      const padding = 12;
+      const questionHeight = 20;
+      const optionHeight = 28;
+      const optionGap = 6;
+      const bottomPadding = 24;
+
+      dimensions.height = padding + questionHeight + 10 + (optionCount * optionHeight) + ((optionCount - 1) * optionGap) + bottomPadding;
+    }
+
+    // Calculate dynamic height for reaction based on showCount
+    if (type === 'reaction') {
+      const padding = 12;
+      const buttonSize = 40;
+      const pillHeight = 65;
+      dimensions.height = customData.data.showCount ? (pillHeight + padding * 2) : (buttonSize + padding * 2);
+    }
 
     // Center the element on the page
     const x = (store.width - dimensions.width) / 2;
@@ -473,308 +831,7 @@ export const InteractiveSectionPanel = observer(({ store }) => {
   );
 });
 
-/* ================= SVG GENERATORS ================= */
 
-function generatePollSVG(data, style, width, height) {
-  const bgColor = style?.containerBgColor || 'linear-gradient(135deg, #667eea, #764ba2)';
-  const radius = style?.containerBorderRadius || 12;
-  const question = data?.question || 'Are you excited for the grand sale?';
-  const options = data?.options || [{ text: 'YES' }, { text: 'NO' }];
-  const buttonBorder = '#667eea';
-  const buttonTextColor = '#667eea';
-  const questionTextColor = '#000000';
-
-  const padding = 8;
-  const innerRadius = 10;
-  const innerX = padding;
-  const innerY = padding + 2;
-  const innerW = width - padding * 2;
-  const questionHeight = 16;
-  const optionHeight = 20;
-  const optionGap = 6;
-  const optionWidth = (innerW - 2 * padding - optionGap) / 2;
-
-  const optionsY = innerY + padding + questionHeight + 6;
-
-  let optionsSVG = '';
-  options.slice(0, 2).forEach((opt, i) => {
-    const x = innerX + padding + i * (optionWidth + optionGap);
-    optionsSVG += `
-      <rect x="${x}" y="${optionsY}" width="${optionWidth}" height="${optionHeight}" rx="6" fill="none" stroke="${buttonBorder}" stroke-width="2"/>
-      <text x="${x + optionWidth / 2}" y="${optionsY + optionHeight / 2 + 4}" text-anchor="middle" fill="${buttonTextColor}" font-size="10" font-weight="700">${escapeXml(opt.text)}</text>
-    `;
-  });
-
-  return `
-    <defs>
-      <filter id="poll-shadow" x="-50%" y="-50%" width="200%" height="200%">
-        <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity="0.25"/>
-      </filter>
-    </defs>
-
-    <rect width="${width}" height="${height}" rx="${radius}" fill="${bgColor}"/>
-    <rect x="${innerX}" y="${innerY}" width="${innerW}" height="52" rx="${innerRadius}" fill="#ffffff" filter="url(#poll-shadow)"/>
-    <text x="${width / 2}" y="${innerY + 18}" text-anchor="middle" fill="${questionTextColor}" font-size="11" font-weight="600">${escapeXml(question)}</text>
-    ${optionsSVG}
-  `;
-}
-
-function generateQuizSVG(data, style, width, height) {
-  const bgColor = style?.containerBgColor || 'rgba(0,0,0,0.7)';
-  const radius = style?.containerBorderRadius || 12;
-  const question = data?.question || 'What is the answer?';
-  const options = data?.options || [{ id: '1', text: 'A' }, { id: '2', text: 'B' }];
-  const correctId = data?.correctAnswerId;
-  const optionBg = style?.optionBgColor || 'rgba(255,255,255,0.2)';
-  const correctColor = style?.correctColor || '#10b981';
-  const textColor = style?.questionColor || '#ffffff';
-  const optionTextColor = style?.optionTextColor || '#ffffff';
-
-  const optionHeight = 36;
-  const optionGap = 8;
-  const padding = 16;
-  const questionHeight = 30;
-
-  let optionsSVG = '';
-  options.forEach((opt, i) => {
-    const y = padding + questionHeight + (i * (optionHeight + optionGap));
-    const isCorrect = opt.id === correctId;
-    const bg = isCorrect ? correctColor : optionBg;
-    optionsSVG += `
-      <rect x="${padding}" y="${y}" width="${width - padding * 2}" height="${optionHeight}" rx="8" fill="${bg}"/>
-      <text x="${width / 2}" y="${y + optionHeight / 2 + 4}" text-anchor="middle" fill="${optionTextColor}" font-size="13" font-weight="500">${escapeXml(opt.text)}${isCorrect ? ' ✓' : ''}</text>
-    `;
-  });
-
-  return `
-    <rect width="${width}" height="${height}" rx="${radius}" fill="${bgColor}"/>
-    <text x="${width / 2}" y="${padding + 14}" text-anchor="middle" fill="${textColor}" font-size="15" font-weight="600">${escapeXml(question)}</text>
-    ${optionsSVG}
-  `;
-}
-
-function generateRatingSVG(data, style, width, height) {
-  const padding = 8;
-  const cardW = width - padding * 2;
-  const cardH = height - padding * 2;
-  const textY = padding + 18;
-  const sliderY = padding + 38;
-  const sliderW = cardW - 24;
-  const sliderX = padding + 12;
-  const title = data?.title || 'Do you like my eyes?';
-  const emoji = data?.emoji || '😺';
-  const maxRating = data?.maxRating || 5;
-  const currentRating = data?.currentRating || 3;
-  const fillPercent = Math.min(1, currentRating / maxRating);
-  const fillW = sliderW * fillPercent;
-  const cardBg = style?.cardBgColor || '#ffffff';
-  const titleColor = style?.titleColor || '#000000';
-  const titleFontSize = style?.titleFontSize || 12;
-  const emojiSize = style?.emojiSize || 18;
-
-  const gradId = 'grad' + Math.random().toString(36).substr(2, 9);
-  const svgContent = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="${gradId}" x1="0" x2="1" y1="0" y2="0">
-        <stop offset="0%" stop-color="#d946ef"/>
-        <stop offset="50%" stop-color="#f43f5e"/>
-        <stop offset="100%" stop-color="#fb923c"/>
-      </linearGradient>
-    </defs>
-    <rect x="${padding}" y="${padding}" width="${cardW}" height="${cardH}" fill="${cardBg}" rx="12"/>
-    <text x="${width / 2}" y="${textY}" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="${titleFontSize}" font-weight="600" fill="${titleColor}">
-      ${escapeXml(title)}
-    </text>
-    <rect x="${sliderX}" y="${sliderY}" width="${sliderW}" height="8" rx="4" fill="#e5e7eb"/>
-    <rect x="${sliderX}" y="${sliderY}" width="${fillW}" height="8" rx="4" fill="url(#${gradId})"/>
-    <text x="${sliderX + fillW}" y="${sliderY + 14}" text-anchor="middle" font-size="${emojiSize}">${escapeXml(emoji)}</text>
-  </svg>`;
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgContent)}`;
-}
-
-function generateReactionSVG(data, style, width, height) {
-  const emojis = data?.emojis || ['😍', '🔥', '😂', '😮', '😢'];
-  const emojiSize = style?.emojiSize || 40;
-  const emojiGap = 16;
-  const totalWidth = emojis.length * emojiSize + (emojis.length - 1) * emojiGap;
-  const startX = (width - totalWidth) / 2;
-
-  let emojisSVG = '';
-  emojis.forEach((emoji, i) => {
-    const x = startX + i * (emojiSize + emojiGap) + emojiSize / 2;
-    emojisSVG += `<text x="${x}" y="${height / 2 + emojiSize / 3}" text-anchor="middle" font-size="${emojiSize}">${emoji}</text>`;
-  });
-
-  return `
-    <rect width="${width}" height="${height}" rx="12" fill="transparent"/>
-    ${emojisSVG}
-  `;
-}
-
-function generateCountdownSVG(data, style, width, height) {
-  const bgColor = style?.containerBgColor || 'rgba(0,0,0,0.7)';
-  const radius = style?.containerBorderRadius || 16;
-  const title = data?.title || 'Ends In';
-  const digitBg = style?.digitBgColor || 'rgba(255,255,255,0.15)';
-  const digitColor = style?.digitColor || '#ffffff';
-  const labelColor = style?.labelColor || 'rgba(255,255,255,0.7)';
-  const titleColor = style?.titleColor || '#ffffff';
-  const digitSize = style?.digitFontSize || 28;
-
-  const boxWidth = 50;
-  const boxHeight = 56;
-  const boxGap = 12;
-  const units = [
-    { val: '00', label: 'Days' },
-    { val: '12', label: 'Hrs' },
-    { val: '34', label: 'Min' },
-    { val: '56', label: 'Sec' },
-  ];
-  const totalWidth = units.length * boxWidth + (units.length - 1) * boxGap;
-  const startX = (width - totalWidth) / 2;
-  const startY = height / 2 - 10;
-
-  let boxesSVG = '';
-  units.forEach((unit, i) => {
-    const x = startX + i * (boxWidth + boxGap);
-    boxesSVG += `
-      <rect x="${x}" y="${startY}" width="${boxWidth}" height="${boxHeight}" rx="8" fill="${digitBg}"/>
-      <text x="${x + boxWidth / 2}" y="${startY + 28}" text-anchor="middle" fill="${digitColor}" font-size="${digitSize}" font-weight="700" font-family="monospace">${unit.val}</text>
-      <text x="${x + boxWidth / 2}" y="${startY + boxHeight - 8}" text-anchor="middle" fill="${labelColor}" font-size="9" font-weight="500">${unit.label}</text>
-    `;
-  });
-
-  return `
-    <rect width="${width}" height="${height}" rx="${radius}" fill="${bgColor}"/>
-    <text x="${width / 2}" y="28" text-anchor="middle" fill="${titleColor}" font-size="13" font-weight="600" letter-spacing="2">${escapeXml(title.toUpperCase())}</text>
-    ${boxesSVG}
-  `;
-}
-
-function generatePromoSVG(data, style, width, height) {
-  const bgColor = style?.containerBgColor || 'rgba(0,0,0,0.7)';
-  const radius = style?.containerBorderRadius || 12;
-  const title = data?.title || 'Special Offer';
-  const code = data?.couponCode || 'SAVE20';
-  const codeBg = style?.codeBgColor || 'rgba(255,255,255,0.15)';
-  const codeColor = style?.codeColor || '#ffffff';
-  const titleColor = style?.titleColor || '#ffffff';
-  const buttonBg = style?.buttonBgColor || '#F97316';
-  const buttonText = style?.buttonTextColor || '#000000';
-  const hasDashed = data?.dashedBorder !== false;
-  const borderColor = style?.borderColor || 'rgba(255,255,255,0.3)';
-
-  const codeBoxWidth = Math.min(width - 60, 180);
-
-  return `
-    <rect width="${width}" height="${height}" rx="${radius}" fill="${bgColor}" ${hasDashed ? `stroke="${borderColor}" stroke-width="2" stroke-dasharray="8 4"` : ''}/>
-    <text x="${width / 2}" y="35" text-anchor="middle" fill="${titleColor}" font-size="14" font-weight="600">${escapeXml(title)}</text>
-    <rect x="${(width - codeBoxWidth) / 2}" y="${height / 2 - 16}" width="${codeBoxWidth}" height="40" rx="8" fill="${codeBg}"/>
-    <text x="${width / 2 - 20}" y="${height / 2 + 10}" text-anchor="middle" fill="${codeColor}" font-size="20" font-weight="700" font-family="monospace" letter-spacing="2">${escapeXml(code)}</text>
-    <rect x="${width / 2 + 40}" y="${height / 2 - 8}" width="50" height="24" rx="4" fill="${buttonBg}"/>
-    <text x="${width / 2 + 65}" y="${height / 2 + 6}" text-anchor="middle" fill="${buttonText}" font-size="11" font-weight="600">Copy</text>
-  `;
-}
-
-function generateQuestionSVG(data, style, width, height) {
-  const bgColor = style?.containerBgColor || 'rgba(0,0,0,0.7)';
-  const radius = style?.containerBorderRadius || 12;
-  const title = data?.title || 'Ask me anything';
-  const placeholder = data?.placeholder || 'Type your answer...';
-  const inputBg = style?.inputBgColor || 'rgba(255,255,255,0.15)';
-  const inputText = style?.placeholderColor || 'rgba(255,255,255,0.5)';
-  const titleColor = style?.titleColor || '#ffffff';
-  const buttonBg = style?.submitBgColor || '#F97316';
-  const buttonText = style?.submitTextColor || '#000000';
-
-  const padding = 16;
-  const inputHeight = 40;
-  const buttonHeight = 36;
-
-  return `
-    <rect width="${width}" height="${height}" rx="${radius}" fill="${bgColor}"/>
-    <text x="${width / 2}" y="35" text-anchor="middle" fill="${titleColor}" font-size="15" font-weight="600">${escapeXml(title)}</text>
-    <rect x="${padding}" y="50" width="${width - padding * 2}" height="${inputHeight}" rx="8" fill="${inputBg}"/>
-    <text x="${padding + 14}" y="76" fill="${inputText}" font-size="13">${escapeXml(placeholder)}</text>
-    <rect x="${padding}" y="${height - padding - buttonHeight}" width="${width - padding * 2}" height="${buttonHeight}" rx="8" fill="${buttonBg}"/>
-    <text x="${width / 2}" y="${height - padding - buttonHeight / 2 + 5}" text-anchor="middle" fill="${buttonText}" font-size="14" font-weight="600">Submit</text>
-  `;
-}
-
-function generateImageQuizSVG(data, style, width, height) {
-  const bgColor = style?.containerBgColor || 'rgba(0,0,0,0.7)';
-  const radius = style?.containerBorderRadius || 12;
-  const question = data?.question || 'Which one?';
-  const options = data?.options || [{ id: '1', label: 'A' }, { id: '2', label: 'B' }];
-  const columns = data?.columns || 2;
-  const correctId = data?.correctAnswerId;
-  const textColor = style?.questionColor || '#ffffff';
-  const labelColor = style?.labelColor || '#ffffff';
-  const borderColor = style?.imageBorderColor || 'rgba(255,255,255,0.3)';
-  const correctBorderColor = style?.correctBorderColor || '#10b981';
-
-  const padding = 14;
-  const questionHeight = 28;
-  const gridGap = 8;
-  const availableWidth = width - padding * 2;
-  const imageSize = (availableWidth - gridGap * (columns - 1)) / columns;
-  const startY = padding + questionHeight + 8;
-
-  let imagesSVG = '';
-  options.slice(0, columns * 2).forEach((opt, i) => {
-    const col = i % columns;
-    const row = Math.floor(i / columns);
-    const x = padding + col * (imageSize + gridGap);
-    const y = startY + row * (imageSize + 24);
-    const isCorrect = opt.id === correctId;
-    const strokeColor = isCorrect ? correctBorderColor : borderColor;
-    const strokeWidth = isCorrect ? 3 : 2;
-
-    // Check if option has an image URL
-    if (opt.imageUrl) {
-      imagesSVG += `
-        <defs>
-          <clipPath id="clip-${opt.id}">
-            <rect x="${x}" y="${y}" width="${imageSize}" height="${imageSize}" rx="8"/>
-          </clipPath>
-        </defs>
-        <image 
-          x="${x}" 
-          y="${y}" 
-          width="${imageSize}" 
-          height="${imageSize}" 
-          href="${opt.imageUrl}" 
-          preserveAspectRatio="xMidYMid slice"
-          clip-path="url(#clip-${opt.id})"
-        />
-        <rect x="${x}" y="${y}" width="${imageSize}" height="${imageSize}" rx="8" fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
-        <text x="${x + imageSize / 2}" y="${y + imageSize + 16}" text-anchor="middle" fill="${labelColor}" font-size="11">${escapeXml(opt.label)}${isCorrect ? ' ✓' : ''}</text>
-      `;
-    } else {
-      imagesSVG += `
-        <rect x="${x}" y="${y}" width="${imageSize}" height="${imageSize}" rx="8" fill="rgba(255,255,255,0.1)" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
-        <text x="${x + imageSize / 2}" y="${y + imageSize / 2 + 10}" text-anchor="middle" font-size="24" fill="rgba(255,255,255,0.3)">🖼️</text>
-        <text x="${x + imageSize / 2}" y="${y + imageSize + 16}" text-anchor="middle" fill="${labelColor}" font-size="11">${escapeXml(opt.label)}${isCorrect ? ' ✓' : ''}</text>
-      `
-    }
-  });
-
-  return `
-    <rect width="${width}" height="${height}" rx="${radius}" fill="${bgColor}"/>
-    <text x="${width / 2}" y="${padding + 14}" text-anchor="middle" fill="${textColor}" font-size="14" font-weight="600">${escapeXml(question)}</text>
-    ${imagesSVG}
-  `;
-}
-
-function escapeXml(text) {
-  if (!text) return '';
-  return String(text)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-}
 
 /* ================= EXPORT ================= */
 
