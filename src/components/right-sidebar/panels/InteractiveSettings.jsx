@@ -10,10 +10,12 @@ import {
   getInteractiveType,
   getInteractiveData,
   getInteractiveStyle,
+  getInteractiveTypeLabel,
+  getInteractiveTypeIcon,
   INTERACTIVE_STYLES,
   INTERACTIVE_DIMENSIONS,
 } from '../../interactive/schemas';
-import { generateInteractiveSVG } from '../../interactive/interactiveSvg';
+import { generateInteractiveSVG } from '../../side-panel/sections/InteractiveSection';
 
 /**
  * Interactive Settings Panel
@@ -349,10 +351,10 @@ export const InteractiveSettings = observer(({ store, element }) => {
 
       <div className="section" style={{ marginTop: 16 }}>
         {renderSectionTitle('Answer Options')}
-        {(data.options || []).map((option) => (
-          <div key={option.id} style={{ 
-            display: 'flex', 
-            gap: 8, 
+        {(data.options || []).map((option, index) => (
+          <div key={option.id} style={{
+            display: 'flex',
+            gap: 8,
             marginBottom: 8,
             alignItems: 'center'
           }}>

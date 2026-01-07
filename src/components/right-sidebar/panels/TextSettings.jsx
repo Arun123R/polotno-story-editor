@@ -44,13 +44,19 @@ export const TextSettings = observer(({ store, element, elements = [], isMultiSe
           className={`sidebar-tab ${activeTab === 'general' ? 'active' : ''}`}
           onClick={() => setActiveTab('general')}
         >
-          General
+          Content
+        </button>
+        <button
+          className={`sidebar-tab ${activeTab === 'style' ? 'active' : ''}`}
+          onClick={() => setActiveTab('style')}
+        >
+          Style
         </button>
         <button
           className={`sidebar-tab ${activeTab === 'animation' ? 'active' : ''}`}
           onClick={() => setActiveTab('animation')}
         >
-          Animation
+          Animate
         </button>
       </div>
 
@@ -71,6 +77,48 @@ export const TextSettings = observer(({ store, element, elements = [], isMultiSe
         )}
 
         {activeTab === 'general' ? (
+          <>
+            {/* Content Section */}
+            <div className="section">
+              <div className="section-title">Text Content</div>
+
+              {/* Text Content */}
+              <div className="control-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
+                <textarea
+                  value={element.text || ''}
+                  onChange={(e) => applyToAll({ text: e.target.value })}
+                  placeholder="Enter your text here..."
+                  style={{
+                    width: '100%',
+                    minHeight: '120px',
+                    padding: '12px',
+                    background: 'var(--sidebar-input-bg)',
+                    border: '1px solid var(--sidebar-input-border)',
+                    borderRadius: '8px',
+                    color: 'var(--sidebar-text)',
+                    fontSize: '14px',
+                    fontFamily: 'inherit',
+                    resize: 'vertical',
+                    lineHeight: '1.5',
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Duration Section */}
+            <DurationSection store={store} element={element} />
+
+            {/* Action Buttons */}
+            <div className="action-buttons">
+              <button
+                className="action-btn delete"
+                onClick={() => store.deleteElements(targetElements.map(el => el.id))}
+              >
+                <span>🗑</span> {isMultiSelect ? 'Delete All' : 'Delete'}
+              </button>
+            </div>
+          </>
+        ) : activeTab === 'style' ? (
           <>
             {/* Style Section */}
             <div className="section">
