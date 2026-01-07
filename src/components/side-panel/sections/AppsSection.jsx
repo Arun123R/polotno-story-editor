@@ -249,6 +249,7 @@ export const AppsSectionPanel = observer(({ store }) => {
 });
 
 // Export the complete section
+/* eslint-disable react-refresh/only-export-components */
 export const AppsSection = {
   name: 'apps',
   Tab: AppsSectionTab,
