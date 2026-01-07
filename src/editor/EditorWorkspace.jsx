@@ -1,23 +1,28 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Workspace } from "polotno/canvas/workspace";
 import { ZoomButtons } from "polotno/toolbar/zoom-buttons";
 import { InteractiveOverlay } from "../components/interactive/InteractiveOverlay";
 
 export const EditorWorkspace = ({ store }) => {
   const containerRef = useRef(null);
-  
+
+  useEffect(() => {
+    // Zoom out the card initially
+    store.setScale(1.1);
+  }, [store]);
+
   return (
-    <div 
+    <div
       ref={containerRef}
-      style={{ width: '100%', height: '100%', position: 'relative' }}
+      style={{ width: '100%', height: '100%', position: 'relative', top: '-60px' }}
     >
-      <Workspace 
-        store={store} 
-        backgroundColor="var(--bg-primary)"
+      <Workspace
+        store={store}
+        backgroundColor="#EDEFF2"
         activePageBorderColor="#F97316"
-        layout="horizontal" 
+        layout="horizontal"
       />
-      
+
       {/* Interactive Preview Overlay - positioned on top of canvas */}
       {/* Note: This is disabled for now as Polotno handles its own rendering.
           The interactive elements use text type with custom metadata,
@@ -25,8 +30,8 @@ export const EditorWorkspace = ({ store }) => {
           For full live previews, consider implementing a custom Polotno extension
           or using the preview mode. */}
       {/* <InteractiveOverlay store={store} containerRef={containerRef} /> */}
-      
-      <ZoomButtons store={store} />
+
+      {/* <ZoomButtons store={store} /> */}
     </div>
   );
 };

@@ -3,75 +3,73 @@ import {
   SidePanelWrap,
   WorkspaceWrap,
 } from "polotno";
+import { Topbar } from "./Topbar";
 
-export const EditorLayout = ({ sidePanel, toolbar, canvas, footer, rightSidebar }) => {
+export const EditorLayout = ({ sidePanel, toolbar, canvas, footer, rightSidebar, store }) => {
   return (
-  <div className="h-screen overflow-hidden">
-    {/* TOP TOOLBAR (fixed height) */}
-    <div className=" flex flex-row justify-between">
-      <img src="AppStorys_logo_white-Dy7IWqWA.png" alt="AppStorys_logo_white-Dy7IWqWA.png" className="p-2 h-12"></img>
+    <div className="h-screen overflow-hidden">
+      {/* TOP BAR - App Stories branded topbar */}
+      <Topbar store={store} />
 
-      {toolbar}
-    </div>
-    <PolotnoContainer
-      className="w-full overflow-hidden"
-      style={{ display: "flex", height: "100vh" }}
-    >
-      {/* LEFT SIDEBAR */}
-      <SidePanelWrap className="shrink-0" style={{ backgroundColor: 'var(--bg-secondary)', borderRight: '1px solid var(--border-primary)' }}>
-        {sidePanel}
-      </SidePanelWrap>
-
-      {/* CENTER AREA (Toolbar + Canvas + Footer) */}
-      <WorkspaceWrap
-        style={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          flex: 1, 
-          minWidth: 0, 
-          minHeight: 0, 
-          overflow: 'hidden' 
-        }}
+      <PolotnoContainer
+        className="w-full overflow-hidden"
+        style={{ display: "flex", height: "100vh" }}
       >
-        {/* TOP TOOLBAR (fixed height) */}
-        {/* <div className="shrink-0">
+        {/* LEFT SIDEBAR */}
+        <SidePanelWrap className="shrink-0" style={{ backgroundColor: '#ffffff', borderRight: '1px solid var(--border-primary)' }}>
+          {sidePanel}
+        </SidePanelWrap>
+
+        {/* CENTER AREA (Toolbar + Canvas + Footer) */}
+        <WorkspaceWrap
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            flex: 1,
+            minWidth: 0,
+            minHeight: 0,
+            overflow: 'hidden'
+          }}
+        >
+          {/* TOP TOOLBAR (fixed height) */}
+          {/* <div className="shrink-0">
           {toolbar}
         </div> */}
 
-        {/* MAIN CONTENT AREA (Canvas + RightSidebar) */}
-        <div style={{ 
-          flex: 1, 
-          display: 'flex', 
-          minHeight: 0, 
-          overflow: 'hidden' 
-        }}>
-          {/* CANVAS AREA (takes remaining space) */}
-          <div 
-          className="mb-0"
-          style={{ 
-            flex: 1, 
-            minHeight: 0, 
-            minWidth: 0,
-            backgroundColor: 'var(--bg-tertiary)', 
-            position: 'relative' 
+          {/* MAIN CONTENT AREA (Canvas + RightSidebar) */}
+          <div style={{
+            flex: 1,
+            display: 'flex',
+            minHeight: 0,
+            overflow: 'hidden'
           }}>
-            {canvas}
+            {/* CANVAS AREA (takes remaining space) */}
+            <div
+              className="mb-0"
+              style={{
+                flex: 1,
+                minHeight: 0,
+                minWidth: 0,
+                backgroundColor: 'var(--bg-tertiary)',
+                position: 'relative'
+              }}>
+              {canvas}
+            </div>
+
+            {/* RIGHT SIDEBAR (fixed width) */}
+            {rightSidebar && (
+              <div className="shrink-0">
+                {rightSidebar}
+              </div>
+            )}
           </div>
 
-          {/* RIGHT SIDEBAR (fixed width) */}
-          {rightSidebar && (
-            <div className="shrink-0">
-              {rightSidebar}
-            </div>
-          )}
-        </div>
-
-        {/* BOTTOM TIMELINE (fixed height) */}
-        <div className="shrink-0">
-          {footer}
-        </div>
-      </WorkspaceWrap>
-    </PolotnoContainer>
-  </div>
+          {/* BOTTOM TIMELINE (fixed height) */}
+          <div className="shrink-0">
+            {footer}
+          </div>
+        </WorkspaceWrap>
+      </PolotnoContainer>
+    </div>
   );
 };

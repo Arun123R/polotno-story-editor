@@ -35,11 +35,11 @@ export const INTERACTIVE_DEFAULTS = {
     },
 
     rating: {
-        title: 'Rate this!',
-        type: 'star', // 'star' | 'emoji' | 'slider'
+        title: 'Do you like my eyes?',
+        type: 'slider', // 'star' | 'emoji' | 'slider'
         maxRating: 5,
-        emoji: '⭐',
-        currentRating: 0,
+        emoji: '😺',
+        currentRating: 3,
     },
 
     reaction: {
@@ -118,7 +118,7 @@ export const INTERACTIVE_STYLES = {
     },
 
     rating: {
-        titleColor: '#ffffff',
+        titleColor: '#000000',
         titleFontSize: 14,
         activeColor: '#fbbf24',
         inactiveColor: 'rgba(255,255,255,0.3)',
@@ -200,7 +200,7 @@ export const INTERACTIVE_STYLES = {
 export const INTERACTIVE_DIMENSIONS = {
     poll: { width: 280, height: 180 },
     quiz: { width: 280, height: 200 },
-    rating: { width: 260, height: 100 },
+    rating: { width: 237, height: 90 },
     reaction: { width: 280, height: 80 },
     countdown: { width: 300, height: 140 },
     promo: { width: 280, height: 160 },

@@ -1,32 +1,32 @@
 @import "tailwindcss";
 
 /* ===================================
-   DARK THEME - AppStorys Brand Design
+   LIGHT THEME - AppStorys Brand Design
    =================================== */
 
-/* CSS Variables - Dark Theme with AppStorys Orange */
+/* CSS Variables - Light Theme with AppStorys Orange */
 :root {
-    /* Primary background colors - Dark Theme */
-    --bg-primary: #1a1a2e;
-    --bg-secondary: #16213e;
-    --bg-tertiary: #0f0f23;
-    --bg-elevated: #252547;
-    --bg-hover: #2a2a4a;
+    /* Primary background colors - Light Theme */
+    --bg-primary: #F8F8FA;
+    --bg-secondary: #FFFFFF;
+    --bg-tertiary: #F3F4F6;
+    --bg-elevated: #FFFFFF;
+    --bg-hover: #F0F0F2;
 
     /* Surface colors */
-    --surface-dark: #1e1e3f;
-    --surface-light: #2d2d5a;
+    --surface-dark: #E8E8EA;
+    --surface-light: #FFFFFF;
 
     /* Border colors */
-    --border-primary: #3d3d6b;
-    --border-secondary: #2a2a4f;
-    --border-accent: #4a4a7f;
+    --border-primary: #E5E5E7;
+    --border-secondary: #EFEFEF;
+    --border-accent: #D1D1D6;
 
     /* Text colors */
-    --text-primary: #ffffff;
-    --text-secondary: #b8b8d0;
-    --text-muted: #7a7a9a;
-    --text-disabled: #5a5a7a;
+    --text-primary: #1C1C1E;
+    --text-secondary: #6B6B6B;
+    --text-muted: #8E8E93;
+    --text-disabled: #C7C7CC;
 
     /* AppStorys Orange Gradient Theme */
     --accent-primary: #F97316;
@@ -43,11 +43,11 @@
     /* Orange gradient */
     --gradient-primary: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
     --gradient-hover: linear-gradient(135deg, #FB923C 0%, #F97316 100%);
-    --gradient-subtle: linear-gradient(135deg, rgba(249, 115, 22, 0.2) 0%, rgba(234, 88, 12, 0.1) 100%);
+    --gradient-subtle: linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(234, 88, 12, 0.05) 100%);
 
     /* Subtle orange for backgrounds */
-    --accent-subtle: rgba(249, 115, 22, 0.15);
-    --accent-glow: rgba(249, 115, 22, 0.4);
+    --accent-subtle: rgba(249, 115, 22, 0.08);
+    --accent-glow: rgba(249, 115, 22, 0.2);
 
     /* Status colors */
     --success: #10b981;
@@ -56,19 +56,19 @@
     --info: #3b82f6;
 
     /* Input colors */
-    --input-bg: #252547;
-    --input-border: #3d3d6b;
+    --input-bg: #FFFFFF;
+    --input-border: #E5E5E7;
     --input-focus: #F97316;
 
     /* Shadow */
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
-    --shadow-accent: 0 0 0 3px rgba(249, 115, 22, 0.3);
-    --shadow-glow: 0 0 20px rgba(249, 115, 22, 0.3);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    --shadow-accent: 0 0 0 3px rgba(249, 115, 22, 0.15);
+    --shadow-glow: 0 0 20px rgba(249, 115, 22, 0.15);
 }
 
-/* Global Reset for Dark Theme */
+/* Global Reset for Light Theme */
 *,
 *::before,
 *::after {
@@ -103,47 +103,44 @@ body {
 .go685369399,
 [class*="polotno-side-panel"],
 .bp5-tabs {
-    background-color: var(--bg-secondary) !important;
+    background-color: #EDEFF2 !important;
 
 }
 
 /* Side panel tabs container */
 .polotno-side-tabs-container,
 .go3163804498 {
-    background-color: var(--bg-secondary) !important;
+    background-color: #EDEFF2 !important;
     border-right: 1px solid var(--border-primary) !important;
 }
 
 /* Individual tab buttons */
 .polotno-side-panel-tab,
-.go2556403498,
 .bp5-tab {
-    background-color: transparent !important;
     color: var(--text-secondary) !important;
     border: none !important;
     transition: all 0.2s ease !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 12px 4px !important;
+    gap: 4px !important;
 }
 
-.polotno-side-panel-tab:hover,
-.go2556403498:hover,
-.bp5-tab:hover {
-    background-color: var(--bg-hover) !important;
-    color: var(--text-primary) !important;
-}
-
-.polotno-side-panel-tab[aria-selected="true"],
-.go2556403498[aria-selected="true"],
-.bp5-tab[aria-selected="true"],
-.bp5-tab.bp5-selected {
-    background-color: var(--accent-subtle) !important;
-    color: var(--accent-primary) !important;
-    border-left: 3px solid var(--accent-primary) !important;
+/* Tab icon default colors */
+.polotno-side-panel-tab svg,
+.bp5-tab svg {
+    fill: currentColor;
+    color: inherit !important;
+    width: 23px !important;
+    height: 23px !important;
 }
 
 /* Tab icon colors */
 .polotno-side-panel-tab svg,
 .bp5-tab svg {
-    fill: currentColor !important;
+    fill: currentColor;
     color: inherit !important;
 }
 
@@ -151,9 +148,10 @@ body {
 .polotno-side-panel-content,
 .go2913498543,
 .bp5-tab-panel {
-    background-color: var(--bg-secondary) !important;
+    background-color: #ffffff !important;
     color: var(--text-primary) !important;
     border: none !important;
+    border-top: 1px solid #e0e0e0 !important;
 }
 
 /* Remove box-shadow border effect from side panel container */
@@ -161,7 +159,8 @@ body {
 [class*="go"][class*="polotno-panel"] {
     box-shadow: none !important;
     border: none !important;
-    background-color: var(--bg-secondary) !important;
+    border-top: 1px solid #e0e0e0 !important;
+    background-color: #ffffff !important;
     padding: 0 !important;
 }
 
@@ -187,9 +186,9 @@ body {
 /* Toolbar buttons */
 .polotno-toolbar button,
 .polotno-toolbar .bp5-button {
-    background-color: transparent !important;
     color: var(--text-secondary) !important;
     border: none !important;
+    border-top: 1px solid #e0e0e0 !important;
 }
 
 .polotno-toolbar button:hover,
@@ -213,6 +212,9 @@ body {
 .go3742766498,
 .go3845422651 {
     background-color: var(--bg-tertiary) !important;
+    margin-top: -60px !important;
+    position: relative !important;
+    top: -60px !important;
 }
 
 /* Canvas background */
@@ -220,17 +222,18 @@ body {
     background-color: var(--bg-tertiary) !important;
 }
 
-/* Zoom buttons */
+/* Zoom buttons - Remove black background */
 .polotno-zoom-buttons,
 .go1704528498 {
-    background-color: var(--bg-elevated) !important;
+    background-color: #FFFFFF !important;
     border: 1px solid var(--border-primary) !important;
     border-radius: 8px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
 }
 
 .polotno-zoom-buttons button {
-    background-color: transparent !important;
     color: var(--text-secondary) !important;
+    background-color: transparent !important;
     border: none !important;
 }
 
@@ -239,20 +242,33 @@ body {
     color: var(--text-primary) !important;
 }
 
+/* Zoom percentage display */
+.polotno-zoom-buttons span,
+.polotno-zoom-buttons div {
+    color: var(--text-primary) !important;
+    background-color: transparent !important;
+}
+
 /* ===================================
-   PAGES TIMELINE (BOTTOM) - DARK THEME
+   PAGES TIMELINE (BOTTOM) - LIGHT THEME
    =================================== */
 
 .polotno-pages-timeline,
 .go685639639 {
-    background-color: var(--bg-secondary) !important;
-    border-top: 1px solid var(--border-primary) !important;
+    background-color: #FFFFFF !important;
+    border-top: none !important;
+}
+
+/* Pages button and container */
+.polotno-pages-timeline button,
+.polotno-pages-timeline>div {
+    background-color: transparent;
 }
 
 /* Page thumbnails */
 .polotno-page-thumbnail,
 .go3162374498 {
-    background-color: var(--bg-elevated) !important;
+    background-color: #FFFFFF !important;
     border: 2px solid var(--border-primary) !important;
     border-radius: 8px !important;
 }
@@ -270,7 +286,7 @@ body {
 /* Add page button */
 .polotno-add-page-button,
 .go1234567890 {
-    background-color: var(--bg-elevated) !important;
+    background-color: #FFFFFF !important;
     border: 2px dashed var(--border-primary) !important;
     color: var(--text-muted) !important;
     border-radius: 8px !important;
@@ -283,13 +299,44 @@ body {
 
 /* Timeline controls */
 .polotno-timeline-controls button {
-    background-color: var(--bg-elevated) !important;
+    background-color: #FFFFFF !important;
     color: var(--text-secondary) !important;
     border: 1px solid var(--border-primary) !important;
 }
 
 .polotno-timeline-controls button:hover {
     background-color: var(--bg-hover) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Remove black bars from Pages timeline and Zoom buttons */
+/* Target the Pages timeline wrapper specifically */
+.polotno-pages-timeline,
+.polotno-pages-timeline>div,
+.polotno-pages-timeline button,
+div[class*="go"][class*="685639639"],
+div[class*="go"][class*="685639639"]>div {
+    background-color: #FFFFFF !important;
+}
+
+/* Target zoom buttons wrapper specifically */
+.polotno-zoom-buttons,
+div[class*="go"][class*="1704528498"],
+div[class*="go"][class*="1704528498"]>div,
+div[class*="go"][class*="1704528498"] button {
+    background-color: #FFFFFF !important;
+}
+
+/* Ensure any absolutely positioned UI controls have white background */
+div[style*="position: absolute"][style*="bottom"][style*="right"],
+div[style*="position:absolute"][style*="bottom"][style*="right"] {
+    background-color: transparent !important;
+}
+
+/* Target zoom percentage text */
+.polotno-zoom-buttons span,
+.polotno-zoom-buttons div:not(button) {
+    background-color: transparent !important;
     color: var(--text-primary) !important;
 }
 
@@ -353,6 +400,7 @@ input[type="search"]:focus {
     background: var(--gradient-primary) !important;
     color: white !important;
     border: none !important;
+    border-top: 1px solid #e0e0e0 !important;
     font-weight: 500 !important;
 }
 
@@ -362,8 +410,8 @@ input[type="search"]:focus {
 }
 
 .bp5-button.bp5-minimal {
-    background-color: transparent !important;
     border: none !important;
+    border-top: 1px solid #e0e0e0 !important;
 }
 
 .bp5-button.bp5-minimal:hover {
@@ -522,11 +570,6 @@ input[type="search"]:focus {
 /* Overlay backdrop */
 .bp5-overlay-backdrop {
     background-color: rgba(10, 10, 20, 0.8) !important;
-}
-
-/* Tabs */
-.bp5-tabs {
-    background-color: transparent !important;
 }
 
 .bp5-tab-list {
@@ -697,6 +740,7 @@ input[type="search"]:focus {
     background: var(--gradient-primary) !important;
     color: white !important;
     border: none !important;
+    border-top: 1px solid #e0e0e0 !important;
     border-radius: 8px !important;
     font-weight: 500 !important;
     transition: all 0.2s ease !important;
@@ -804,6 +848,7 @@ button[class*="PlayButton"],
     background: var(--gradient-primary) !important;
     color: white !important;
     border: none !important;
+    border-top: 1px solid #e0e0e0 !important;
 }
 
 [class*="go"] button[class*="play"]:hover,
@@ -1111,4 +1156,63 @@ svg [fill="cyan"] {
 .bp5-tab-panel div[style*="padding-bottom: 15px"][style*="padding-top: 15px"] svg {
     fill: var(--accent-primary) !important;
     stroke: var(--accent-primary) !important;
+}
+
+/* Fix black bar above Pages and Zoom buttons */
+div[style*="position: absolute"] {
+    background-color: transparent !important;
+}
+
+/* ===================================
+   SIDE PANEL TABS - FINAL OVERRIDES
+   =================================== */
+
+/* Forced White Background for Hover & Active */
+/* Hover State - Transparent background, no shadow */
+.polotno-side-tabs-container .polotno-side-panel-tab:hover,
+.polotno-side-tabs-container .bp5-tab:hover {
+    background-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: var(--accent-primary) !important;
+}
+
+/* Active State - White background (prevents hover from making it transparent) */
+.polotno-side-tabs-container .polotno-side-panel-tab[aria-selected="true"],
+.polotno-side-tabs-container .polotno-side-panel-tab[aria-selected="true"]:hover,
+.polotno-side-tabs-container .bp5-tab[aria-selected="true"],
+.polotno-side-tabs-container .bp5-tab[aria-selected="true"]:hover,
+.polotno-side-tabs-container .bp5-tab.bp5-selected,
+.polotno-side-tabs-container .bp5-tab.bp5-selected:hover,
+.polotno-side-tabs-container [class*="active"],
+.polotno-side-tabs-container [class*="active"]:hover,
+.polotno-side-tabs-container [class*="selected"],
+.polotno-side-tabs-container [class*="selected"]:hover {
+    background-color: #FFFFFF !important;
+    background: #FFFFFF !important;
+    color: var(--accent-primary) !important;
+    box-shadow: -4px 4px 12px rgba(0, 0, 0, 0.08) !important;
+    border: none !important;
+    /* Blend with content area */
+    margin-right: -1px !important;
+    width: calc(100% + 1px) !important;
+    border-right: 1px solid #FFFFFF !important;
+    position: relative !important;
+    z-index: 10 !important;
+}
+
+/* Ensure the container doesn't clip the tab's overlap */
+.polotno-side-tabs-container,
+[class*="polotno-side-tabs-container"] {
+    overflow: visible !important;
+}
+
+/* Force Icon Color in Active State (includes hover) */
+.polotno-side-tabs-container [aria-selected="true"] svg,
+.polotno-side-tabs-container [aria-selected="true"]:hover svg,
+.polotno-side-tabs-container [class*="active"] svg,
+.polotno-side-tabs-container [class*="active"]:hover svg,
+.polotno-side-tabs-container [class*="selected"] svg,
+.polotno-side-tabs-container [class*="selected"]:hover svg {
+    color: var(--accent-primary) !important;
 }

@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite';
  */
 export const MultiSelectSettings = observer(({ store }) => {
   const selectedElements = store.selectedElements;
-  
+
   if (selectedElements.length <= 1) return null;
 
   const handleAlignLeft = () => {
@@ -56,12 +56,12 @@ export const MultiSelectSettings = observer(({ store }) => {
         <button className="sidebar-tab">Animation</button>
       </div>
 
-      <div className="settings-content" style={{ padding: '16px' }}>
+      <div className="settings-content">
         {/* Selection Info */}
-        <div style={{ 
-          padding: '12px 16px', 
-          background: 'var(--sidebar-bg-secondary)', 
-          borderRadius: '8px', 
+        <div style={{
+          padding: '12px 16px',
+          background: 'var(--sidebar-bg-secondary)',
+          borderRadius: '8px',
           marginBottom: '16px',
           textAlign: 'center',
           fontSize: '13px'

@@ -12,7 +12,7 @@ import { generateCtaSVG, CTA_DEFAULTS } from '../../side-panel/sections/CtaSecti
 export const CtaSettings = observer(({ store, element }) => {
   const [activeTab, setActiveTab] = useState('general');
   const productImageInputRef = useRef(null);
-  
+
   if (!element) return null;
 
   const ctaType = element.custom?.ctaType || 'classic';
@@ -44,9 +44,9 @@ export const CtaSettings = observer(({ store, element }) => {
   const regenerateSVG = useCallback((newCustomData) => {
     if (isSvgElement) {
       const newSrc = generateCtaSVG(
-        ctaType, 
-        newCustomData, 
-        element.width, 
+        ctaType,
+        newCustomData,
+        element.width,
         element.height
       );
       element.set({ src: newSrc });
@@ -86,9 +86,9 @@ export const CtaSettings = observer(({ store, element }) => {
     if (isSvgElement) {
       updateCustomData('bgColor', value);
     } else if (isTextElement) {
-      element.set({ 
+      element.set({
         background: value,
-        backgroundEnabled: true 
+        backgroundEnabled: true
       });
     }
   };
@@ -306,7 +306,7 @@ export const CtaSettings = observer(({ store, element }) => {
   const handleProductImageUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file || !file.type.startsWith('image/')) return;
-    
+
     const reader = new FileReader();
     reader.onload = (event) => {
       setProductImageUrl(event.target.result);
@@ -347,28 +347,28 @@ export const CtaSettings = observer(({ store, element }) => {
   const getProductTitle = () => customData.title ?? CTA_DEFAULTS[ctaType]?.title ?? 'Product Name';
   const getProductPrice = () => customData.price ?? CTA_DEFAULTS[ctaType]?.price ?? '$150';
   const getProductImageUrl = () => customData.imageUrl ?? '';
-  
+
   // Card styling getters - use ctaType-specific defaults
   const getCardBgColor = () => customData.cardBgColor ?? CTA_DEFAULTS[ctaType]?.cardBgColor ?? '#ffffff';
   const getCardBorderRadius = () => customData.cardBorderRadius ?? CTA_DEFAULTS[ctaType]?.cardBorderRadius ?? 24;
   const getCardShadow = () => customData.cardShadow !== false;
   const getCardShadowBlur = () => customData.cardShadowBlur ?? CTA_DEFAULTS[ctaType]?.cardShadowBlur ?? 20;
   const getCardShadowOpacity = () => customData.cardShadowOpacity ?? CTA_DEFAULTS[ctaType]?.cardShadowOpacity ?? 0.15;
-  
+
   // Image styling getters
   const getImageHeightRatio = () => customData.imageHeightRatio ?? CTA_DEFAULTS[ctaType]?.imageHeightRatio ?? 0.68;
   const getImageBorderRadius = () => customData.imageBorderRadius ?? CTA_DEFAULTS[ctaType]?.imageBorderRadius ?? 20;
-  
+
   // Title styling getters
   const getTitleColor = () => customData.titleColor ?? CTA_DEFAULTS[ctaType]?.titleColor ?? '#1a1a2e';
   const getTitleFontSize = () => customData.titleFontSize ?? CTA_DEFAULTS[ctaType]?.titleFontSize ?? 42;
   const getTitleFontWeight = () => customData.titleFontWeight ?? CTA_DEFAULTS[ctaType]?.titleFontWeight ?? '600';
-  
+
   // Price styling getters
   const getPriceColor = () => customData.priceColor ?? CTA_DEFAULTS[ctaType]?.priceColor ?? '#e67e22';
   const getPriceFontSize = () => customData.priceFontSize ?? CTA_DEFAULTS[ctaType]?.priceFontSize ?? 38;
   const getPriceFontWeight = () => customData.priceFontWeight ?? CTA_DEFAULTS[ctaType]?.priceFontWeight ?? '700';
-  
+
   // Arrow button getters
   const getArrowButtonSize = () => customData.arrowButtonSize ?? CTA_DEFAULTS[ctaType]?.arrowButtonSize ?? 80;
   const getArrowButtonBgColor = () => customData.arrowButtonBgColor ?? CTA_DEFAULTS[ctaType]?.arrowButtonBgColor ?? '#f5f5f5';
@@ -376,31 +376,31 @@ export const CtaSettings = observer(({ store, element }) => {
   const getArrowButtonBorderRadius = () => customData.arrowButtonBorderRadius ?? CTA_DEFAULTS[ctaType]?.arrowButtonBorderRadius ?? 20;
   const getArrowButtonPositionX = () => customData.arrowButtonPositionX ?? 0;
   const getArrowButtonPositionY = () => customData.arrowButtonPositionY ?? 0;
-  
+
   // Favorite icon getters
   const getShowFavoriteIcon = () => customData.showFavoriteIcon !== false;
   const getFavoriteIconSize = () => customData.favoriteIconSize ?? CTA_DEFAULTS[ctaType]?.favoriteIconSize ?? 56;
   const getFavoriteIconBgColor = () => customData.favoriteIconBgColor ?? CTA_DEFAULTS[ctaType]?.favoriteIconBgColor ?? 'rgba(128,128,128,0.6)';
   const getFavoriteIconColor = () => customData.favoriteIconColor ?? CTA_DEFAULTS[ctaType]?.favoriteIconColor ?? '#ffffff';
-  
+
   // Carousel dots getters - use ctaType-specific defaults
   const getShowCarouselDots = () => customData.showCarouselDots !== false;
   const getCarouselDotsCount = () => customData.carouselDotsCount ?? CTA_DEFAULTS[ctaType]?.carouselDotsCount ?? 4;
   const getCarouselDotsActiveIndex = () => customData.carouselDotsActiveIndex ?? CTA_DEFAULTS[ctaType]?.carouselDotsActiveIndex ?? 0;
 
   // === NEW PRODUCT CARD VARIANT SETTERS & GETTERS ===
-  
+
   // Description setters/getters (for buy_product, visit_product)
   const setDescription = (value) => {
     updateCustomData('description', value);
   };
   const getDescription = () => customData.description ?? CTA_DEFAULTS[ctaType]?.description ?? '';
-  
+
   const setDescriptionColor = (value) => {
     updateCustomData('descriptionColor', value);
   };
   const getDescriptionColor = () => customData.descriptionColor ?? CTA_DEFAULTS[ctaType]?.descriptionColor ?? '#64748b';
-  
+
   const setDescriptionFontSize = (value) => {
     const numValue = parseInt(value);
     updateCustomData('descriptionFontSize', isNaN(numValue) ? value : numValue);
@@ -412,12 +412,12 @@ export const CtaSettings = observer(({ store, element }) => {
     updateCustomData('originalPrice', value);
   };
   const getOriginalPrice = () => customData.originalPrice ?? CTA_DEFAULTS[ctaType]?.originalPrice ?? '';
-  
+
   const setShowOriginalPrice = (value) => {
     updateCustomData('showOriginalPrice', value);
   };
   const getShowOriginalPrice = () => customData.showOriginalPrice !== false;
-  
+
   const setOriginalPriceColor = (value) => {
     updateCustomData('originalPriceColor', value);
   };
@@ -428,7 +428,7 @@ export const CtaSettings = observer(({ store, element }) => {
     updateCustomData('priceBgColor', value);
   };
   const getPriceBadgeBg = () => customData.priceBgColor ?? CTA_DEFAULTS[ctaType]?.priceBgColor ?? '#334155';
-  
+
   const setPriceBadgeRadius = (value) => {
     const numValue = parseInt(value);
     updateCustomData('priceBorderRadius', isNaN(numValue) ? value : numValue);
@@ -440,7 +440,7 @@ export const CtaSettings = observer(({ store, element }) => {
     updateCustomData('arrowButtonBgColor', value);
   };
   const getArrowBgColor = () => customData.arrowButtonBgColor ?? CTA_DEFAULTS[ctaType]?.arrowButtonBgColor ?? 'transparent';
-  
+
   const setArrowIconColor = (value) => {
     updateCustomData('arrowButtonIconColor', value);
   };
@@ -451,7 +451,7 @@ export const CtaSettings = observer(({ store, element }) => {
     updateCustomData('showImage', value);
   };
   const getShowImage = () => customData.showImage !== false;
-  
+
   const setImageSize = (value) => {
     const numValue = parseInt(value);
     updateCustomData('imageSize', isNaN(numValue) ? value : numValue);
@@ -463,23 +463,23 @@ export const CtaSettings = observer(({ store, element }) => {
     updateCustomData('buyButtonText', value);
   };
   const getButtonText = () => customData.buyButtonText ?? CTA_DEFAULTS[ctaType]?.buyButtonText ?? 'Buy Now';
-  
+
   const setButtonBgColor = (value) => {
     updateCustomData('buyButtonBgColor', value);
   };
   const getButtonBgColor = () => customData.buyButtonBgColor ?? CTA_DEFAULTS[ctaType]?.buyButtonBgColor ?? '#1a1a2e';
-  
+
   const setButtonTextColor = (value) => {
     updateCustomData('buyButtonTextColor', value);
   };
   const getButtonTextColor = () => customData.buyButtonTextColor ?? CTA_DEFAULTS[ctaType]?.buyButtonTextColor ?? '#ffffff';
-  
+
   const setButtonFontSize = (value) => {
     const numValue = parseInt(value);
     updateCustomData('buyButtonFontSize', isNaN(numValue) ? value : numValue);
   };
   const getButtonFontSize = () => customData.buyButtonFontSize ?? CTA_DEFAULTS[ctaType]?.buyButtonFontSize ?? 14;
-  
+
   const setButtonBorderRadius = (value) => {
     const numValue = parseInt(value);
     updateCustomData('buyButtonBorderRadius', isNaN(numValue) ? value : numValue);
@@ -507,19 +507,19 @@ export const CtaSettings = observer(({ store, element }) => {
 
       {/* Tab Navigation */}
       <div className="sidebar-tabs">
-        <button 
+        <button
           className={`sidebar-tab ${activeTab === 'general' ? 'active' : ''}`}
           onClick={() => setActiveTab('general')}
         >
           Content
         </button>
-        <button 
+        <button
           className={`sidebar-tab ${activeTab === 'style' ? 'active' : ''}`}
           onClick={() => setActiveTab('style')}
         >
           Style
         </button>
-        <button 
+        <button
           className={`sidebar-tab ${activeTab === 'animation' ? 'active' : ''}`}
           onClick={() => setActiveTab('animation')}
         >
@@ -527,14 +527,14 @@ export const CtaSettings = observer(({ store, element }) => {
         </button>
       </div>
 
-      <div className="settings-content" style={{ padding: '16px' }}>
+      <div className="settings-content">
         {/* ==================== CONTENT TAB ==================== */}
         {activeTab === 'general' && (
           <>
             {/* Content Section */}
             <div className="section">
               <div className="section-title">Content</div>
-              
+
               {/* Redirect URL - for all CTA types */}
               <div className="control-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '6px' }}>
                 <span className="control-label">Redirect URL</span>
@@ -603,16 +603,16 @@ export const CtaSettings = observer(({ store, element }) => {
                         <div style={{ width: '100%' }}>
                           {getProductImageUrl() ? (
                             <div style={{ position: 'relative', width: '100%' }}>
-                              <img 
-                                src={getProductImageUrl()} 
-                                alt="Product" 
-                                style={{ 
-                                  width: '100%', 
-                                  height: '80px', 
-                                  objectFit: 'cover', 
+                              <img
+                                src={getProductImageUrl()}
+                                alt="Product"
+                                style={{
+                                  width: '100%',
+                                  height: '80px',
+                                  objectFit: 'cover',
                                   borderRadius: '8px',
                                   border: '1px solid var(--sidebar-input-border)',
-                                }} 
+                                }}
                               />
                               <button
                                 onClick={() => setProductImageUrl('')}
@@ -808,8 +808,8 @@ export const CtaSettings = observer(({ store, element }) => {
 
             {/* Delete Button */}
             <div className="action-buttons">
-              <button 
-                className="action-btn delete" 
+              <button
+                className="action-btn delete"
                 onClick={() => store.deleteElements([element.id])}
               >
                 <span>🗑</span> Delete CTA
@@ -824,7 +824,7 @@ export const CtaSettings = observer(({ store, element }) => {
             {/* Position & Size Section */}
             <div className="section">
               <div className="section-title">Position & Size</div>
-              
+
               <div className="control-row">
                 <span className="control-label">Position</span>
                 <div className="control-value">
@@ -915,8 +915,8 @@ export const CtaSettings = observer(({ store, element }) => {
                       max={100}
                     />
                     <div className="slider-track">
-                      <div 
-                        className="slider-fill" 
+                      <div
+                        className="slider-fill"
                         style={{ width: `${Math.round((element.opacity ?? 1) * 100)}%` }}
                       >
                         <div className="slider-thumb" />
@@ -944,8 +944,8 @@ export const CtaSettings = observer(({ store, element }) => {
                   <span className="control-label">Background</span>
                   <div className="control-value">
                     <div className="color-picker-row">
-                      <div 
-                        className="color-swatch" 
+                      <div
+                        className="color-swatch"
                         style={{ backgroundColor: getBgColor() }}
                       >
                         <input
@@ -972,8 +972,8 @@ export const CtaSettings = observer(({ store, element }) => {
                   <span className="control-label">Text Color</span>
                   <div className="control-value">
                     <div className="color-picker-row">
-                      <div 
-                        className="color-swatch" 
+                      <div
+                        className="color-swatch"
                         style={{ backgroundColor: getTextColor() }}
                       >
                         <input
@@ -1000,8 +1000,8 @@ export const CtaSettings = observer(({ store, element }) => {
                   <span className="control-label">Arrow Color</span>
                   <div className="control-value">
                     <div className="color-picker-row">
-                      <div 
-                        className="color-swatch" 
+                      <div
+                        className="color-swatch"
                         style={{ backgroundColor: getArrowColor() }}
                       >
                         <input
@@ -1120,8 +1120,8 @@ export const CtaSettings = observer(({ store, element }) => {
                   <span className="control-label">Border Color</span>
                   <div className="control-value">
                     <div className="color-picker-row">
-                      <div 
-                        className="color-swatch" 
+                      <div
+                        className="color-swatch"
                         style={{ backgroundColor: getBorderColor() }}
                       >
                         <input
@@ -1150,8 +1150,8 @@ export const CtaSettings = observer(({ store, element }) => {
                     <span className="control-label">Card Background</span>
                     <div className="control-value">
                       <div className="color-picker-row">
-                        <div 
-                          className="color-swatch" 
+                        <div
+                          className="color-swatch"
                           style={{ backgroundColor: getCardBgColor() }}
                         >
                           <input
@@ -1240,8 +1240,8 @@ export const CtaSettings = observer(({ store, element }) => {
                               max={100}
                             />
                             <div className="slider-track">
-                              <div 
-                                className="slider-fill" 
+                              <div
+                                className="slider-fill"
                                 style={{ width: `${Math.round(getCardShadowOpacity() * 100)}%` }}
                               >
                                 <div className="slider-thumb" />
@@ -1267,7 +1267,7 @@ export const CtaSettings = observer(({ store, element }) => {
             {(ctaType === 'product_card' || ctaType === 'describe_product') && (
               <div className="section">
                 <div className="section-title">Image Style</div>
-                
+
                 <div className="control-row">
                   <span className="control-label">Height Ratio</span>
                   <div className="control-value">
@@ -1285,8 +1285,8 @@ export const CtaSettings = observer(({ store, element }) => {
                         max={85}
                       />
                       <div className="slider-track">
-                        <div 
-                          className="slider-fill" 
+                        <div
+                          className="slider-fill"
                           style={{ width: `${((getImageHeightRatio() - 0.4) / 0.45) * 100}%` }}
                         >
                           <div className="slider-thumb" />
@@ -1324,13 +1324,13 @@ export const CtaSettings = observer(({ store, element }) => {
             {isProductCardVariant && (
               <div className="section">
                 <div className="section-title">Title Style</div>
-                
+
                 <div className="control-row">
                   <span className="control-label">Text Color</span>
                   <div className="control-value">
                     <div className="color-picker-row">
-                      <div 
-                        className="color-swatch" 
+                      <div
+                        className="color-swatch"
                         style={{ backgroundColor: getTitleColor() }}
                       >
                         <input
@@ -1394,13 +1394,13 @@ export const CtaSettings = observer(({ store, element }) => {
             {isProductCardVariant && (
               <div className="section">
                 <div className="section-title">Price Style</div>
-                
+
                 <div className="control-row">
                   <span className="control-label">Text Color</span>
                   <div className="control-value">
                     <div className="color-picker-row">
-                      <div 
-                        className="color-swatch" 
+                      <div
+                        className="color-swatch"
                         style={{ backgroundColor: getPriceColor() }}
                       >
                         <input
@@ -1464,13 +1464,13 @@ export const CtaSettings = observer(({ store, element }) => {
             {(ctaType === 'product_card' || ctaType === 'describe_product') && (
               <div className="section">
                 <div className="section-title">Arrow Button Style</div>
-                
+
                 <div className="control-row">
                   <span className="control-label">Background</span>
                   <div className="control-value">
                     <div className="color-picker-row">
-                      <div 
-                        className="color-swatch" 
+                      <div
+                        className="color-swatch"
                         style={{ backgroundColor: getArrowButtonBgColor() }}
                       >
                         <input
@@ -1494,8 +1494,8 @@ export const CtaSettings = observer(({ store, element }) => {
                   <span className="control-label">Icon Color</span>
                   <div className="control-value">
                     <div className="color-picker-row">
-                      <div 
-                        className="color-swatch" 
+                      <div
+                        className="color-swatch"
                         style={{ backgroundColor: getArrowButtonIconColor() }}
                       >
                         <input
@@ -1577,7 +1577,7 @@ export const CtaSettings = observer(({ store, element }) => {
             {(ctaType === 'product_card' || ctaType === 'describe_product') && (
               <div className="section">
                 <div className="section-title">Favorite Icon</div>
-                
+
                 <div className="control-row">
                   <span className="control-label">Show Icon</span>
                   <div className="control-value">
@@ -1601,8 +1601,8 @@ export const CtaSettings = observer(({ store, element }) => {
                       <span className="control-label">Background</span>
                       <div className="control-value">
                         <div className="color-picker-row">
-                          <div 
-                            className="color-swatch" 
+                          <div
+                            className="color-swatch"
                             style={{ backgroundColor: getFavoriteIconBgColor() }}
                           >
                             <input
@@ -1626,8 +1626,8 @@ export const CtaSettings = observer(({ store, element }) => {
                       <span className="control-label">Icon Color</span>
                       <div className="control-value">
                         <div className="color-picker-row">
-                          <div 
-                            className="color-swatch" 
+                          <div
+                            className="color-swatch"
                             style={{ backgroundColor: getFavoriteIconColor() }}
                           >
                             <input
@@ -1670,7 +1670,7 @@ export const CtaSettings = observer(({ store, element }) => {
             {(ctaType === 'product_card' || ctaType === 'describe_product') && (
               <div className="section">
                 <div className="section-title">Carousel Dots</div>
-                
+
                 <div className="control-row">
                   <span className="control-label">Show Dots</span>
                   <div className="control-value">
@@ -1727,13 +1727,13 @@ export const CtaSettings = observer(({ store, element }) => {
             {ctaType === 'visit_product' && (
               <div className="section">
                 <div className="section-title">Arrow Style</div>
-                
+
                 <div className="control-row">
                   <span className="control-label">Arrow Color</span>
                   <div className="control-value">
                     <div className="color-picker-row">
-                      <div 
-                        className="color-swatch" 
+                      <div
+                        className="color-swatch"
                         style={{ backgroundColor: getArrowIconColor() }}
                       >
                         <input
@@ -1759,13 +1759,13 @@ export const CtaSettings = observer(({ store, element }) => {
             {ctaType === 'visit_product' && (
               <div className="section">
                 <div className="section-title">Price Badge</div>
-                
+
                 <div className="control-row">
                   <span className="control-label">Background</span>
                   <div className="control-value">
                     <div className="color-picker-row">
-                      <div 
-                        className="color-swatch" 
+                      <div
+                        className="color-swatch"
                         style={{ backgroundColor: getPriceBadgeBg() }}
                       >
                         <input
@@ -1805,8 +1805,8 @@ export const CtaSettings = observer(({ store, element }) => {
                     <span className="control-label">Strike Color</span>
                     <div className="control-value">
                       <div className="color-picker-row">
-                        <div 
-                          className="color-swatch" 
+                        <div
+                          className="color-swatch"
                           style={{ backgroundColor: getOriginalPriceColor() }}
                         >
                           <input
@@ -1833,13 +1833,13 @@ export const CtaSettings = observer(({ store, element }) => {
             {ctaType === 'buy_product' && (
               <div className="section">
                 <div className="section-title">Description Style</div>
-                
+
                 <div className="control-row">
                   <span className="control-label">Text Color</span>
                   <div className="control-value">
                     <div className="color-picker-row">
-                      <div 
-                        className="color-swatch" 
+                      <div
+                        className="color-swatch"
                         style={{ backgroundColor: getDescriptionColor() }}
                       >
                         <input
@@ -1880,13 +1880,13 @@ export const CtaSettings = observer(({ store, element }) => {
             {ctaType === 'buy_product' && (
               <div className="section">
                 <div className="section-title">Button Style</div>
-                
+
                 <div className="control-row">
                   <span className="control-label">Background</span>
                   <div className="control-value">
                     <div className="color-picker-row">
-                      <div 
-                        className="color-swatch" 
+                      <div
+                        className="color-swatch"
                         style={{ backgroundColor: getButtonBgColor() }}
                       >
                         <input
@@ -1910,8 +1910,8 @@ export const CtaSettings = observer(({ store, element }) => {
                   <span className="control-label">Text Color</span>
                   <div className="control-value">
                     <div className="color-picker-row">
-                      <div 
-                        className="color-swatch" 
+                      <div
+                        className="color-swatch"
                         style={{ backgroundColor: getButtonTextColor() }}
                       >
                         <input
@@ -1967,7 +1967,7 @@ export const CtaSettings = observer(({ store, element }) => {
             {ctaType === 'buy_product' && getShowImage() && (
               <div className="section">
                 <div className="section-title">Image Style</div>
-                
+
                 <div className="control-row">
                   <span className="control-label">Image Size</span>
                   <div className="control-value">

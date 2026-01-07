@@ -14,7 +14,7 @@ export const PageSettings = observer(({ store }) => {
   // Ensure Story is pre-selected on load
   useEffect(() => {
     setActivePreset('story');
-    store.setSize(1080, 1920);
+    store.setSize(279, 496);
   }, [store]);
 
   if (!activePage) return null;
@@ -27,7 +27,7 @@ export const PageSettings = observer(({ store }) => {
         <button className="sidebar-tab">Animation</button>
       </div>
 
-      <div className="settings-content" style={{ padding: '16px' }}>
+      <div className="settings-content">
         <div className="section">
           <div className="section-title">Page</div>
 
@@ -108,21 +108,19 @@ export const PageSettings = observer(({ store }) => {
             <div className="control-value">
               <div className="segment-group">
                 <button
-                  className={`segment-btn ${
-                    activePreset === 'story' ? 'active' : ''
-                  }`}
+                  className={`segment-btn ${activePreset === 'story' ? 'active' : ''
+                    }`}
                   onClick={() => {
                     setActivePreset('story');
-                    store.setSize(1080, 1920);
+                    store.setSize(279, 496);
                   }}
                 >
                   Story
                 </button>
 
                 <button
-                  className={`segment-btn ${
-                    activePreset === 'square' ? 'active' : ''
-                  }`}
+                  className={`segment-btn ${activePreset === 'square' ? 'active' : ''
+                    }`}
                   onClick={() => {
                     setActivePreset('square');
                     store.setSize(1080, 1080);
@@ -132,9 +130,8 @@ export const PageSettings = observer(({ store }) => {
                 </button>
 
                 <button
-                  className={`segment-btn ${
-                    activePreset === 'wide' ? 'active' : ''
-                  }`}
+                  className={`segment-btn ${activePreset === 'wide' ? 'active' : ''
+                    }`}
                   onClick={() => {
                     setActivePreset('wide');
                     store.setSize(1920, 1080);

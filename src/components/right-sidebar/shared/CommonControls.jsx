@@ -15,70 +15,52 @@ export const PositionSection = observer(({ element }) => {
 
   return (
     <div className="section">
-      <div className="section-title">Position & Size</div>
-      
+      <div className="section-title">Position</div>
+
       <div className="control-row">
         <span className="control-label">Position</span>
         <div className="control-value">
-          <div className="position-row">
-            <div className="position-field">
-              <input
-                type="number"
-                className="position-input"
-                value={Math.round(element.x)}
-                onChange={(e) => handleNumericChange((v) => element.set({ x: v }), e.target.value)}
-              />
-              <label>X</label>
-            </div>
-            <div className="position-field">
-              <input
-                type="number"
-                className="position-input"
-                value={Math.round(element.y)}
-                onChange={(e) => handleNumericChange((v) => element.set({ y: v }), e.target.value)}
-              />
-              <label>Y</label>
-            </div>
-          </div>
+          <span style={{ fontSize: 11, color: '#a0aec0' }}>X</span>
+          <input
+            type="number"
+            className="position-input"
+            value={Math.round(element.x)}
+            onChange={(e) => handleNumericChange((v) => element.set({ x: v }), e.target.value)}
+          />
+          <span style={{ fontSize: 11, color: '#a0aec0' }}>Y</span>
+          <input
+            type="number"
+            className="position-input"
+            value={Math.round(element.y)}
+            onChange={(e) => handleNumericChange((v) => element.set({ y: v }), e.target.value)}
+          />
         </div>
       </div>
 
       <div className="control-row">
         <span className="control-label">Size</span>
         <div className="control-value">
-          <div className="position-row">
-            <div className="position-field">
-              <input
-                type="number"
-                className="position-input"
-                value={Math.round(element.width)}
-                onChange={(e) => handleNumericChange((v) => element.set({ width: v }), e.target.value, 1)}
-              />
-              <label>W</label>
-            </div>
-            <div className="position-field">
-              <input
-                type="number"
-                className="position-input"
-                value={Math.round(element.height)}
-                onChange={(e) => handleNumericChange((v) => element.set({ height: v }), e.target.value, 1)}
-              />
-              <label>H</label>
-            </div>
-          </div>
+          <span style={{ fontSize: 14, color: '#a0aec0', lineHeight: 1 }}>↔</span>
+          <input
+            type="number"
+            className="position-input"
+            value={Math.round(element.width)}
+            onChange={(e) => handleNumericChange((v) => element.set({ width: v }), e.target.value, 1)}
+          />
+          <span style={{ fontSize: 14, color: '#a0aec0', lineHeight: 1 }}>↕</span>
+          <input
+            type="number"
+            className="position-input"
+            value={Math.round(element.height)}
+            onChange={(e) => handleNumericChange((v) => element.set({ height: v }), e.target.value, 1)}
+          />
         </div>
       </div>
 
       <div className="control-row">
         <span className="control-label">Rotation</span>
         <div className="control-value">
-          <input
-            type="number"
-            className="position-input"
-            value={Math.round(element.rotation ?? 0)}
-            onChange={(e) => handleNumericChange((v) => element.set({ rotation: v }), e.target.value)}
-          />
-          <span style={{ color: 'var(--sidebar-text-muted)', fontSize: '11px' }}>°</span>
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#2d3748' }}>{Math.round(element.rotation ?? 0)}°</span>
         </div>
       </div>
     </div>
@@ -86,36 +68,102 @@ export const PositionSection = observer(({ element }) => {
 });
 
 /**
- * Opacity slider control - Dark theme style
+ * Appearance controls (Opacity, Radius) - Light theme style
  */
-export const OpacitySlider = observer(({ element }) => {
+export const AppearanceSection = observer(({ element }) => {
   if (!element) return null;
 
   const opacity = element.opacity ?? 1;
   const percentage = Math.round(opacity * 100);
+  const cornerRadius = element.cornerRadius || element.custom?.style?.containerBorderRadius || 0;
 
-  const handleOpacityChange = (value) => {
-    const numValue = parseInt(value);
-    if (!isNaN(numValue)) {
-      const clamped = Math.max(0, Math.min(100, numValue));
-      element.set({ opacity: clamped / 100 });
-    }
-  };
+  return (
+    <div className="section">
+      <div className="section-title">Appearance</div>
+
+      <div className="control-row">
+        <span className="control-label">Opacity</span>
+        <div className="control-value">
+          <div className="slider-container" style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ fontSize: 13, fontWeight: 500, color: '#2d3748', minWidth: 45, textAlign: 'right' }}>{percentage} %</span>
+            <div className="slider-track" style={{ flex: 1 }}>
+              <div
+                className="slider-fill"
+                style={{ width: `${percentage}%` }}
+              >
+                <div className="slider-thumb" />
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={percentage}
+                onChange={(e) => element.set({ opacity: parseInt(e.target.value) / 100 })}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="control-row">
+        <span className="control-label">Radius</span>
+        <div className="control-value">
+          <div className="slider-container" style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ fontSize: 13, fontWeight: 500, color: '#2d3748', minWidth: 45, textAlign: 'right' }}>{cornerRadius} px</span>
+            <div className="slider-track" style={{ flex: 1 }}>
+              <div
+                className="slider-fill"
+                style={{ width: `${(cornerRadius / 50) * 100}%` }}
+              >
+                <div className="slider-thumb" />
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={50}
+                value={cornerRadius}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value);
+                  if (element.set) element.set({ cornerRadius: val });
+                  if (element.custom?.style) {
+                    element.set({
+                      custom: {
+                        ...element.custom,
+                        style: { ...element.custom.style, containerBorderRadius: val }
+                      }
+                    });
+                  }
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+});
+
+/**
+ * Shared Opacity Slider component
+ */
+export const OpacitySlider = observer(({ element }) => {
+  if (!element) return null;
+  const opacity = element.opacity ?? 1;
+  const percentage = Math.round(opacity * 100);
 
   return (
     <div className="control-row">
       <span className="control-label">Opacity</span>
       <div className="control-value">
-        <div className="slider-container">
-          <input
-            type="number"
-            className="slider-input"
-            value={percentage}
-            onChange={(e) => handleOpacityChange(e.target.value)}
-            min={0}
-            max={100}
-          />
-          <div className="slider-track">
+        <div className="slider-container" style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ fontSize: 13, fontWeight: 500, color: '#2d3748', minWidth: 45, textAlign: 'right' }}>{percentage} %</span>
+          <div className="slider-track" style={{ flex: 1 }}>
+            <div
+              className="slider-fill"
+              style={{ width: `${percentage}%` }}
+            >
+              <div className="slider-thumb" />
+            </div>
             <input
               type="range"
               min={0}
@@ -123,9 +171,50 @@ export const OpacitySlider = observer(({ element }) => {
               value={percentage}
               onChange={(e) => element.set({ opacity: parseInt(e.target.value) / 100 })}
             />
-            <div className="slider-fill" style={{ width: `${percentage}%` }}>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+});
+
+/**
+ * Shared Corner Radius Slider component
+ */
+export const CornerRadiusSlider = observer(({ element, max = 50 }) => {
+  if (!element) return null;
+  const cornerRadius = element.cornerRadius || element.custom?.style?.containerBorderRadius || 0;
+
+  return (
+    <div className="control-row">
+      <span className="control-label">Radius</span>
+      <div className="control-value">
+        <div className="slider-container" style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div className="slider-track" style={{ flex: 1 }}>
+            <div
+              className="slider-fill"
+              style={{ width: `${(cornerRadius / max) * 100}%` }}
+            >
               <div className="slider-thumb" />
             </div>
+            <input
+              type="range"
+              min={0}
+              max={max}
+              value={cornerRadius}
+              onChange={(e) => {
+                const val = parseInt(e.target.value);
+                if (element.set) element.set({ cornerRadius: val });
+                if (element.custom?.style) {
+                  element.set({
+                    custom: {
+                      ...element.custom,
+                      style: { ...element.custom.style, containerBorderRadius: val }
+                    }
+                  });
+                }
+              }}
+            />
           </div>
         </div>
       </div>
@@ -164,34 +253,71 @@ export const ActionButtons = observer(({ store, element }) => {
  */
 export const DurationSection = observer(({ store, element }) => {
   const activePage = store.activePage;
-  const duration = activePage?.duration || 7;
+  const rawDuration = activePage?.duration || 5;
+  const durationInSeconds = rawDuration > 100 ? rawDuration / 1000 : rawDuration;
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}.00`;
+  };
+
+  const timeStr = formatTime(durationInSeconds);
 
   return (
-    <div className="duration-section">
-      <div className="duration-header">
-        <span className="duration-title">
-          Duration <span style={{ fontSize: '10px', color: 'var(--sidebar-text-muted)' }}>ⓘ</span>
-        </span>
-        <span className="new-badge">New</span>
+    <div className="section duration-section">
+      <div className="duration-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span className="section-title" style={{ margin: 0 }}>Duration</span>
+          <span style={{ fontSize: '14px', color: '#a0aec0', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>ⓘ</span>
+        </div>
+        <span style={{
+          background: 'var(--sidebar-accent)',
+          color: 'white',
+          fontSize: '10px',
+          fontWeight: '700',
+          padding: '2px 8px',
+          borderRadius: '4px',
+          textTransform: 'uppercase'
+        }}>New</span>
       </div>
 
-      <div className="duration-controls">
-        <button className="play-btn" onClick={() => store.play()}>
-          ▶
+      <div className="duration-controls" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <button
+          className="play-btn"
+          onClick={() => store.play()}
+          style={{
+            width: '64px',
+            height: '64px',
+            borderRadius: '50%',
+            background: 'var(--sidebar-accent)',
+            color: 'white',
+            border: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'transform 0.2s',
+            boxShadow: '0 4px 12px rgba(249, 115, 22, 0.2)'
+          }}
+          onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+          onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+        >
+          <span style={{ fontSize: '24px', marginLeft: '4px' }}>▶</span>
         </button>
-        <div className="duration-display">
-          <div className="time-display">
-            00:00 / 00:{String(duration).padStart(2, '0')}
-            <span style={{ marginLeft: '8px', cursor: 'pointer' }}>🔊</span>
+        <div className="duration-display" style={{ flex: 1 }}>
+          <div className="time-display" style={{ fontSize: '18px', fontWeight: '600', color: '#2d3748', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            00:00 / {timeStr}
+            <span style={{ fontSize: '10px', color: '#718096' }}>▶</span>
           </div>
-          <div className="time-slider">
-            <div className="time-slider-fill" style={{ width: '0%' }} />
+          <div className="time-slider" style={{ height: '4px', background: '#edf2f7', borderRadius: '2px', position: 'relative' }}>
+            <div className="time-slider-fill" style={{ width: '0%', height: '100%', background: 'var(--sidebar-accent)', borderRadius: '2px' }} />
           </div>
         </div>
       </div>
 
-      <div className="duration-info">
-        Starts at <span>00:00</span> and ends at <span>00:{String(duration).padStart(2, '0')}</span>
+      <div className="duration-info" style={{ marginTop: '16px', fontSize: '13px', color: '#718096', textAlign: 'center' }}>
+        Starts at <span style={{ color: 'var(--sidebar-accent)', fontWeight: '600' }}>00:00</span> and ends at <span style={{ color: 'var(--sidebar-accent)', fontWeight: '600' }}>{timeStr}</span>
       </div>
     </div>
   );
@@ -314,9 +440,9 @@ export const AnimationSection = observer(({ store, element }) => {
       if (anim.type === type) {
         // Handle direction updates for move animation
         if (updates.direction !== undefined) {
-          return { 
-            ...anim, 
-            data: { ...anim.data, direction: updates.direction } 
+          return {
+            ...anim,
+            data: { ...anim.data, direction: updates.direction }
           };
         }
         return { ...anim, ...updates };
@@ -339,34 +465,38 @@ export const AnimationSection = observer(({ store, element }) => {
 
   return (
     <div className="section">
-      <div className="section-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className="section-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <span>Animation</span>
-        <button 
+        <button
           onClick={handlePlay}
+          className="action-btn"
           style={{
-            background: 'var(--accent-primary)',
-            color: 'var(--bg-primary)',
+            background: 'var(--sidebar-accent)',
+            color: 'white',
             border: 'none',
-            borderRadius: '6px',
-            padding: '6px 16px',
+            borderRadius: '8px',
+            padding: '6px 12px',
             fontSize: '12px',
             fontWeight: '600',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '6px'
+            gap: '6px',
+            width: 'auto',
+            maxWidth: '100px',
+            flexShrink: 0
           }}
         >
-          ▶ Preview
+          <span style={{ fontSize: 10 }}>▶</span> Preview
         </button>
       </div>
 
       {/* Entrance Animation */}
       <div style={{ marginTop: '16px' }}>
-        <div style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+        <div style={{ fontSize: '11px', color: '#a0aec0', fontWeight: '700', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
           Entrance
         </div>
-        
+
         <div className="control-row">
           <span className="control-label">Effect</span>
           <div className="control-value">
@@ -418,7 +548,6 @@ export const AnimationSection = observer(({ store, element }) => {
                   className="position-input"
                   value={enterAnimation.duration || 1000}
                   onChange={(e) => updateAnimation('enter', { duration: parseInt(e.target.value) || 1000 })}
-                  style={{ width: '60px' }}
                   step={100}
                   min={0}
                 />
@@ -437,7 +566,6 @@ export const AnimationSection = observer(({ store, element }) => {
                     const value = parseInt(e.target.value);
                     updateAnimation('enter', { delay: isNaN(value) ? 0 : value });
                   }}
-                  style={{ width: '60px' }}
                   step={100}
                   min={0}
                 />
@@ -455,7 +583,6 @@ export const AnimationSection = observer(({ store, element }) => {
                     className="position-input"
                     value={enterAnimation.speed || 1}
                     onChange={(e) => updateAnimation('enter', { speed: parseFloat(e.target.value) || 1 })}
-                    style={{ width: '60px' }}
                     step={0.1}
                     min={0.1}
                     max={10}
@@ -488,11 +615,11 @@ export const AnimationSection = observer(({ store, element }) => {
       </div>
 
       {/* Exit Animation */}
-      <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid var(--border-primary)' }}>
-        <div style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+      <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #f2f2f2' }}>
+        <div style={{ fontSize: '11px', color: '#a0aec0', fontWeight: '700', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
           Exit
         </div>
-        
+
         <div className="control-row">
           <span className="control-label">Effect</span>
           <div className="control-value">
@@ -614,11 +741,11 @@ export const AnimationSection = observer(({ store, element }) => {
       </div>
 
       {/* Loop Animation */}
-      <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid var(--border-primary)' }}>
-        <div style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+      <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #f2f2f2' }}>
+        <div style={{ fontSize: '11px', color: '#a0aec0', fontWeight: '700', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
           Loop
         </div>
-        
+
         <div className="control-row">
           <span className="control-label">Effect</span>
           <div className="control-value">

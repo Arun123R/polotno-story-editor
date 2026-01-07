@@ -9,6 +9,7 @@ import { RightSidebar } from "../components/right-sidebar/RightSidebar";
 export const Editor = () => {
   return (
     <EditorLayout
+      store={store}
       sidePanel={<EditorSidePanel store={store} />}
       toolbar={<EditorToolbar store={store} />}
       canvas={<EditorWorkspace store={store} />}

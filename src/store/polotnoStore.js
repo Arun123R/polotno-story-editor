@@ -8,6 +8,7 @@ export const store = createStore({
 });
 
 store.addPage();
+store.setSize(279, 496);
 
 // setAnimationsEnabled(true);
 store.play();
