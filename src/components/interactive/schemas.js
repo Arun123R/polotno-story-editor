@@ -13,11 +13,12 @@
 
 export const INTERACTIVE_DEFAULTS = {
     poll: {
-        question: 'What do you prefer?',
+        question: 'Are you excited for the grand sale?',
         options: [
-            { id: 'opt1', text: 'Option A', votes: 0 },
-            { id: 'opt2', text: 'Option B', votes: 0 },
+            { id: 'opt1', label: 'YES', votes: 0 },
+            { id: 'opt2', label: 'NO', votes: 0 },
         ],
+        layout: 'horizontal', // 'horizontal' or 'vertical'
         allowMultiple: false,
         showResults: true,
     },
@@ -43,9 +44,8 @@ export const INTERACTIVE_DEFAULTS = {
     },
 
     reaction: {
-        emojis: ['😍', '🔥', '😂', '😮', '😢'],
-        size: 48,
-        showCount: false,
+        emojis: ['👍', '👎'],
+        showCount: true,
     },
 
     countdown: {
@@ -90,15 +90,15 @@ export const INTERACTIVE_DEFAULTS = {
 
 export const INTERACTIVE_STYLES = {
     poll: {
-        questionColor: '#ffffff',
-        questionFontSize: 16,
-        optionBgColor: 'rgba(255,255,255,0.2)',
-        optionBgHoverColor: 'rgba(255,255,255,0.3)',
-        optionTextColor: '#ffffff',
-        optionFontSize: 14,
+        questionColor: '#1f2937',
+        questionFontSize: 9,
+        optionBgColor: '#ffffff',
+        optionBgHoverColor: '#f3f4f6',
+        optionTextColor: '#1f2937',
+        optionFontSize: 9,
         optionBorderRadius: 8,
         resultBarColor: '#F97316',
-        containerBgColor: 'rgba(0,0,0,0.5)',
+        containerBgColor: '#ffffff', // White card background
         containerBorderRadius: 12,
         containerPadding: 16,
     },
@@ -114,7 +114,7 @@ export const INTERACTIVE_STYLES = {
         incorrectColor: '#ef4444',
         containerBgColor: 'rgba(0,0,0,0.5)',
         containerBorderRadius: 12,
-        containerPadding: 16,
+        containerPadding: 12,
     },
 
     rating: {
@@ -129,9 +129,10 @@ export const INTERACTIVE_STYLES = {
     },
 
     reaction: {
-        bgColor: 'transparent',
+        containerBgColor: '#ffffff',
         hoverScale: 1.2,
         emojiSize: 48,
+        transparentBg: false,
     },
 
     countdown: {
@@ -198,8 +199,8 @@ export const INTERACTIVE_STYLES = {
 // ==================== ELEMENT DIMENSIONS ====================
 
 export const INTERACTIVE_DIMENSIONS = {
-    poll: { width: 280, height: 180 },
-    quiz: { width: 280, height: 200 },
+    poll: { width: 280, height: 110 },
+    quiz: { width: 280, height: 110 },
     rating: { width: 237, height: 90 },
     reaction: { width: 280, height: 80 },
     countdown: { width: 300, height: 140 },

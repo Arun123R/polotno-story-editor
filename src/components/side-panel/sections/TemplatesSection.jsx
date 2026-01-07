@@ -139,5 +139,5 @@ const NormalizedTemplatesPanel = observer(({ store }) => {
 
 export const TemplatesSection = {
   ...PolotnoTemplatesSection,
-  Panel: ({ store }) => <NormalizedTemplatesPanel store={store} />, 
+  Panel: ({ store }) => <NormalizedTemplatesPanel store={store} />,
 };
