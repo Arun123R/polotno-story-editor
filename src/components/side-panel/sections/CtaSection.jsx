@@ -130,6 +130,7 @@ const CTA_DEFAULTS = {
     // Card styling
     cardBgColor: '#ffffff',
     cardBorderRadius: 24,
+    cardOpacity: 1,
     cardShadow: true,
     cardShadowBlur: 20,
     cardShadowOpacity: 0.15,
@@ -174,6 +175,7 @@ const CTA_DEFAULTS = {
     // Card styling
     cardBgColor: '#1e293b',
     cardBorderRadius: 16,
+    cardOpacity: 1,
     cardShadow: false,
     cardShadowBlur: 0,
     cardShadowOpacity: 0,
@@ -214,6 +216,7 @@ const CTA_DEFAULTS = {
     // Card styling
     cardBgColor: '#ffffff',
     cardBorderRadius: 24,
+    cardOpacity: 1,
     cardShadow: true,
     cardShadowBlur: 20,
     cardShadowOpacity: 0.15,
@@ -258,6 +261,7 @@ const CTA_DEFAULTS = {
     // Card styling
     cardBgColor: '#ffffff',
     cardBorderRadius: 16,
+    cardOpacity: 1,
     cardShadow: true,
     cardShadowBlur: 12,
     cardShadowOpacity: 0.15,
@@ -469,6 +473,7 @@ function generateDescribeProductSVG(data, width, height) {
   // Card styling
   const cardBgColor = data?.cardBgColor || '#ffffff';
   const cardBorderRadius = data?.cardBorderRadius || 24;
+  const cardOpacity = data?.cardOpacity !== undefined ? data.cardOpacity : 1;
   const cardShadow = data?.cardShadow !== false;
   const cardShadowBlur = data?.cardShadowBlur || 20;
   const cardShadowOpacity = data?.cardShadowOpacity || 0.15;
@@ -603,7 +608,7 @@ function generateDescribeProductSVG(data, width, height) {
       </defs>
       
       <!-- Card Container -->
-      <rect width="${width}" height="${height}" rx="${cardBorderRadius}" fill="${cardBgColor}" ${cardShadow ? 'filter="url(#cardShadow)"' : ''}/>
+      <rect width="${width}" height="${height}" rx="${cardBorderRadius}" fill="${cardBgColor}" fill-opacity="${cardOpacity}" ${cardShadow ? 'filter="url(#cardShadow)"' : ''}/>
       
       <!-- Image Section -->
       ${imageSection}
@@ -645,6 +650,7 @@ function generateVisitProductSVG(data, width, height) {
   // Card styling
   const cardBgColor = data?.cardBgColor || '#1e293b';
   const cardBorderRadius = data?.cardBorderRadius || 16;
+  const cardOpacity = data?.cardOpacity !== undefined ? data.cardOpacity : 1;
   const cardPaddingX = data?.cardPaddingX || 24;
   const cardPaddingY = data?.cardPaddingY || 20;
 
@@ -695,7 +701,7 @@ function generateVisitProductSVG(data, width, height) {
   return `data:image/svg+xml;utf8,${encodeURIComponent(`
     <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
       <!-- Card Container -->
-      <rect width="${width}" height="${height}" rx="${cardBorderRadius}" fill="${cardBgColor}"/>
+      <rect width="${width}" height="${height}" rx="${cardBorderRadius}" fill="${cardBgColor}" fill-opacity="${cardOpacity}"/>
       
       <!-- Title with Arrow -->
       <text x="${cardPaddingX}" y="${titleY}" fill="${titleColor}" font-size="${titleFontSize}" font-weight="${titleFontWeight}" font-family="${titleFontFamily}, -apple-system, sans-serif">${escapeXml(title)}</text>
@@ -739,6 +745,7 @@ function generateBuyProductSVG(data, width, height) {
   // Card styling
   const cardBgColor = data?.cardBgColor || '#ffffff';
   const cardBorderRadius = data?.cardBorderRadius || 16;
+  const cardOpacity = data?.cardOpacity !== undefined ? data.cardOpacity : 1;
   const cardShadow = data?.cardShadow !== false;
   const cardShadowBlur = data?.cardShadowBlur || 12;
   const cardShadowOpacity = data?.cardShadowOpacity || 0.15;
@@ -818,7 +825,7 @@ function generateBuyProductSVG(data, width, height) {
       </defs>
       
       <!-- Card Container -->
-      <rect width="${width}" height="${height}" rx="${cardBorderRadius}" fill="${cardBgColor}" ${cardShadow ? 'filter="url(#buyShadow)"' : ''}/>
+      <rect width="${width}" height="${height}" rx="${cardBorderRadius}" fill="${cardBgColor}" fill-opacity="${cardOpacity}" ${cardShadow ? 'filter="url(#buyShadow)"' : ''}/>
       
       <!-- Product Image -->
       ${imageSection}

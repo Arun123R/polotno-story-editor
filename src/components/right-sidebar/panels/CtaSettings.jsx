@@ -326,7 +326,14 @@ export const CtaSettings = observer(({ store, element }) => {
   const getTextColor = () => customData.textColor ?? CTA_DEFAULTS[ctaType]?.textColor ?? '#ffffff';
   const getBorderRadius = () => {
     if (isImageElement) {
-      return element.cornerRadius ?? customData.borderRadius ?? CTA_DEFAULTS[ctaType]?.borderRadius ?? 12;
+      // For image elements, prioritize customData (export units), then convert cornerRadius from canvas units
+      if (customData.borderRadius !== undefined && customData.borderRadius !== null) {
+        return customData.borderRadius;
+      }
+      if (element.cornerRadius !== undefined && element.cornerRadius !== null) {
+        return Math.round(toExport(element.cornerRadius));
+      }
+      return CTA_DEFAULTS[ctaType]?.borderRadius ?? 12;
     }
     return customData.borderRadius ?? CTA_DEFAULTS[ctaType]?.borderRadius ?? 25;
   };
@@ -485,6 +492,13 @@ export const CtaSettings = observer(({ store, element }) => {
     updateCustomData('buyButtonBorderRadius', isNaN(numValue) ? value : numValue);
   };
   const getButtonBorderRadius = () => customData.buyButtonBorderRadius ?? CTA_DEFAULTS[ctaType]?.buyButtonBorderRadius ?? 8;
+
+  // Card opacity setters/getters (for product card variants)
+  const setCardOpacity = (value) => {
+    const numValue = parseFloat(value);
+    updateCustomData('cardOpacity', isNaN(numValue) ? value : numValue);
+  };
+  const getCardOpacity = () => customData.cardOpacity !== undefined ? customData.cardOpacity : (CTA_DEFAULTS[ctaType]?.cardOpacity ?? 1);
 
   return (
     <div className="settings-panel cta-settings">
@@ -906,10 +920,14 @@ export const CtaSettings = observer(({ store, element }) => {
                     <input
                       type="number"
                       className="slider-input"
-                      value={Math.round((element.opacity ?? 1) * 100)}
+                      value={isProductCardVariant ? Math.round(getCardOpacity() * 100) : Math.round((element.opacity ?? 1) * 100)}
                       onChange={(e) => {
                         const value = parseInt(e.target.value);
-                        element.set({ opacity: (isNaN(value) ? 0 : value) / 100 });
+                        if (isProductCardVariant) {
+                          setCardOpacity((isNaN(value) ? 0 : value) / 100);
+                        } else {
+                          element.set({ opacity: (isNaN(value) ? 0 : value) / 100 });
+                        }
                       }}
                       min={0}
                       max={100}
@@ -917,7 +935,7 @@ export const CtaSettings = observer(({ store, element }) => {
                     <div className="slider-track">
                       <div
                         className="slider-fill"
-                        style={{ width: `${Math.round((element.opacity ?? 1) * 100)}%` }}
+                        style={{ width: `${isProductCardVariant ? Math.round(getCardOpacity() * 100) : Math.round((element.opacity ?? 1) * 100)}%` }}
                       >
                         <div className="slider-thumb" />
                       </div>
@@ -925,8 +943,14 @@ export const CtaSettings = observer(({ store, element }) => {
                         type="range"
                         min={0}
                         max={100}
-                        value={Math.round((element.opacity ?? 1) * 100)}
-                        onChange={(e) => element.set({ opacity: parseInt(e.target.value) / 100 })}
+                        value={isProductCardVariant ? Math.round(getCardOpacity() * 100) : Math.round((element.opacity ?? 1) * 100)}
+                        onChange={(e) => {
+                          if (isProductCardVariant) {
+                            setCardOpacity(parseInt(e.target.value) / 100);
+                          } else {
+                            element.set({ opacity: parseInt(e.target.value) / 100 });
+                          }
+                        }}
                       />
                     </div>
                   </div>
@@ -1078,8 +1102,8 @@ export const CtaSettings = observer(({ store, element }) => {
                 </div>
               )}
 
-              {/* Border Radius - for classic, swipe_up, image */}
-              {(ctaType === 'classic' || ctaType === 'swipe_up' || ctaType === 'image') && (
+              {/* Border Radius - for classic, swipe_up only */}
+              {(ctaType === 'classic' || ctaType === 'swipe_up') && (
                 <div className="control-row">
                   <span className="control-label">Border Radius</span>
                   <div className="control-value">
@@ -1096,8 +1120,8 @@ export const CtaSettings = observer(({ store, element }) => {
                 </div>
               )}
 
-              {/* Border Width - for classic and image */}
-              {(ctaType === 'classic' || ctaType === 'image') && (
+              {/* Border Width - for classic only */}
+              {ctaType === 'classic' && (
                 <div className="control-row">
                   <span className="control-label">Border Width</span>
                   <div className="control-value">
@@ -1114,8 +1138,8 @@ export const CtaSettings = observer(({ store, element }) => {
                 </div>
               )}
 
-              {/* Border Color - for classic and image */}
-              {(ctaType === 'classic' || ctaType === 'image') && (
+              {/* Border Color - for classic only */}
+              {ctaType === 'classic' && (
                 <div className="control-row">
                   <span className="control-label">Border Color</span>
                   <div className="control-value">
@@ -1138,6 +1162,24 @@ export const CtaSettings = observer(({ store, element }) => {
                         style={{ width: 80 }}
                       />
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Corner Radius - for image CTA only */}
+              {ctaType === 'image' && (
+                <div className="control-row">
+                  <span className="control-label">Corner Radius</span>
+                  <div className="control-value">
+                    <input
+                      type="number"
+                      className="position-input"
+                      value={getBorderRadius()}
+                      onChange={(e) => setBorderRadius(e.target.value)}
+                      min={0}
+                      max={100}
+                    />
+                    <span style={{ color: 'var(--sidebar-text-muted)', fontSize: 11 }}>px</span>
                   </div>
                 </div>
               )}
