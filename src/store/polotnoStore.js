@@ -311,3 +311,91 @@ reaction(
     }
   }
 );
+
+// 3) Global visibility controller for elements with custom timing (startTime/endTime).
+// This ensures ALL elements on the active page respect their timing during playback,
+// not just the currently selected element.
+
+// Track original visibility per element ID to restore after playback stops.
+const baseVisibilityMap = new Map();
+
+const clampValue = (value, min, max) => Math.max(min, Math.min(max, value));
+
+const getElementTimingData = (element, pageDurationMs) => {
+  const rawStart = element?.custom?.startTime;
+  const rawEnd = element?.custom?.endTime;
+  const startTime = Number.isFinite(rawStart) ? rawStart : 0;
+  const endTime = Number.isFinite(rawEnd) ? rawEnd : pageDurationMs;
+  return {
+    startTime: clampValue(startTime, 0, pageDurationMs),
+    endTime: clampValue(Math.max(endTime, startTime), 0, pageDurationMs),
+    hasCustomTiming: Number.isFinite(rawStart) || Number.isFinite(rawEnd),
+  };
+};
+
+// This reaction runs during playback to enforce visibility for all timed elements.
+reaction(
+  () => {
+    const isPlaying = store.isPlaying;
+    const currentTime = store.currentTime;
+    const page = store.activePage;
+    const pageStartMs = page?.startTime ?? 0;
+    const pageDurationMs = page?.duration ?? 5000;
+
+    // Return a composite key so the reaction fires on any relevant change.
+    return {
+      isPlaying,
+      currentTime,
+      pageId: page?.id,
+      pageStartMs,
+      pageDurationMs,
+    };
+  },
+  ({ isPlaying, currentTime, pageId, pageStartMs, pageDurationMs }) => {
+    try {
+      const page = store.activePage;
+      if (!page || page.id !== pageId) return;
+
+      const children = Array.isArray(page.children) ? page.children : [];
+      const pageTimeMs = clampValue((currentTime ?? 0) - pageStartMs, 0, pageDurationMs);
+
+      // Find all elements with custom timing.
+      const timedElements = children.filter((el) => {
+        if (!el) return false;
+        const { hasCustomTiming } = getElementTimingData(el, pageDurationMs);
+        return hasCustomTiming;
+      });
+
+      if (isPlaying) {
+        // During playback: enforce visibility based on timing for all timed elements.
+        timedElements.forEach((el) => {
+          // Store original visibility if not already stored.
+          if (!baseVisibilityMap.has(el.id)) {
+            baseVisibilityMap.set(el.id, el.visible ?? true);
+          }
+
+          const { startTime, endTime } = getElementTimingData(el, pageDurationMs);
+          const inRange = pageTimeMs >= startTime && pageTimeMs <= endTime;
+          const baseVisible = baseVisibilityMap.get(el.id) ?? true;
+          const nextVisible = Boolean(baseVisible && inRange);
+
+          if (el.visible !== nextVisible) {
+            el.set({ visible: nextVisible });
+          }
+        });
+      } else {
+        // Playback stopped: restore original visibility for all tracked elements.
+        baseVisibilityMap.forEach((originalVisibility, elementId) => {
+          const el = store.getElementById?.(elementId);
+          if (el && el.visible !== originalVisibility) {
+            el.set({ visible: originalVisibility });
+          }
+        });
+        baseVisibilityMap.clear();
+      }
+    } catch {
+      // Never block UI.
+    }
+  },
+  { fireImmediately: false }
+);

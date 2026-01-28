@@ -6,6 +6,7 @@ import {
   DurationSection,
   AnimationSection,
 } from '../shared/CommonControls';
+import { ColorPicker } from '../shared/ColorPicker';
 
 /**
  * Text element settings panel - Storyly-inspired dark theme
@@ -331,25 +332,10 @@ export const TextSettings = observer(({ store, element, elements = [], isMultiSe
               <div className="control-row">
                 <span className="control-label">Text Color</span>
                 <div className="control-value">
-                  <div className="color-picker-row">
-                    <div
-                      className="color-swatch"
-                      style={{ backgroundColor: element.fill || '#000000' }}
-                    >
-                      <input
-                        type="color"
-                        value={element.fill || '#000000'}
-                        onChange={(e) => applyToAll({ fill: e.target.value })}
-                      />
-                    </div>
-                    <input
-                      type="text"
-                      className="color-input-text"
-                      value={element.fill || '#000000'}
-                      onChange={(e) => applyToAll({ fill: e.target.value })}
-                      style={{ width: '80px' }}
-                    />
-                  </div>
+                  <ColorPicker
+                    value={element.fill || '#000000'}
+                    onChange={(color) => applyToAll({ fill: color })}
+                  />
                 </div>
               </div>
             </div>

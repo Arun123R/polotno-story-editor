@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { useState, useEffect } from 'react';
 import { DurationSection } from '../shared/CommonControls';
+import { ColorPicker } from '../shared/ColorPicker';
 import { getStorePresetName } from '../../../utils/scale';
 import { setStorePreset } from '../../../store/polotnoStore';
 
@@ -36,29 +37,10 @@ export const PageSettings = observer(({ store }) => {
           <div className="control-row">
             <span className="control-label">Background</span>
             <div className="control-value">
-              <div className="color-picker-row">
-                <div
-                  className="color-swatch"
-                  style={{ backgroundColor: activePage.background || '#ffffff' }}
-                >
-                  <input
-                    type="color"
-                    value={activePage.background || '#ffffff'}
-                    onChange={(e) =>
-                      activePage.set({ background: e.target.value })
-                    }
-                  />
-                </div>
-                <input
-                  type="text"
-                  className="color-input-text"
-                  value={activePage.background || '#ffffff'}
-                  onChange={(e) =>
-                    activePage.set({ background: e.target.value })
-                  }
-                  style={{ width: '80px' }}
-                />
-              </div>
+              <ColorPicker
+                value={activePage.background || '#ffffff'}
+                onChange={(color) => activePage.set({ background: color })}
+              />
             </div>
           </div>
 
