@@ -9,6 +9,20 @@ import {
   INTERACTIVE_STYLES,
 } from '../../interactive/schemas';
 
+// Helper to escape XML characters for SVG text
+const escapeXml = (unsafe) => {
+  if (typeof unsafe !== 'string') return unsafe;
+  return unsafe.replace(/[<>&'"]/g, (c) => {
+    switch (c) {
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '&': return '&amp;';
+      case '\'': return '&apos;';
+      case '"': return '&quot;';
+    }
+  });
+};
+
 /* ================= STYLES ================= */
 
 // Generate SVG preview for interactive elements
@@ -68,8 +82,8 @@ const generatePollSVG = (data, style, width, height) => {
   const buttonBg = style?.optionBgColor || '#ffffff';
   const buttonBorder = '#e5e7eb';
   const buttonTextColor = style?.optionTextColor || '#1f2937';
-  const questionFontSize = style?.questionFontSize || 9;
-  const optionFontSize = style?.optionFontSize || 9;
+  const questionFontSize = style?.questionFontSize || 11;
+  const optionFontSize = style?.optionFontSize || 13;
 
   const padding = 16;
   const questionY = padding + 12;
@@ -183,39 +197,62 @@ const generateQuizSVG = (data, style, width, height) => {
   const bgColor = style?.containerBgColor || '#ffffff';
   const questionColor = style?.questionColor || '#1f2937';
   const optionBg = style?.optionBgColor || '#f9fafb';
-  const optionBorder = '#e5e7eb';
-  const optionTextColor = style?.optionTextColor || '#374151';
-  const letterBg = '#f3f4f6';
-  const letterColor = '#6b7280';
-  const questionFontSize = style?.questionFontSize || 10;
-  const optionFontSize = style?.optionFontSize || 10;
-  const padding = style?.containerPadding || 12;
-  const borderRadius = style?.optionBorderRadius || 4;
+  const optionTextColor = style?.optionTextColor || '#1f2937';
+  // Circle style for letter
+  const circleBg = '#e5e7eb'; // Light gray circle as in image
+  const circleText = '#1f2937';
 
-  const questionY = padding + 10;
-  const optionStartY = padding + 30;
-  const optionHeight = 20;
-  const optionGap = 6;
+  // Layout
+  const padding = 20;
+  const questionY = 35;
+
+  // Calculate dynamic spacing
+  const startY = 60;
+  const optionH = 34; // Slightly taller pill
+  const gap = 12; // More breathing room
 
   let optionsSVG = '';
   options.forEach((option, idx) => {
-    const y = optionStartY + idx * (optionHeight + optionGap);
+
+
+    const y = startY + idx * (optionH + gap);
     const letter = String.fromCharCode(65 + idx); // A, B, C...
 
     optionsSVG += `
-      <rect x="${padding}" y="${y}" width="${width - padding * 2}" height="${optionHeight}" fill="${optionBg}" stroke="${optionBorder}" stroke-width="1" rx="${borderRadius}"/>
-      <circle cx="${padding + 10}" cy="${y + 10}" r="6" fill="${letterBg}" stroke="${optionBorder}" stroke-width="1"/>
-      <text x="${padding + 10}" y="${y + 10}" font-family="Arial, sans-serif" font-size="9" font-weight="600" fill="${letterColor}" text-anchor="middle" dominant-baseline="middle">${letter}</text>
-      <text x="${padding + 24}" y="${y + 10}" font-family="Arial, sans-serif" font-size="${optionFontSize}" font-weight="500" fill="${optionTextColor}" dominant-baseline="middle">${option.text || option.label || 'Option'}</text>
-    `;
+       <g>
+         <!-- Option Pill -->
+         <rect x="${padding}" y="${y}" width="${width - (padding * 2)}" height="${optionH}" rx="${optionH / 2}" fill="${optionBg}" />
+         
+         <!-- Letter Circle -->
+         <circle cx="${padding + (optionH / 2)}" cy="${y + optionH / 2}" r="12" fill="${circleBg}" opacity="0.5" />
+         <text x="${padding + (optionH / 2)}" y="${y + optionH / 2 + 4}" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="700" fill="${circleText}" text-anchor="middle">${letter}</text>
+         
+         <!-- Text -->
+         <text x="${padding + optionH + 12}" y="${y + optionH / 2 + 5}" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="500" fill="${optionTextColor}">${escapeXml(option.text || '')}</text>
+       </g>
+     `;
   });
 
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
-    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-      <rect width="${width}" height="${height}" fill="${bgColor}" rx="12"/>
+    <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="shadow-quiz-card" x="-10%" y="-10%" width="120%" height="120%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+          <feOffset dx="0" dy="1" result="offsetblur"/>
+          <feComponentTransfer>
+             <feFuncA type="linear" slope="0.1"/>
+          </feComponentTransfer>
+          <feMerge> 
+            <feMergeNode/>
+            <feMergeNode in="SourceGraphic"/> 
+          </feMerge>
+        </filter>
+      </defs>
+
+      <rect width="100%" height="100%" fill="${bgColor}" rx="16" filter="url(#shadow-quiz-card)"/>
       
       <!-- Question -->
-      <text x="${padding}" y="${questionY}" font-family="Arial, sans-serif" font-size="${questionFontSize}" font-weight="600" fill="${questionColor}">${question}</text>
+      <text x="${padding}" y="${questionY}" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700" fill="${questionColor}">${escapeXml(question)}</text>
       
       <!-- Options -->
       ${optionsSVG}
@@ -274,77 +311,261 @@ const generateReactionSVG = (data, style, width, height) => {
   `)}`;
 };
 
-// Generate Countdown SVG
+// Generate Countdown SVG with Individual Digit Tiles
 const generateCountdownSVG = (data, style, width, height) => {
-  const title = data?.title || 'Ends In';
+  const title = data?.title || "It's almost my b-day!";
   const containerBg = style?.containerBgColor || '#ffffff';
-  const textColor = style?.titleColor || '#000000';
+  const textColor = style?.titleColor || '#1f2937';
+  const labelColor = style?.labelColor || '#1f2937'; // Darker label color from image
+  // New tiling styles
+  const digitBoxBg = '#f3f4f6'; // Light gray for digit tiles
+  const digitBoxRadius = 6;
+  const digitBoxWidth = 32;
+  const digitBoxHeight = 44;
+  const digitGap = 4; // Gap between two digits of same unit
+  const groupGap = 16; // Gap between units (where colon lives)
+
+  // Parsing visibility
+  const showDays = data?.showDays !== false;
+  const showHours = data?.showHours !== false;
+  const showMinutes = data?.showMinutes !== false;
+  const showSeconds = data?.showSeconds !== false;
+
+  // Calculate time remaining
+  let days = '00', hours = '00', minutes = '00', seconds = '00';
+
+  if (data?.endDate) {
+    const endDateTimeString = data.endTime ? `${data.endDate}T${data.endTime}` : data.endDate;
+    const targetDate = new Date(endDateTimeString);
+    const now = new Date();
+    const diff = targetDate - now;
+
+    if (diff > 0) {
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+      days = d.toString().padStart(2, '0');
+      hours = h.toString().padStart(2, '0');
+      minutes = m.toString().padStart(2, '0');
+      seconds = s.toString().padStart(2, '0');
+    }
+  }
+
+  // Build the layout groups dynamically
+  let groups = [];
+  if (showDays) groups.push({ value: days, label: 'days' });
+  if (showHours) groups.push({ value: hours, label: 'hours' });
+  if (showMinutes) groups.push({ value: minutes, label: 'minutes' });
+  if (showSeconds) groups.push({ value: seconds, label: 'seconds' });
+
+  // Calculate total width of the time display to center it
+  // Group width = (digitBoxWidth * 2) + digitGap
+  const groupWidth = (digitBoxWidth * 2) + digitGap;
+  const totalContentWidth = (groups.length * groupWidth) + ((groups.length - 1) * groupGap);
+
+  // Starting X position to center content
+  let currentX = (width - totalContentWidth) / 2;
+  const startY = 45;
+
+  // Generate SVG parts
+  const groupSVGs = groups.map((g, index) => {
+    const isLast = index === groups.length - 1;
+    const gX = currentX;
+
+    // Update X for next loop
+    currentX += groupWidth + groupGap;
+
+    const [d1, d2] = g.value.toString().padStart(2, '0').split('');
+
+    // Digit 1
+    const d1Rect = `<rect x="${gX}" y="${startY}" width="${digitBoxWidth}" height="${digitBoxHeight}" rx="${digitBoxRadius}" fill="${digitBoxBg}" />`;
+    const d1Text = `<text x="${gX + digitBoxWidth / 2}" y="${startY + 30}" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700" fill="${textColor}" text-anchor="middle">${d1}</text>`;
+
+    // Digit 2
+    const d2X = gX + digitBoxWidth + digitGap;
+    const d2Rect = `<rect x="${d2X}" y="${startY}" width="${digitBoxWidth}" height="${digitBoxHeight}" rx="${digitBoxRadius}" fill="${digitBoxBg}" />`;
+    const d2Text = `<text x="${d2X + digitBoxWidth / 2}" y="${startY + 30}" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700" fill="${textColor}" text-anchor="middle">${d2}</text>`;
+
+    // Label
+    const labelText = `<text x="${gX + groupWidth / 2}" y="${startY + 60}" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="600" fill="${labelColor}" text-anchor="middle">${g.label}</text>`;
+
+    // Colon (if not last)
+    let colon = '';
+    if (!isLast) {
+      const colonX = d2X + digitBoxWidth + (groupGap / 2);
+      colon = `<text x="${colonX}" y="${startY + 28}" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="${textColor}" text-anchor="middle">:</text>`;
+    }
+
+    return d1Rect + d1Text + d2Rect + d2Text + labelText + colon;
+  }).join('');
 
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-      <rect width="${width}" height="${height}" fill="${containerBg}" rx="12"/>
+      <rect width="${width}" height="${height}" fill="${containerBg}" rx="16" stroke="#e5e7eb" stroke-width="1"/>
       
-      <text x="${width / 2}" y="30" font-family="Arial, sans-serif" font-size="14" font-weight="600" fill="${textColor}" text-anchor="middle">${title}</text>
+      <!-- Title -->
+      <text x="${width / 2}" y="35" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700" fill="${textColor}" text-anchor="middle">${escapeXml(title)}</text>
       
-      <!-- Time Display -->
-      <text x="${width / 2}" y="${height / 2 + 10}" font-family="Arial, sans-serif" font-size="32" font-weight="700" fill="${textColor}" text-anchor="middle">00:00:00</text>
-      <text x="${width / 2}" y="${height / 2 + 30}" font-family="Arial, sans-serif" font-size="10" fill="#9ca3af" text-anchor="middle">days : hours : minutes</text>
+      <!-- Time Display Groups -->
+      ${groupSVGs}
     </svg>
   `)}`;
 };
 
-// Generate Promo SVG  
+// Generate Promo SVG (Coupon Style) 
 const generatePromoSVG = (data, style, width, height) => {
-  const title = data?.title || 'Special Offer';
-  const code = data?.code || 'SAVE20';
+  // Use 'Coupon' as default title to match the image if no title provided
+  const title = data?.title || 'Coupon';
   const containerBg = style?.containerBgColor || '#ffffff';
-  const titleColor = style?.titleColor || '#000000';
-  const codeColor = style?.codeColor || '#f97316';
+  const borderColor = style?.borderColor || '#f97316';
+  const textColor = style?.titleColor || '#1f2937';
+  const iconBg = style?.codeBgColor || '#fef3c7';
+  const dashed = data?.dashedBorder !== false;
+
+  const strokeDash = dashed ? '8,6' : '0';
 
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-      <rect width="${width}" height="${height}" fill="${containerBg}" rx="12"/>
+      <!-- Main container with border -->
+      <rect x="5" y="5" width="${width - 10}" height="${height - 10}" fill="${containerBg}" rx="24" stroke="${borderColor}" stroke-width="2" stroke-dasharray="${strokeDash}"/>
       
-      <text x="${width / 2}" y="30" font-family="Arial, sans-serif" font-size="14" font-weight="600" fill="${titleColor}" text-anchor="middle">${title}</text>
+      <!-- 'Coupon' Text -->
+      <text x="40" y="${height / 2 + 10}" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="800" fill="${textColor}" text-anchor="start">${escapeXml(title)}</text>
       
-      <!-- Code Box -->
-      <rect x="20" y="45" width="${width - 40}" height="45" fill="#fef3c7" rx="8" stroke="#fb923c" stroke-width="2" stroke-dasharray="5,3"/>
-      <text x="${width / 2}" y="72" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="${codeColor}" text-anchor="middle">${code}</text>
+      <!-- Clipboard Icon Background -->
+      <!-- Positioned to the right -->
+      <rect x="${width - 90}" y="${height / 2 - 25}" width="50" height="50" rx="12" fill="${iconBg}" />
+      
+      <!-- Clipboard Icon -->
+      <g transform="translate(${width - 77}, ${height / 2 - 12}) scale(1.2)">
+         <!-- Board -->
+         <rect x="0" y="0" width="20" height="26" fill="#d1d5db" rx="2" stroke="#9ca3af" stroke-width="1.5"/>
+         <!-- Paper -->
+         <rect x="2" y="4" width="16" height="20" fill="#ffffff" />
+         <!-- Clip -->
+         <rect x="5" y="-2" width="10" height="4" fill="#9ca3af" rx="1" />
+      </g>
     </svg>
   `)}`;
 };
 
 // Generate Question SVG
 const generateQuestionSVG = (data, style, width, height) => {
-  const question = data?.question || 'Ask me anything!';
-  const containerBg = style?.containerBgColor || 'rgba(0,0,0,0.6)';
-  const textColor = style?.questionColor || '#ffffff';
+  const title = data?.title || 'Ask me anything!';
+  const placeholder = data?.placeholder || 'Tap to ask';
+  const containerBg = style?.containerBgColor || '#ffffff';
+  const textColor = style?.titleColor || '#1f2937';
+  const inputBg = style?.inputBgColor || '#f3f4f6';
+  const placeholderColor = style?.placeholderColor || '#9ca3af';
 
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-      <rect width="${width}" height="${height}" fill="${containerBg}" rx="12"/>
+      <defs>
+        <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+          <feOffset dx="0" dy="2" result="offsetblur"/>
+          <feComponentTransfer>
+             <feFuncA type="linear" slope="0.1"/>
+          </feComponentTransfer>
+          <feMerge> 
+            <feMergeNode/>
+            <feMergeNode in="SourceGraphic"/> 
+          </feMerge>
+        </filter>
+      </defs>
       
-      <text x="${width / 2}" y="${height / 2 - 10}" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="${textColor}" text-anchor="middle">${question}</text>
-      <text x="${width / 2}" y="${height / 2 + 15}" font-family="Arial, sans-serif" font-size="12" fill="rgba(255,255,255,0.7)" text-anchor="middle">Tap to ask</text>
+      <!-- Main Card -->
+      <rect x="5" y="5" width="${width - 10}" height="${height - 10}" fill="${containerBg}" rx="16" filter="url(#shadow)"/>
+      
+      <!-- Speech Bubble Tail Mockup (Optional) - User image shows a speech bubble style in thumbnail, but preview is a card. Let's stick to the card style for now as it's cleaner -->
+
+      <!-- Title -->
+      <text x="${width / 2}" y="50" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="${textColor}" text-anchor="middle">${escapeXml(title)}</text>
+      
+      <!-- Input Box -->
+      <rect x="25" y="75" width="${width - 50}" height="45" fill="${inputBg}" rx="12"/>
+      <text x="${width / 2}" y="103" font-family="Inter, Arial, sans-serif" font-size="14" fill="${placeholderColor}" text-anchor="middle">${escapeXml(placeholder)}</text>
     </svg>
   `)}`;
 };
 
 // Generate Image Quiz SVG
 const generateImageQuizSVG = (data, style, width, height) => {
-  const question = data?.question || 'Which one?';
-  const containerBg = style?.containerBgColor || 'rgba(0,0,0,0.6)';
-  const textColor = style?.questionColor || '#ffffff';
+  const question = data?.question || 'Which one is correct?';
+  const containerBg = style?.containerBgColor || '#ffffff';
+  const textColor = style?.questionColor || '#1f2937';
+  const labelColor = style?.labelColor || '#4b5563';
+  const borderColor = style?.imageBorderColor || '#e5e7eb';
+  const options = data?.options || [{ label: 'Option 1' }, { label: 'Option 2' }];
+
+  // Two columns hardcoded for preview simplicity, matching standard layout
+  const gap = 12;
+  const padding = 20;
+  const availableWidth = width - (padding * 2);
+  const optionWidth = (availableWidth - gap) / 2;
+  // Make options roughly square or slight portrait
+  const optionHeight = optionWidth * 1.0;
+
+  const startY = 60;
+
+  let optionsSVG = '';
+  // Only render first 2 options for the preview if more exist
+  for (let i = 0; i < 2; i++) {
+    const x = padding + (i * (optionWidth + gap));
+    const label = options[i]?.label || `Option ${i + 1}`;
+    const imageUrl = options[i]?.imageUrl;
+
+    let content = '';
+    if (imageUrl) {
+      // Render image if available
+      content = `
+          <defs>
+             <clipPath id="clip-${i}">
+                <rect x="${x}" y="${startY}" width="${optionWidth}" height="${optionHeight}" rx="8" />
+             </clipPath>
+          </defs>
+          <image href="${imageUrl}" x="${x}" y="${startY}" width="${optionWidth}" height="${optionHeight}" preserveAspectRatio="xMidYMid slice" clip-path="url(#clip-${i})" />
+          <rect x="${x}" y="${startY}" width="${optionWidth}" height="${optionHeight}" rx="8" fill="none" stroke="${borderColor}" stroke-width="1"/>
+        `;
+    } else {
+      // Render placeholder
+      content = `
+           <rect x="${x}" y="${startY}" width="${optionWidth}" height="${optionHeight}" rx="8" fill="#f3f4f6" stroke="${borderColor}" stroke-width="1"/>
+           <text x="${x + optionWidth / 2}" y="${startY + optionHeight / 2 + 5}" font-family="Arial" font-size="24" fill="#9ca3af" text-anchor="middle">📷</text>
+        `;
+    }
+
+    optionsSVG += `
+       ${content}
+       
+       <!-- Label -->
+       <text x="${x + optionWidth / 2}" y="${startY + optionHeight + 20}" font-family="Inter, Arial, sans-serif" font-size="12" fill="${labelColor}" text-anchor="middle">${escapeXml(label)}</text>
+     `;
+  }
 
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-      <rect width="${width}" height="${height}" fill="${containerBg}" rx="12"/>
+      <defs>
+        <filter id="shadow-quiz" x="-10%" y="-10%" width="120%" height="120%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+          <feOffset dx="0" dy="2" result="offsetblur"/>
+          <feComponentTransfer>
+             <feFuncA type="linear" slope="0.1"/>
+          </feComponentTransfer>
+          <feMerge> 
+            <feMergeNode/>
+            <feMergeNode in="SourceGraphic"/> 
+          </feMerge>
+        </filter>
+      </defs>
+
+      <rect x="5" y="5" width="${width - 10}" height="${height - 10}" fill="${containerBg}" rx="16" filter="url(#shadow-quiz)"/>
       
-      <text x="${width / 2}" y="30" font-family="Arial, sans-serif" font-size="14" font-weight="600" fill="${textColor}" text-anchor="middle">${question}</text>
+      <text x="${width / 2}" y="35" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700" fill="${textColor}" text-anchor="middle">${escapeXml(question)}</text>
       
-      <!-- Image Placeholders -->
-      <rect x="20" y="50" width="${(width - 52) / 2}" height="${(width - 52) / 2}" fill="rgba(255,255,255,0.1)" rx="8" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
-      <rect x="${32 + (width - 52) / 2}" y="50" width="${(width - 52) / 2}" height="${(width - 52) / 2}" fill="rgba(255,255,255,0.1)" rx="8" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+      ${optionsSVG}
     </svg>
   `)}`;
 };
@@ -524,13 +745,18 @@ const InteractionButton = ({ type, onClick }) => {
               </div>
               <span style={{ fontSize: 10, fontWeight: 600, color: '#d1d5db', marginBottom: 6 }}>:</span>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 22 }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#1f2937' }}>0:02</span>
-                <span style={{ fontSize: 6, color: '#9ca3af', marginTop: -2 }}>01:02</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#1f2937' }}>02</span>
+                <span style={{ fontSize: 6, color: '#9ca3af', marginTop: -2 }}>hours</span>
               </div>
               <span style={{ fontSize: 10, fontWeight: 600, color: '#d1d5db', marginBottom: 6 }}>:</span>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 22 }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#1f2937' }}>2:44</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#1f2937' }}>44</span>
                 <span style={{ fontSize: 6, color: '#9ca3af', marginTop: -2 }}>minutes</span>
+              </div>
+              <span style={{ fontSize: 10, fontWeight: 600, color: '#d1d5db', marginBottom: 6 }}>:</span>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 22 }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#1f2937' }}>12</span>
+                <span style={{ fontSize: 6, color: '#9ca3af', marginTop: -2 }}>seconds</span>
               </div>
             </div>
           </div>
@@ -635,14 +861,15 @@ export const InteractiveSectionPanel = observer(({ store }) => {
     // Calculate dynamic height for quiz based on options
     if (type === 'quiz' && customData.data.options) {
       const optionCount = customData.data.options.length;
-      const padding = 12;
-      const questionHeight = 20;
-      const optionHeight = 28;
-      const optionGap = 6;
-      const bottomPadding = 24;
-
-      dimensions.height = padding + questionHeight + 10 + (optionCount * optionHeight) + ((optionCount - 1) * optionGap) + bottomPadding;
+      const padding = 20;
+      const questionHeight = 35;
+      const optionHeight = 34;
+      const optionGap = 12;
+      const bottomPadding = 20;
+      dimensions.height = padding + questionHeight + 15 + (optionCount * optionHeight) + ((optionCount - 1) * optionGap) + bottomPadding;
     }
+
+
 
     // Calculate dynamic height for reaction based on showCount
     if (type === 'reaction') {
@@ -652,29 +879,37 @@ export const InteractiveSectionPanel = observer(({ store }) => {
       dimensions.height = customData.data.showCount ? (pillHeight + padding * 2) : (buttonSize + padding * 2);
     }
 
-    // Center the element on the page
-    const x = (store.width - dimensions.width) / 2;
-    const y = (store.height - dimensions.height) / 2;
+    // Safety check for dimensions
+    const canvasWidth = store.width || page.width || 1080;
+    const canvasHeight = store.height || page.height || 1920;
 
-    // Generate SVG preview based on interactive type
+    // Center the element on the page
+    const x = (canvasWidth - dimensions.width) / 2;
+    const y = (canvasHeight - dimensions.height) / 2;
+
+    // Generate SVG preview as a fallback if needed
     const svgContent = generateInteractiveSVG(type, customData.data, styleDefaults, dimensions);
 
-    // Create element with 'svg' type - this allows height control and custom rendering
+    // Create element with 'svg' type to ensure visibility
+    // We use the generated SVG as the source
     const element = page.addElement({
       type: 'svg',
-      x,
-      y,
-      width: dimensions.width,
+      x: isNaN(x) ? 100 : x,
+      y: isNaN(y) ? 100 : y,
+      width: dimensions.width, // Ensure this reflects the updated 340
       height: dimensions.height,
+      keepRatio: false,
       src: svgContent,
-      keepRatio: false, // Allow independent width/height control
-
-      // Interactive metadata
-      custom: customData,
+      custom: {
+        ...customData,
+        isInteractive: true,
+      }
     });
 
     // Auto-select the new element
-    store.selectElements([element.id]);
+    if (element) {
+      store.selectElements([element.id]);
+    }
   };
 
   // Get existing interactive elements on this page
@@ -683,7 +918,7 @@ export const InteractiveSectionPanel = observer(({ store }) => {
   );
 
   return (
-    <div style={{ padding: 16 }}>
+    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100vh', overflowY: 'auto', padding: 16, boxSizing: 'border-box' }}>
       {/* Section Header */}
       <div style={{
         display: 'flex',

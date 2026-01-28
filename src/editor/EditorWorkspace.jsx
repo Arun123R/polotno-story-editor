@@ -8,8 +8,8 @@ export const EditorWorkspace = ({ store }) => {
 
   useEffect(() => {
     const id = requestAnimationFrame(() => {
-      const stf = store.scaleToFit;
-      store.setScale(typeof stf === 'number' && stf > 0 ? stf : 1);
+      // Set specific startup zoom to 81%
+      store.setScale(0.81);
     });
     return () => cancelAnimationFrame(id);
   }, [store]);
@@ -20,11 +20,11 @@ export const EditorWorkspace = ({ store }) => {
       className="workspace-backdrop"
       style={{ width: '100%', height: '100%', position: 'relative' }}
     >
-      <Workspace 
-        store={store} 
+      <Workspace
+        store={store}
         backgroundColor="transparent"
         activePageBorderColor="#FF7A1A"
-        layout="horizontal" 
+        layout="horizontal"
       />
 
       {/* Interactive Preview Overlay - positioned on top of canvas */}
@@ -34,7 +34,7 @@ export const EditorWorkspace = ({ store }) => {
           For full live previews, consider implementing a custom Polotno extension
           or using the preview mode. */}
       {/* <InteractiveOverlay store={store} containerRef={containerRef} /> */}
-      
+
       <FitZoomButtons store={store} />
     </div>
   );

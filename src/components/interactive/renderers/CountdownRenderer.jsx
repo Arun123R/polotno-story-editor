@@ -20,7 +20,7 @@ export const CountdownRenderer = ({ data, style, width, height }) => {
       if (!endDate) {
         return { days: 0, hours: 12, minutes: 34, seconds: 56 };
       }
-      
+
       const endDateTime = new Date(`${endDate}T${endTime}:00`);
       const now = new Date();
       const diff = endDateTime - now;
@@ -45,102 +45,125 @@ export const CountdownRenderer = ({ data, style, width, height }) => {
     return () => clearInterval(timer);
   }, [endDate, endTime]);
 
+
+
   const containerStyle = {
     width: width || 300,
     height: height || 'auto',
-    minHeight: 120,
-    background: style?.containerBgColor || 'rgba(0,0,0,0.6)',
+    background: style?.containerBgColor || '#ffffff',
     borderRadius: style?.containerBorderRadius || 16,
     padding: style?.containerPadding || 20,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     gap: 16,
-    backdropFilter: 'blur(10px)',
+    border: '1px solid #e5e7eb',
     boxSizing: 'border-box',
+    fontFamily: 'Inter, Arial, sans-serif',
   };
 
   const titleStyle = {
-    color: style?.titleColor || '#ffffff',
-    fontSize: style?.titleFontSize || 14,
-    fontWeight: 600,
-    textTransform: 'uppercase',
-    letterSpacing: 2,
+    color: style?.titleColor || '#1f2937',
+    fontSize: style?.titleFontSize || 16,
+    fontWeight: 700,
     margin: 0,
+    textAlign: 'center',
+    marginBottom: 4,
   };
 
   const timerContainerStyle = {
     display: 'flex',
-    gap: 8,
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    gap: 16, // Gap between units
   };
 
-  const digitBoxStyle = {
-    background: style?.digitBgColor || 'rgba(255,255,255,0.15)',
-    borderRadius: 8,
-    padding: '12px 16px',
+  const digitGroupStyle = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: 4,
-    minWidth: 50,
+    gap: 6,
   };
 
-  const digitStyle = {
-    color: style?.digitColor || '#ffffff',
-    fontSize: style?.digitFontSize || 36,
+  const digitsRowStyle = {
+    display: 'flex',
+    gap: 4, // Gap between digits in same unit
+  };
+
+  const digitBoxStyle = {
+    width: 32,
+    height: 44,
+    background: '#f3f4f6', // Light gray tile
+    borderRadius: 6,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  };
+
+  const digitTextStyle = {
+    color: style?.digitColor || '#1f2937',
+    fontSize: style?.digitFontSize || 24, // Smaller font for tiles
     fontWeight: 700,
     lineHeight: 1,
-    fontFamily: 'monospace',
   };
 
   const labelStyle = {
-    color: style?.labelColor || 'rgba(255,255,255,0.7)',
-    fontSize: style?.labelFontSize || 10,
-    fontWeight: 500,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
+    color: style?.labelColor || '#1f2937',
+    fontSize: 11,
+    fontWeight: 600,
+  };
+
+  const separatorContainerStyle = {
+    height: 44,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   };
 
   const separatorStyle = {
-    color: style?.separatorColor || '#ffffff',
-    fontSize: 28,
+    color: style?.separatorColor || '#1f2937',
+    fontSize: 20,
     fontWeight: 700,
-    opacity: 0.5,
   };
 
-  const formatNumber = (num) => String(num).padStart(2, '0');
+  const formatDigits = (num) => String(num).padStart(2, '0').split('');
 
-  const renderDigitBox = (value, label) => (
-    <div style={digitBoxStyle}>
-      <span style={digitStyle}>{formatNumber(value)}</span>
-      <span style={labelStyle}>{label}</span>
-    </div>
-  );
+  const renderUnit = (value, label, isLast) => {
+    const [d1, d2] = formatDigits(value);
+
+    return (
+      <>
+        <div style={digitGroupStyle}>
+          <div style={digitsRowStyle}>
+            <div style={digitBoxStyle}><span style={digitTextStyle}>{d1}</span></div>
+            <div style={digitBoxStyle}><span style={digitTextStyle}>{d2}</span></div>
+          </div>
+          <span style={labelStyle}>{label}</span>
+        </div>
+        {!isLast && (
+          <div style={separatorContainerStyle}>
+            <span style={separatorStyle}>:</span>
+          </div>
+        )}
+      </>
+    );
+  };
+
+  // Filter active units to manage separators correctly
+  const activeUnits = [];
+  if (showDays) activeUnits.push({ val: timeLeft.days, label: 'days' });
+  if (showHours) activeUnits.push({ val: timeLeft.hours, label: 'hours' });
+  if (showMinutes) activeUnits.push({ val: timeLeft.minutes, label: 'minutes' });
+  if (showSeconds) activeUnits.push({ val: timeLeft.seconds, label: 'seconds' });
 
   return (
     <div style={containerStyle}>
       <p style={titleStyle}>{title}</p>
       <div style={timerContainerStyle}>
-        {showDays && (
-          <>
-            {renderDigitBox(timeLeft.days, 'Days')}
-            <span style={separatorStyle}>:</span>
-          </>
-        )}
-        {showHours && (
-          <>
-            {renderDigitBox(timeLeft.hours, 'Hrs')}
-            <span style={separatorStyle}>:</span>
-          </>
-        )}
-        {showMinutes && (
-          <>
-            {renderDigitBox(timeLeft.minutes, 'Min')}
-            {showSeconds && <span style={separatorStyle}>:</span>}
-          </>
-        )}
-        {showSeconds && renderDigitBox(timeLeft.seconds, 'Sec')}
+        {activeUnits.map((unit, index) => (
+          <React.Fragment key={unit.label}>
+            {renderUnit(unit.val, unit.label, index === activeUnits.length - 1)}
+          </React.Fragment>
+        ))}
       </div>
     </div>
   );
