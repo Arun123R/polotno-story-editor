@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { useState, useRef, useCallback } from 'react';
 import { AnimationSection } from '../shared/CommonControls';
+import { ColorPicker } from '../shared/ColorPicker';
 import { generateCtaSVG, CTA_DEFAULTS } from '../../side-panel/sections/CtaSection';
 import { toCanvas, toExport } from '../../../utils/scale';
 
@@ -967,25 +968,10 @@ export const CtaSettings = observer(({ store, element }) => {
                 <div className="control-row">
                   <span className="control-label">Background</span>
                   <div className="control-value">
-                    <div className="color-picker-row">
-                      <div
-                        className="color-swatch"
-                        style={{ backgroundColor: getBgColor() }}
-                      >
-                        <input
-                          type="color"
-                          value={getBgColor()}
-                          onChange={(e) => setBackgroundColor(e.target.value)}
-                        />
-                      </div>
-                      <input
-                        type="text"
-                        className="color-input-text"
-                        value={getBgColor()}
-                        onChange={(e) => setBackgroundColor(e.target.value)}
-                        style={{ width: 80 }}
-                      />
-                    </div>
+                    <ColorPicker
+                      value={getBgColor()}
+                      onChange={setBackgroundColor}
+                    />
                   </div>
                 </div>
               )}
@@ -995,25 +981,10 @@ export const CtaSettings = observer(({ store, element }) => {
                 <div className="control-row">
                   <span className="control-label">Text Color</span>
                   <div className="control-value">
-                    <div className="color-picker-row">
-                      <div
-                        className="color-swatch"
-                        style={{ backgroundColor: getTextColor() }}
-                      >
-                        <input
-                          type="color"
-                          value={getTextColor()}
-                          onChange={(e) => setTextColor(e.target.value)}
-                        />
-                      </div>
-                      <input
-                        type="text"
-                        className="color-input-text"
-                        value={getTextColor()}
-                        onChange={(e) => setTextColor(e.target.value)}
-                        style={{ width: 80 }}
-                      />
-                    </div>
+                    <ColorPicker
+                      value={getTextColor()}
+                      onChange={setTextColor}
+                    />
                   </div>
                 </div>
               )}
@@ -1023,25 +994,10 @@ export const CtaSettings = observer(({ store, element }) => {
                 <div className="control-row">
                   <span className="control-label">Arrow Color</span>
                   <div className="control-value">
-                    <div className="color-picker-row">
-                      <div
-                        className="color-swatch"
-                        style={{ backgroundColor: getArrowColor() }}
-                      >
-                        <input
-                          type="color"
-                          value={getArrowColor()}
-                          onChange={(e) => setArrowColor(e.target.value)}
-                        />
-                      </div>
-                      <input
-                        type="text"
-                        className="color-input-text"
-                        value={getArrowColor()}
-                        onChange={(e) => setArrowColor(e.target.value)}
-                        style={{ width: 80 }}
-                      />
-                    </div>
+                    <ColorPicker
+                      value={getArrowColor()}
+                      onChange={setArrowColor}
+                    />
                   </div>
                 </div>
               )}
@@ -1143,25 +1099,10 @@ export const CtaSettings = observer(({ store, element }) => {
                 <div className="control-row">
                   <span className="control-label">Border Color</span>
                   <div className="control-value">
-                    <div className="color-picker-row">
-                      <div
-                        className="color-swatch"
-                        style={{ backgroundColor: getBorderColor() }}
-                      >
-                        <input
-                          type="color"
-                          value={getBorderColor()}
-                          onChange={(e) => setBorderColor(e.target.value)}
-                        />
-                      </div>
-                      <input
-                        type="text"
-                        className="color-input-text"
-                        value={getBorderColor()}
-                        onChange={(e) => setBorderColor(e.target.value)}
-                        style={{ width: 80 }}
-                      />
-                    </div>
+                    <ColorPicker
+                      value={getBorderColor()}
+                      onChange={setBorderColor}
+                    />
                   </div>
                 </div>
               )}
@@ -1191,25 +1132,10 @@ export const CtaSettings = observer(({ store, element }) => {
                   <div className="control-row">
                     <span className="control-label">Card Background</span>
                     <div className="control-value">
-                      <div className="color-picker-row">
-                        <div
-                          className="color-swatch"
-                          style={{ backgroundColor: getCardBgColor() }}
-                        >
-                          <input
-                            type="color"
-                            value={getCardBgColor()}
-                            onChange={(e) => setCardBgColor(e.target.value)}
-                          />
-                        </div>
-                        <input
-                          type="text"
-                          className="color-input-text"
-                          value={getCardBgColor()}
-                          onChange={(e) => setCardBgColor(e.target.value)}
-                          style={{ width: 80 }}
-                        />
-                      </div>
+                      <ColorPicker
+                        value={getCardBgColor()}
+                        onChange={setCardBgColor}
+                      />
                     </div>
                   </div>
 
@@ -1370,25 +1296,10 @@ export const CtaSettings = observer(({ store, element }) => {
                 <div className="control-row">
                   <span className="control-label">Text Color</span>
                   <div className="control-value">
-                    <div className="color-picker-row">
-                      <div
-                        className="color-swatch"
-                        style={{ backgroundColor: getTitleColor() }}
-                      >
-                        <input
-                          type="color"
-                          value={getTitleColor()}
-                          onChange={(e) => setTitleColor(e.target.value)}
-                        />
-                      </div>
-                      <input
-                        type="text"
-                        className="color-input-text"
-                        value={getTitleColor()}
-                        onChange={(e) => setTitleColor(e.target.value)}
-                        style={{ width: 80 }}
-                      />
-                    </div>
+                    <ColorPicker
+                      value={getTitleColor()}
+                      onChange={setTitleColor}
+                    />
                   </div>
                 </div>
 
@@ -1440,25 +1351,10 @@ export const CtaSettings = observer(({ store, element }) => {
                 <div className="control-row">
                   <span className="control-label">Text Color</span>
                   <div className="control-value">
-                    <div className="color-picker-row">
-                      <div
-                        className="color-swatch"
-                        style={{ backgroundColor: getPriceColor() }}
-                      >
-                        <input
-                          type="color"
-                          value={getPriceColor()}
-                          onChange={(e) => setPriceColor(e.target.value)}
-                        />
-                      </div>
-                      <input
-                        type="text"
-                        className="color-input-text"
-                        value={getPriceColor()}
-                        onChange={(e) => setPriceColor(e.target.value)}
-                        style={{ width: 80 }}
-                      />
-                    </div>
+                    <ColorPicker
+                      value={getPriceColor()}
+                      onChange={setPriceColor}
+                    />
                   </div>
                 </div>
 

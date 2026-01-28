@@ -302,6 +302,34 @@
   gap: 12px;
 }
 
+/* Numeric input for sliders - styled consistently with position-input */
+.slider-input {
+  width: 50px;
+  padding: 6px 4px;
+  background: var(--sidebar-input-bg);
+  border: 1px solid var(--sidebar-input-border);
+  border-radius: 6px;
+  color: var(--sidebar-text);
+  font-size: 12px;
+  text-align: center;
+  transition: border-color 0.2s;
+  flex-shrink: 0;
+  /* Hide number input spinners for cleaner look */
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.slider-input::-webkit-outer-spin-button,
+.slider-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.slider-input:focus {
+  outline: none;
+  border-color: var(--sidebar-accent);
+}
+
 .slider-track {
   flex: 1;
   height: 2px;

@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { DurationSection, AnimationSection } from '../shared/CommonControls';
+import { ColorPicker } from '../shared/ColorPicker';
 
 /**
  * SVG element settings panel - Storyly-inspired dark theme
@@ -114,25 +115,10 @@ export const SvgSettings = observer(({ store, element, elements = [], isMultiSel
               <div className="control-row">
                 <span className="control-label">Fill Color</span>
                 <div className="control-value">
-                  <div className="color-picker-row">
-                    <div
-                      className="color-swatch"
-                      style={{ backgroundColor: element.fill || '#DDDDE5' }}
-                    >
-                      <input
-                        type="color"
-                        value={element.fill || '#DDDDE5'}
-                        onChange={(e) => applyToAll({ fill: e.target.value })}
-                      />
-                    </div>
-                    <input
-                      type="text"
-                      className="color-input-text"
-                      value={element.fill || '#DDDDE5'}
-                      onChange={(e) => applyToAll({ fill: e.target.value })}
-                      style={{ width: '80px' }}
-                    />
-                  </div>
+                  <ColorPicker
+                    value={element.fill || '#DDDDE5'}
+                    onChange={(color) => applyToAll({ fill: color })}
+                  />
                 </div>
               </div>
 
@@ -171,18 +157,10 @@ export const SvgSettings = observer(({ store, element, elements = [], isMultiSel
                 <div className="control-row">
                   <span className="control-label">Border Color</span>
                   <div className="control-value">
-                    <div className="color-picker-row">
-                      <div
-                        className="color-swatch"
-                        style={{ backgroundColor: element.stroke || '#000000' }}
-                      >
-                        <input
-                          type="color"
-                          value={element.stroke || '#000000'}
-                          onChange={(e) => applyToAll({ stroke: e.target.value })}
-                        />
-                      </div>
-                    </div>
+                    <ColorPicker
+                      value={element.stroke || '#000000'}
+                      onChange={(color) => applyToAll({ stroke: color })}
+                    />
                   </div>
                 </div>
               )}
