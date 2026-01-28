@@ -5,7 +5,7 @@ import {
   ElementsSection,
   UploadSection,
   BackgroundSection,
-  SizeSection,
+  // SizeSection,
 } from 'polotno/side-panel';
 
 import { TemplatesSection } from '../components/side-panel/sections/TemplatesSection';
@@ -45,7 +45,7 @@ const sections = [
   UploadSection,         // Upload
   ElementsSection,       // Elements (shapes, lines, etc.)
   BackgroundSection,     // Background
-  SizeSection,           // Resize
+  // SizeSection,           // Resize
   // AppsSection,           // App integrations (custom)
 ];
 
