@@ -6,6 +6,7 @@ import {
   AnimationSection,
   DurationSection,
 } from '../shared/CommonControls';
+import { ColorPicker } from '../shared/ColorPicker';
 import {
   getInteractiveType,
   getInteractiveData,
@@ -285,25 +286,10 @@ export const InteractiveSettings = observer(({ store, element }) => {
     <div className="control-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }}>
       <span className="control-label" style={{ fontWeight: 500, color: '#333', fontSize: '13px', marginBottom: 4 }}>{label}</span>
       <div className="control-value" style={{ width: '100%' }}>
-        <div className="color-picker-row" style={{ width: '100%', background: '#fff', border: '1px solid #e2e8f0', borderRadius: 8, padding: '4px 8px', display: 'flex', alignItems: 'center' }}>
-          <div
-            className="color-swatch"
-            style={{ backgroundColor: value || defaultColor, border: '1px solid #ddd', width: 20, height: 20, borderRadius: 4, position: 'relative', overflow: 'hidden' }}
-          >
-            <input
-              type="color"
-              value={value || defaultColor}
-              onChange={(e) => onChange(e.target.value)}
-              style={{ position: 'absolute', opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }}
-            />
-          </div>
-          <input
-            type="text"
-            value={value || defaultColor}
-            onChange={(e) => onChange(e.target.value)}
-            style={{ border: 'none', background: 'transparent', paddingLeft: 12, flex: 1, fontSize: '13px', color: '#2d3748', fontFamily: 'SF Mono, Monaco, monospace' }}
-          />
-        </div>
+        <ColorPicker
+          value={value || defaultColor}
+          onChange={onChange}
+        />
       </div>
     </div>
   );
