@@ -142,8 +142,8 @@ export const EditorWorkspace = observer(({ store }) => {
 
   useEffect(() => {
     const id = requestAnimationFrame(() => {
-      const stf = store.scaleToFit;
-      store.setScale(typeof stf === 'number' && stf > 0 ? stf : 1);
+      // Set specific startup zoom to 81%
+      store.setScale(0.81);
     });
     return () => cancelAnimationFrame(id);
   }, [store]);
@@ -154,15 +154,21 @@ export const EditorWorkspace = observer(({ store }) => {
       className="workspace-backdrop"
       style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}
     >
-      <Workspace 
-        store={store} 
+      <Workspace
+        store={store}
         backgroundColor="transparent"
         activePageBorderColor="#FF7A1A"
         layout="horizontal"
-        paddingX={50}
-        paddingY={50}
       />
-      
+
+      {/* Interactive Preview Overlay - positioned on top of canvas */}
+      {/* Note: This is disabled for now as Polotno handles its own rendering.
+          The interactive elements use text type with custom metadata,
+          and the visual preview is approximated through the background property.
+          For full live previews, consider implementing a custom Polotno extension
+          or using the preview mode. */}
+      {/* <InteractiveOverlay store={store} containerRef={containerRef} /> */}
+
       <FitZoomButtons store={store} />
     </div>
   );

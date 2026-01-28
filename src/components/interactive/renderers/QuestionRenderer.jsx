@@ -11,49 +11,47 @@ export const QuestionRenderer = ({ data, style, width, height }) => {
 
   const containerStyle = {
     width: width || 280,
-    height: height || 'auto',
-    minHeight: 140,
-    background: style?.containerBgColor || 'rgba(0,0,0,0.5)',
-    borderRadius: style?.containerBorderRadius || 12,
-    padding: style?.containerPadding || 16,
+    height: height || 160,
+    background: style?.containerBgColor || '#ffffff',
+    borderRadius: style?.containerBorderRadius || 16,
+    padding: style?.containerPadding || 20,
     display: 'flex',
     flexDirection: 'column',
-    gap: 12,
-    backdropFilter: 'blur(10px)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 16,
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
     boxSizing: 'border-box',
   };
 
   const titleStyle = {
-    color: style?.titleColor || '#ffffff',
-    fontSize: style?.titleFontSize || 16,
-    fontWeight: 600,
+    color: style?.titleColor || '#1f2937',
+    fontSize: style?.titleFontSize || 20,
+    fontWeight: 700,
     textAlign: 'center',
     margin: 0,
+    lineHeight: 1.2,
+  };
+
+  const inputContainerStyle = {
+    width: '100%',
+    background: style?.inputBgColor || '#f3f4f6',
+    borderRadius: style?.inputBorderRadius || 12,
+    padding: '12px 16px',
+    boxSizing: 'border-box',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   };
 
   const inputStyle = {
     width: '100%',
-    padding: '14px 16px',
-    background: style?.inputBgColor || 'rgba(255,255,255,0.15)',
+    background: 'transparent',
     border: 'none',
-    borderRadius: style?.inputBorderRadius || 8,
-    color: style?.inputTextColor || '#ffffff',
+    color: style?.inputTextColor || '#1f2937',
     fontSize: style?.inputFontSize || 14,
+    textAlign: 'center',
     outline: 'none',
-    boxSizing: 'border-box',
-  };
-
-  const submitButtonStyle = {
-    width: '100%',
-    padding: '12px 16px',
-    background: style?.submitBgColor || '#F97316',
-    color: style?.submitTextColor || '#000000',
-    border: 'none',
-    borderRadius: 8,
-    fontSize: 14,
-    fontWeight: 600,
-    cursor: 'pointer',
-    transition: 'all 0.2s',
   };
 
   const anonymousStyle = {
@@ -61,23 +59,28 @@ export const QuestionRenderer = ({ data, style, width, height }) => {
     alignItems: 'center',
     gap: 8,
     fontSize: 11,
-    color: 'rgba(255,255,255,0.6)',
+    color: '#9ca3af',
     justifyContent: 'center',
+    marginTop: 8,
   };
 
   return (
     <div style={containerStyle}>
       <p style={titleStyle}>{title}</p>
-      <input 
-        type="text" 
-        placeholder={placeholder}
-        style={inputStyle}
-        readOnly
-      />
-      <button style={submitButtonStyle}>Submit</button>
+
+      <div style={inputContainerStyle}>
+        <input
+          type="text"
+          placeholder={placeholder}
+          disabled
+          style={inputStyle}
+          readOnly
+        />
+      </div>
+
       {allowAnonymous && (
         <div style={anonymousStyle}>
-          <span>🔒</span>
+          <span style={{ fontSize: 10 }}>🔒</span>
           <span>Anonymous responses</span>
         </div>
       )}

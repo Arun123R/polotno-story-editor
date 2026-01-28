@@ -57,16 +57,36 @@ export const InteractiveSettings = observer(({ store, element }) => {
       }
     }
 
+    // Force regeneration for countdown to make toggles work instantly
+    if (interactiveType === 'countdown') {
+      width = INTERACTIVE_DIMENSIONS['countdown'].width; // Force reset to full width
+    }
+    // Force reset width for quiz to ensure options fit
+    if (interactiveType === 'quiz') {
+      width = INTERACTIVE_DIMENSIONS['quiz'].width;
+    }
+    // Force reset for promo to ensure icon isn't cut off
+    if (interactiveType === 'promo') {
+      width = INTERACTIVE_DIMENSIONS['promo'].width;
+      height = INTERACTIVE_DIMENSIONS['promo'].height;
+    }
+    // Force reset for imageQuiz
+    if (interactiveType === 'imageQuiz') {
+      width = INTERACTIVE_DIMENSIONS['imageQuiz'].width;
+      height = INTERACTIVE_DIMENSIONS['imageQuiz'].height;
+    }
+
+
     // Calculate dynamic height for quiz based on options
     if (interactiveType === 'quiz' && newData.options) {
       const optionCount = newData.options.length;
-      const padding = 12;
-      const questionHeight = 20;
-      const optionHeight = 28; // Increased to account for padding and borders
-      const optionGap = 6;
-      const bottomPadding = 24; // Extra padding at bottom to prevent cutoff
+      const padding = 20;
+      const questionHeight = 35; // Larger bold title
+      const optionHeight = 34; // Taller pills
+      const optionGap = 12; // Gap from generator
+      const bottomPadding = 18; // Max safety padding to prevent ANY clipping
 
-      height = padding + questionHeight + 10 + (optionCount * optionHeight) + ((optionCount - 1) * optionGap) + bottomPadding;
+      height = padding + questionHeight + 15 + (optionCount * optionHeight) + ((optionCount - 1) * optionGap) + bottomPadding;
     }
 
     // Dynamic height for reaction
@@ -80,7 +100,7 @@ export const InteractiveSettings = observer(({ store, element }) => {
     const dimensions = { width, height };
     const styleDefaults = { ...INTERACTIVE_STYLES[interactiveType], ...newStyle };
     const newSrc = generateInteractiveSVG(interactiveType, newData, styleDefaults, dimensions);
-    element.set({ src: newSrc, height });
+    element.set({ src: newSrc, height, width });
   }, [element, interactiveType]);
 
   // ==================== DATA UPDATE HELPERS ====================
@@ -117,9 +137,15 @@ export const InteractiveSettings = observer(({ store, element }) => {
   const addOption = () => {
     const options = data.options || [];
     const newId = `opt${Date.now()} `;
-    const newOption = interactiveType === 'imageQuiz'
-      ? { id: newId, imageUrl: '', label: `Option ${options.length + 1}` }
-      : { id: newId, label: `Option ${options.length + 1}`, votes: 0 };
+    let newOption;
+
+    if (interactiveType === 'imageQuiz') {
+      newOption = { id: newId, imageUrl: '', label: `Option ${options.length + 1}` };
+    } else if (interactiveType === 'quiz') {
+      newOption = { id: newId, text: `Option ${options.length + 1}` };
+    } else {
+      newOption = { id: newId, label: `Option ${options.length + 1}`, votes: 0 };
+    }
     updateOptions([...options, newOption]);
   };
 
