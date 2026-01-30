@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { InputGroup, Switch, Alignment } from '@blueprintjs/core';
+import { InputGroup, Checkbox, Alignment } from '@blueprintjs/core';
 import { Search } from '@blueprintjs/icons';
 import { nanoid } from 'nanoid';
 
@@ -106,31 +106,45 @@ const NormalizedTemplatesPanel = observer(({ store }) => {
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <InputGroup
-      
+
         // leftIcon={
         //   <span className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-full text-gray-400 pointer-events-none">
         //     <Search size={16} />
         //   </span>
         // }
-      
+
         placeholder="Search templates..."
         type="search"
         onChange={(e) => setQuery(e.target.value)}
         className="relative mb-5"
+        style={{ width: '240px', marginTop: '20px' }}
         inputClassName="pl-10"
       />
 
 
 
 
-      <Switch
+      <Checkbox
         checked={sameSize}
         onChange={(e) => setSameSize(e.target.checked)}
-        alignIndicator={Alignment.RIGHT}
-        style={{ marginTop: '8px', marginBottom: '8px' }}
+        className="polotno-match-size-checkbox"
+        style={{
+          marginTop: '8px',
+          marginBottom: '20px',
+          marginLeft: '-10px', /* Shift to the left for card alignment */
+          width: '270px',
+          paddingLeft: '16px', /* Ensure space for the checkbox indicator */
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          minHeight: '24px',
+          fontSize: '13px'
+        }}
       >
-        {t('sidePanel.searchTemplatesWithSameSize')}{' '}
-      </Switch>
+        <span style={{ marginLeft: '4px' }}>
+          {t('sidePanel.searchTemplatesWithSameSize')}
+        </span>
+      </Checkbox>
 
       <TemplatesGrid store={store} sizeQuery={`size=${sizeKey}`} query={query} />
     </div>

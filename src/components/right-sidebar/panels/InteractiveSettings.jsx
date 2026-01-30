@@ -283,9 +283,9 @@ export const InteractiveSettings = observer(({ store, element }) => {
   );
 
   const renderColorPicker = (label, value, onChange, defaultColor = '#ffffff') => (
-    <div className="control-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }}>
-      <span className="control-label" style={{ fontWeight: 500, color: '#333', fontSize: '13px', marginBottom: 4 }}>{label}</span>
-      <div className="control-value" style={{ width: '100%' }}>
+    <div className="control-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+      <span className="control-label" style={{ fontWeight: 500, color: '#333', fontSize: '13px' }}>{label}</span>
+      <div className="control-value">
         <ColorPicker
           value={value || defaultColor}
           onChange={onChange}

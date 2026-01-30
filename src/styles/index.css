@@ -201,49 +201,124 @@ body {
 .go3163804498 {
     background-color: var(--bg-secondary) !important;
     border-right: 1px solid var(--border-primary) !important;
+    width: 65px !important;
+    min-width: 65px !important;
+    max-width: 65px !important;
+    flex-basis: 65px !important;
 }
 
+/* Individual tab buttons */
 /* Individual tab buttons */
 .polotno-side-panel-tab,
 .bp5-tab {
     color: var(--text-secondary) !important;
+    background: transparent !important;
+    background-color: transparent !important;
     border: none !important;
     transition: all 0.2s ease !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    padding: 12px 4px !important;
-    gap: 4px !important;
+    padding: 0 !important;
+    margin: 8px auto !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 12px !important;
 }
 
+/* Hide text labels */
+/* Hide text labels */
+.polotno-side-panel-tab {
+    font-size: 0 !important;
+    /* Hide direct text */
+}
+
+/* Assume icon is 1st, Label is 2nd. Hide the label div. */
+.polotno-side-panel-tab>div:nth-child(2),
+.bp5-tab>span:not(.bp5-icon) {
+    display: none !important;
+}
+
+/* Ensure the first div (likely icon wrapper) is visible and centered */
+.polotno-side-panel-tab>div:first-child {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Hover state */
 .polotno-side-panel-tab:hover,
-.go2556403498:hover,
 .bp5-tab:hover {
-    background-color: var(--bg-hover) !important;
-    color: var(--text-primary) !important;
+    background-color: var(--accent-soft) !important;
+    background: var(--accent-soft) !important;
+    color: var(--accent-primary) !important;
+    box-shadow: none !important;
 }
 
+/* Active/Selected state - Peach Floating Card */
 .polotno-side-panel-tab[aria-selected="true"],
-.go2556403498[aria-selected="true"],
 .bp5-tab[aria-selected="true"],
 .bp5-tab.bp5-selected {
-    background-color: transparent !important;
-    color: var(--text-primary) !important;
-    border-left: 3px solid var(--accent-primary) !important;
+    background-color: var(--accent-soft) !important;
+    color: var(--accent-primary) !important;
+    background: var(--accent-soft) !important;
+    border-left: none !important;
+    box-shadow: none !important;
+}
+
+/* Specific Dark Mode Refinement for Sidebar Tabs - Forced Specificity */
+html[data-theme="dark"] .polotno-side-panel-tab[aria-selected="true"],
+html[data-theme="dark"] .bp5-tab[aria-selected="true"],
+html[data-theme="dark"] .bp5-tab.bp5-selected,
+html[data-theme="dark"] .polotno-side-panel-tab:hover,
+html[data-theme="dark"] .bp5-tab:hover {
+    background-color: #1E2638 !important; /* Solid dark blue-gray highlight */
+    background: #1E2638 !important;
+    color: #FF7A1A !important; /* Force brand orange */
+}
+
+html[data-theme="dark"] .polotno-side-panel-tab:not([aria-selected="true"]) svg,
+html[data-theme="dark"] .bp5-tab:not([aria-selected="true"]) svg {
+    color: #6B7280 !important; /* Muted gray for inactive icons */
+}
+
+html[data-theme="dark"] .polotno-side-panel-tab[aria-selected="true"] svg,
+html[data-theme="dark"] .bp5-tab[aria-selected="true"] svg {
+    color: #FF7A1A !important;
 }
 
 /* Tab icon default colors */
+/* Tab icon default colors */
 .polotno-side-panel-tab svg,
 .bp5-tab svg {
-    fill: currentColor;
+    fill: none !important;
+    /* Force no fill for outline icons */
+    stroke: currentColor !important;
+    /* Force stroke color */
+    stroke-width: 2px !important;
+    /* Ensure consistent weight */
     color: inherit !important;
-    width: 23px !important;
-    height: 23px !important;
+    width: 24px !important;
+    height: 24px !important;
+    margin: 0 !important;
 }
 
-/* Tab icon colors */
-.polotno-side-panel-tab svg,
+/* Specific override for the Click/Interact icon to be larger */
+/* Specific override for the Click/Interact icon to be larger - Increased Specificity */
+.polotno-side-panel-tab svg.custom-click-icon,
+.bp5-tab svg.custom-click-icon {
+    width: 34px !important;
+    height: 34px !important;
+    stroke-width: 1.5px !important;
+}
+
+/* Active Tab icon colors */
+.polotno-side-panel-tab[aria-selected="true"] svg,
+.bp5-tab[aria-selected="true"] svg {
+    color: var(--accent-primary) !important;
+}
+
 .bp5-tab svg {
     fill: currentColor;
     color: inherit !important;
@@ -256,7 +331,6 @@ body {
     background-color: var(--bg-secondary) !important;
     color: var(--text-primary) !important;
     border: none !important;
-    border-top: 1px solid var(--border-primary) !important;
 }
 
 /* Ensure SidePanel text has proper contrast in both themes */
@@ -304,9 +378,23 @@ body {
 [class*="go"][class*="polotno-panel"] {
     box-shadow: none !important;
     border: none !important;
-    border-top: 1px solid var(--border-primary) !important;
     background-color: var(--bg-secondary) !important;
-    padding: 0 !important;
+    padding: 0 14px !important;
+    width: 310px !important;
+    max-width: 310px !important;
+}
+
+/* Main checkbox container styling */
+/* .polotno-match-size-checkbox styles handled inline in component */
+
+/* Remove default orange focus outline for this specific checkbox */
+.polotno-match-size-checkbox input:focus+.bp5-control-indicator {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.polotno-match-size-checkbox input:focus {
+    outline: none !important;
 }
 
 /* Section headers in side panel */
@@ -325,7 +413,7 @@ body {
 .polotno-toolbar,
 .go2498094019 {
     background-color: var(--bg-secondary) !important;
-    border-bottom: 1px solid var(--border-primary) !important;
+    border-bottom: none !important;
 }
 
 /* Toolbar buttons */
@@ -764,6 +852,10 @@ input[type="search"]:focus {
 .bp5-tab-list {
     background-color: var(--bg-secondary) !important;
     border-bottom: 1px solid var(--border-primary) !important;
+}
+
+.bp5-tab-panel {
+    background-color: var(--bg-secondary) !important;
 }
 
 .bp5-tab {
@@ -1341,16 +1433,16 @@ div[style*="position: absolute"] {
    =================================== */
 
 /* Forced White Background for Hover & Active */
-/* Hover State - Transparent background, no shadow */
+/* Hover State - Peach background */
 .polotno-side-tabs-container .polotno-side-panel-tab:hover,
 .polotno-side-tabs-container .bp5-tab:hover {
-    background-color: transparent !important;
-    background: transparent !important;
+    background-color: #FFF7ED !important;
+    background: #FFF7ED !important;
     box-shadow: none !important;
     color: var(--accent-primary) !important;
 }
 
-/* Active State - White background (prevents hover from making it transparent) */
+/* Active State - Peach background */
 .polotno-side-tabs-container .polotno-side-panel-tab[aria-selected="true"],
 .polotno-side-tabs-container .polotno-side-panel-tab[aria-selected="true"]:hover,
 .polotno-side-tabs-container .bp5-tab[aria-selected="true"],
@@ -1361,18 +1453,14 @@ div[style*="position: absolute"] {
 .polotno-side-tabs-container [class*="active"]:hover,
 .polotno-side-tabs-container [class*="selected"],
 .polotno-side-tabs-container [class*="selected"]:hover {
-    background-color: var(--bg-secondary) !important;
-    background: var(--bg-secondary) !important;
+    background-color: #FFF7ED !important;
+    background: #FFF7ED !important;
     color: var(--accent-primary) !important;
-    box-shadow: -4px 4px 12px rgba(0, 0, 0, 0.08) !important;
+    box-shadow: none !important;
     border: none !important;
-    /* Blend with content area */
-    margin-right: -1px !important;
-    width: calc(100% + 1px) !important;
-    border-right: 1px solid var(--bg-secondary) !important;
-    position: relative !important;
-    z-index: 10 !important;
 }
+
+
 
 /* Ensure the container doesn't clip the tab's overlap */
 .polotno-side-tabs-container,

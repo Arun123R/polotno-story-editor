@@ -7,63 +7,63 @@ import { Topbar } from "./Topbar";
 
 export const EditorLayout = ({ store, sidePanel, toolbar, canvas, footer, rightSidebar }) => {
   return (
-  <div className="h-screen overflow-hidden flex flex-col appstorys-editor">
-    {/* TOP TOOLBAR (fixed height) */}
-    <Topbar store={store} toolbar={toolbar} />
-    <PolotnoContainer
-      className="w-full overflow-hidden"
-      style={{ display: "flex", flex: 1, minHeight: 0 }}
-    >
-      {/* LEFT SIDEBAR */}
-      <SidePanelWrap className="shrink-0" style={{ backgroundColor: 'var(--bg-secondary)', borderRight: '1px solid var(--border-primary)' }}>
-        {sidePanel}
-      </SidePanelWrap>
-
-      {/* CENTER AREA (Toolbar + Canvas + Footer) */}
-      <WorkspaceWrap
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          flex: 1,
-          minWidth: 0,
-          minHeight: 0,
-          overflow: 'hidden'
-        }}
+    <div className="h-screen overflow-hidden flex flex-col appstorys-editor">
+      {/* TOP TOOLBAR (fixed height) */}
+      <Topbar store={store} toolbar={toolbar} />
+      <PolotnoContainer
+        className="w-full overflow-hidden"
+        style={{ display: "flex", flex: 1, minHeight: 0 }}
       >
-        {/* MAIN CONTENT AREA (Canvas + RightSidebar) */}
-        <div style={{
-          flex: 1,
-          display: 'flex',
-          minHeight: 0,
-          overflow: 'hidden'
-        }}>
-          {/* CANVAS AREA (takes remaining space) */}
-          <div
-            className="mb-0"
-            style={{
-              flex: 1,
-              minHeight: 0,
-              minWidth: 0,
-              backgroundColor: 'var(--bg-tertiary)',
-              position: 'relative'
-            }}>
-            {canvas}
+        {/* LEFT SIDEBAR */}
+        <SidePanelWrap className="shrink-0" style={{ backgroundColor: 'var(--bg-secondary)', borderRight: '1px solid var(--border-primary)' }}>
+          {sidePanel}
+        </SidePanelWrap>
+
+        {/* CENTER AREA (Toolbar + Canvas + Footer) */}
+        <WorkspaceWrap
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            flex: 1,
+            minWidth: 0,
+            minHeight: 0,
+            overflow: 'hidden'
+          }}
+        >
+          {/* MAIN CONTENT AREA (Canvas + RightSidebar) */}
+          <div style={{
+            flex: 1,
+            display: 'flex',
+            minHeight: 0,
+            overflow: 'hidden'
+          }}>
+            {/* CANVAS AREA (takes remaining space) */}
+            <div
+              className="mb-0"
+              style={{
+                flex: 1,
+                minHeight: 0,
+                minWidth: 0,
+                backgroundColor: 'var(--bg-tertiary)',
+                position: 'relative'
+              }}>
+              {canvas}
+            </div>
+
+            {/* RIGHT SIDEBAR (fixed width) */}
+            {rightSidebar && (
+              <div className="shrink-0">
+                {rightSidebar}
+              </div>
+            )}
           </div>
 
-          {/* RIGHT SIDEBAR (fixed width) */}
-          {rightSidebar && (
-            <div className="shrink-0">
-              {rightSidebar}
-            </div>
-          )}
-        </div>
-
-        {/* BOTTOM TIMELINE (fixed height) */}
-        <div className="shrink-0">
-          {footer}
-        </div>
-      </WorkspaceWrap>
-    </PolotnoContainer>
-  </div>
+          {/* BOTTOM TIMELINE (fixed height) */}
+          <div className="shrink-0">
+            {footer}
+          </div>
+        </WorkspaceWrap>
+      </PolotnoContainer>
+    </div>
   );
 };
