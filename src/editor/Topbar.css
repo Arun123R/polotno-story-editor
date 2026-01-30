@@ -7,7 +7,7 @@
     height: 64px;
     padding: 0 20px;
     background-color: var(--bg-secondary);
-    border-bottom: 1px solid var(--border-primary);
+    border-bottom: none;
     gap: 24px;
 }
 

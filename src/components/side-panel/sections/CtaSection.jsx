@@ -37,40 +37,56 @@ export const CtaSectionTab = (props) => (
 );
 
 // CTA Type Icons
-const ClassicIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="3" y="8" width="18" height="8" rx="4" />
-    <line x1="8" y1="12" x2="16" y2="12" />
+const ClassicIcon = (props) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...props}>
+    <rect x="3" y="11" width="18" height="6" rx="3" />
+    <path d="M8 14h8" />
   </svg>
 );
 
-const SwipeUpIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M12 19V5" />
-    <polyline points="5 12 12 5 19 12" />
+const SwipeUpIcon = (props) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="m18 15-6-6-6 6" />
   </svg>
 );
 
-const ImageCtaIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="3" y="3" width="18" height="18" rx="2" />
-    <circle cx="8.5" cy="8.5" r="1.5" />
-    <polyline points="21 15 16 10 5 21" />
+const ImageCtaIcon = (props) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+    <circle cx="9" cy="9" r="2" />
+    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
   </svg>
 );
 
-const ProductCardIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
-    <line x1="3" y1="6" x2="21" y2="6" />
-    <path d="M16 10a4 4 0 01-8 0" />
+const VisitIcon = (props) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <rect width="20" height="14" x="2" y="5" rx="2" />
+    <line x1="2" x2="22" y1="10" y2="10" />
+  </svg>
+);
+
+const DescribeIcon = (props) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+    <polyline points="14 2 14 8 20 8" />
+    <line x1="16" x2="8" y1="13" y2="13" />
+    <line x1="16" x2="8" y1="17" y2="17" />
+    <line x1="10" x2="8" y1="9" y2="9" />
+  </svg>
+);
+
+const BuyIcon = (props) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+    <path d="M3 6h18" />
+    <path d="M16 10a4 4 0 0 1-8 0" />
   </svg>
 );
 
 // ==================== CTA DIMENSIONS ====================
 const CTA_DIMENSIONS = {
   classic: { width: 500, height: 150 },
-  swipe_up: { width: 400, height: 280 },
+  swipe_up: { width: 500, height: 150 }, // Larger size for better visibility
   image: { width: 350, height: 320 },
   product_card: { width: 540, height: 680 },
   // Product Card Variants
@@ -82,7 +98,7 @@ const CTA_DIMENSIONS = {
 // ==================== CTA DEFAULT POSITIONS ====================
 const CTA_POSITIONS = {
   classic: { x: 300, y: 1050 },
-  swipe_up: { x: 350, y: 1600 },
+  swipe_up: { x: 290, y: 1750 }, // Bottom-center position (same size as classic)
   image: { x: 370, y: 1250 },
   product_card: { x: 250, y: 100 },
   // Product Card Variants
@@ -105,15 +121,12 @@ const CTA_DEFAULTS = {
     fontWeight: 'bold',
   },
   swipe_up: {
-    text: 'Swipe Up',
+    text: 'Swipe up', // Default text (user can remove if needed)
     redirectUrl: 'https://example.com',
-    arrowColor: '#636363',
-    arrowSize: 50,
-    arrowAnimation: true,
+    arrowColor: '#ffffff',
     textColor: '#ffffff',
-    bgColor: '#636363',
-    borderRadius: 20,
-    fontSize: 50,
+    bgColor: '#000000', // Solid black like reference images
+    fontSize: 45, // Large font for excellent visibility
   },
   image: {
     redirectUrl: 'https://example.com',
@@ -380,86 +393,86 @@ function generateClassicCtaSVG(data, width, height) {
 }
 
 function generateSwipeUpCtaSVG(data, width, height) {
-  const text = data?.text || 'Swipe Up';
+  const text = data?.text || ''; // Empty by default (optional)
   const arrowColor = data?.arrowColor || '#ffffff';
-  const arrowSize = data?.arrowSize || 28;
   const textColor = data?.textColor || '#ffffff';
-  const bgColor = data?.bgColor || 'rgba(0,0,0,0.5)';
-  const borderRadius = data?.borderRadius || 16;
-  const fontSize = data?.fontSize || 13;
+  const bgColor = data?.bgColor || '#000000'; // Solid black like reference images
+  const fontSize = data?.fontSize || Math.max(24, height * 0.2); // Scale with height, min 24px
 
-  // Arrow positioning - centered horizontally, in upper portion
+  const hasText = text.trim().length > 0;
+
+  // Pill button dimensions - adaptive but scaled to canvas size
+  // Use percentages of canvas dimensions for proper scaling
+  const pillWidth = hasText ? width * 0.85 : width * 0.4; // 85% or 40% of canvas width
+  const pillHeight = hasText ? height * 0.9 : height * 0.7; // 90% or 70% of canvas height
+  const pillX = (width - pillWidth) / 2;
+  const pillY = (height - pillHeight) / 2;
+  const pillRadius = pillHeight / 2;
+
+  // Arrow chevron dimensions - scaled to canvas, very large
+  const chevronSize = Math.min(width, height) * 0.35; // 35% of smaller dimension (~52px)
   const arrowCenterX = width / 2;
-  const arrowCenterY = height * 0.28;
+  const arrowCenterY = hasText ? pillY + pillHeight * 0.35 : pillY + pillHeight / 2;
 
-  // Arrow dimensions based on arrowSize
-  const arrowWidth = arrowSize * 0.9;
-  const arrowHeight = arrowSize * 0.45;
-  const strokeWidth = Math.max(2.5, arrowSize * 0.08);
-
-  // Text position
-  const textY = height * 0.75;
-
-  // Storyly-style premium bounce animation
-  // Uses custom cubic-bezier for natural, premium feel
-  // Motion: rest → up → slight settle → return
-  // Continuous loop, mobile-first (no hover needed)
+  // Text position (only if text exists)
+  const textY = pillY + pillHeight * 0.8;
 
   return `data:image/svg+xml;utf8,${encodeURIComponent(`
     <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
       <style>
-        @keyframes storylyBounce {
-          0% { 
-            transform: translateY(0); 
-            opacity: 1; 
+        @keyframes bounce {
+          0%, 100% {
+            transform: translateY(0);
+            opacity: 1;
           }
-          25% { 
-            transform: translateY(-10px); 
-            opacity: 0.75; 
-          }
-          40% { 
-            transform: translateY(-8px); 
-            opacity: 0.8; 
-          }
-          55% { 
-            transform: translateY(-11px); 
-            opacity: 0.72; 
-          }
-          70% { 
-            transform: translateY(-6px); 
-            opacity: 0.85; 
-          }
-          100% { 
-            transform: translateY(0); 
-            opacity: 1; 
+          50% {
+            transform: translateY(-6px);
+            opacity: 0.85;
           }
         }
-        .swipe-arrow {
-          animation: storylyBounce 1.8s cubic-bezier(0.35, 0, 0.25, 1) infinite;
+        .swipe-button {
+          animation: bounce 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
           transform-origin: center center;
         }
       </style>
       
-      <!-- Background pill -->
-      <rect x="10" y="${height * 0.45}" width="${width - 20}" height="${height * 0.5}" rx="${borderRadius}" fill="${bgColor}"/>
-      
-      <!-- Arrow icon group with animation -->
-      <g class="swipe-arrow">
-        <!-- Chevron up arrow using SVG paths -->
+      <!-- Single pill-shaped button (adapts to content) -->
+      <g class="swipe-button">
+        <!-- Pill background -->
+        <rect 
+          x="${pillX}" 
+          y="${pillY}" 
+          width="${pillWidth}" 
+          height="${pillHeight}" 
+          rx="${pillRadius}" 
+          fill="${bgColor}"
+        />
+        
+        <!-- Chevron up arrow -->
         <path 
-          d="M ${arrowCenterX - arrowWidth / 2} ${arrowCenterY + arrowHeight / 2} 
-             L ${arrowCenterX} ${arrowCenterY - arrowHeight / 2} 
-             L ${arrowCenterX + arrowWidth / 2} ${arrowCenterY + arrowHeight / 2}"
+          d="M ${arrowCenterX - chevronSize} ${arrowCenterY + chevronSize / 3} 
+             L ${arrowCenterX} ${arrowCenterY - chevronSize / 3} 
+             L ${arrowCenterX + chevronSize} ${arrowCenterY + chevronSize / 3}"
           stroke="${arrowColor}"
-          stroke-width="${strokeWidth}"
+          stroke-width="4"
           stroke-linecap="round"
           stroke-linejoin="round"
           fill="none"
         />
+        
+        ${hasText ? `
+          <!-- Text label (only if text exists) -->
+          <text 
+            x="${width / 2}" 
+            y="${textY}" 
+            text-anchor="middle" 
+            fill="${textColor}" 
+            font-size="${fontSize}" 
+            font-weight="600" 
+            font-family="Inter, -apple-system, sans-serif"
+          >${escapeXml(text)}</text>
+        ` : ''}
       </g>
-      
-      <!-- Text label -->
-      <text x="${width / 2}" y="${textY}" text-anchor="middle" fill="${textColor}" font-size="${fontSize}" font-weight="600" font-family="Inter, -apple-system, sans-serif">${escapeXml(text)}</text>
     </svg>
   `)}`;
 }
@@ -1166,446 +1179,160 @@ export const CtaSectionPanel = observer(({ store }) => {
     el.custom?.ctaType !== 'swipe_up_arrow'
   );
 
-  // Styles
-  const panelStyle = {
-    padding: '16px',
-    backgroundColor: 'var(--bg-secondary)',
-    color: 'var(--text-primary)',
-    minHeight: '100%'
-  };
-
-  const sectionLabelStyle = {
-    fontSize: '11px',
-    color: 'var(--text-secondary)',
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-    marginBottom: '10px',
-  };
-
-  const ctaItemStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '12px',
-    background: 'var(--bg-elevated)',
-    border: '1px solid var(--border-primary)',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    marginBottom: '8px',
-    transition: 'all 0.2s',
-  };
-
-  const ctaListItemStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '10px 12px',
-    background: 'var(--bg-elevated)',
-    border: '1px solid var(--border-primary)',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    marginBottom: '6px',
-    transition: 'all 0.2s',
-  };
-
   return (
-    <div style={panelStyle}>
+    <div className="flex flex-col h-full bg-[var(--bg-secondary)] text-[var(--text-primary)] font-sans">
       {/* Hidden file inputs */}
       <input
         ref={imageInputRef}
         type="file"
         accept="image/png,image/jpg,image/jpeg,image/webp"
         onChange={handleImageSelect}
-        style={{ display: 'none' }}
+        className="hidden"
       />
       <input
         ref={productImageInputRef}
         type="file"
         accept="image/png,image/jpg,image/jpeg,image/webp"
         onChange={handleProductImageSelect}
-        style={{ display: 'none' }}
+        className="hidden"
       />
 
-      {/* CTA Types Grid */}
-      <div style={{ marginBottom: '24px' }}>
-        <p style={sectionLabelStyle}>Add CTA</p>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-          {/* Classic CTA */}
-          <div
-            style={{
-              ...ctaItemStyle,
-              flexDirection: 'column',
-              padding: '16px 12px',
-              textAlign: 'center',
-            }}
-            onClick={addClassicCta}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'var(--accent-primary)';
-              e.currentTarget.style.background = 'var(--bg-tertiary)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border-primary)';
-              e.currentTarget.style.background = 'var(--bg-elevated)';
-            }}
-          >
-            {/* Preview */}
-            <div style={{
-              padding: '8px 16px',
-              background: '#3b82f6',
-              borderRadius: '20px',
-              color: '#ffffff',
-              fontSize: '11px',
-              fontWeight: '600',
-              marginBottom: '6px',
-            }}>
-              Shop Now
-            </div>
-            <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>Classic</span>
-          </div>
-
-          {/* Swipe Up CTA */}
-          <div
-            style={{
-              ...ctaItemStyle,
-              flexDirection: 'column',
-              padding: '16px 12px',
-              textAlign: 'center',
-            }}
-            onClick={addSwipeUpCta}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'var(--accent-primary)';
-              e.currentTarget.style.background = 'var(--bg-tertiary)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border-primary)';
-              e.currentTarget.style.background = 'var(--bg-elevated)';
-            }}
-          >
-            {/* Preview */}
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '4px',
-            }}>
-              {/* SVG Arrow Icon with Storyly-style animation */}
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                style={{
-                  animation: 'storylyBouncePreview 1.8s cubic-bezier(0.35, 0, 0.25, 1) infinite',
-                  color: 'var(--text-primary)',
-                }}
-              >
-                <path
-                  d="M6 15 L12 9 L18 15"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  fill="none"
-                />
-              </svg>
-              <span style={{
-                padding: '4px 10px',
-                background: 'rgba(255,255,255,0.15)',
-                borderRadius: '12px',
-                fontSize: '10px',
-                fontWeight: '500',
-              }}>Swipe Up</span>
-            </div>
-            <span style={{ fontSize: '10px', color: 'var(--text-secondary)', marginTop: '6px' }}>Swipe Up</span>
-          </div>
-
-          {/* Image CTA */}
-          <div
-            style={{
-              ...ctaItemStyle,
-              flexDirection: 'column',
-              padding: '16px 12px',
-              textAlign: 'center',
-            }}
-            onClick={openImagePicker}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'var(--accent-primary)';
-              e.currentTarget.style.background = 'var(--bg-tertiary)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border-primary)';
-              e.currentTarget.style.background = 'var(--bg-elevated)';
-            }}
-          >
-            {/* Preview */}
-            <div style={{
-              width: '48px',
-              height: '48px',
-              background: 'var(--bg-tertiary)',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '6px',
-              border: '2px dashed var(--border-primary)',
-            }}>
-              <ImageCtaIcon />
-            </div>
-            <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>Image CTA</span>
-          </div>
-        </div>
-
-        {/* Product Card Variants Section */}
-        <p style={{ ...sectionLabelStyle, marginTop: '20px', marginBottom: '10px' }}>Product Cards</p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
-
-          {/* Visit Product CTA */}
-          <div
-            style={{
-              ...ctaItemStyle,
-              flexDirection: 'column',
-              padding: '12px 8px',
-              textAlign: 'center',
-            }}
-            onClick={addVisitProductCta}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'var(--accent-primary)';
-              e.currentTarget.style.background = 'var(--bg-tertiary)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border-primary)';
-              e.currentTarget.style.background = 'var(--bg-elevated)';
-            }}
-          >
-            {/* Visit Product Preview */}
-            <div style={{
-              width: '54px',
-              height: '36px',
-              background: '#1e293b',
-              borderRadius: '6px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              padding: '5px 6px',
-              marginBottom: '6px',
-            }}>
-              {/* Title row with arrow */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ width: '24px', height: '4px', background: '#fff', borderRadius: '1px' }}></div>
-                <svg width="6" height="6" viewBox="0 0 6 6" fill="none">
-                  <path d="M2 1L4 3L2 5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-              {/* Price row */}
-              <div style={{ display: 'flex', gap: '3px', alignItems: 'center' }}>
-                <div style={{ width: '10px', height: '4px', background: '#64748b', borderRadius: '1px', textDecoration: 'line-through' }}></div>
-                <div style={{ width: '14px', height: '6px', background: '#334155', borderRadius: '2px' }}></div>
-              </div>
-            </div>
-            <span style={{ fontSize: '9px', color: 'var(--text-secondary)' }}>Visit</span>
-          </div>
-
-          {/* Describe Product CTA */}
-          <div
-            style={{
-              ...ctaItemStyle,
-              flexDirection: 'column',
-              padding: '12px 8px',
-              textAlign: 'center',
-            }}
-            onClick={addDescribeProductCta}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'var(--accent-primary)';
-              e.currentTarget.style.background = 'var(--bg-tertiary)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border-primary)';
-              e.currentTarget.style.background = 'var(--bg-elevated)';
-            }}
-          >
-            {/* Describe Product Preview */}
-            <div style={{
-              width: '40px',
-              height: '52px',
-              background: '#ffffff',
-              borderRadius: '6px',
-              display: 'flex',
-              flexDirection: 'column',
-              overflow: 'hidden',
-              marginBottom: '6px',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-            }}>
-              {/* Image area */}
-              <div style={{
-                flex: '0 0 65%',
-                background: 'linear-gradient(135deg, #d4d4d8 0%, #a1a1aa 100%)',
-                borderRadius: '4px',
-                margin: '2px',
-                position: 'relative',
-              }}>
-                <div style={{
-                  position: 'absolute',
-                  top: '2px',
-                  right: '2px',
-                  width: '6px',
-                  height: '6px',
-                  background: 'rgba(128,128,128,0.5)',
-                  borderRadius: '50%',
-                }}></div>
-              </div>
-              {/* Content area */}
-              <div style={{ flex: 1, padding: '2px 3px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div>
-                  <div style={{ width: '16px', height: '3px', background: '#1a1a2e', borderRadius: '1px', marginBottom: '2px' }}></div>
-                  <div style={{ width: '10px', height: '3px', background: '#e67e22', borderRadius: '1px' }}></div>
-                </div>
-                <div style={{ width: '8px', height: '8px', background: '#f5f5f5', borderRadius: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ fontSize: '4px', color: '#1a1a2e', transform: 'rotate(-45deg)' }}>↑</span>
-                </div>
-              </div>
-            </div>
-            <span style={{ fontSize: '9px', color: 'var(--text-secondary)' }}>Describe</span>
-          </div>
-
-          {/* Buy Product CTA */}
-          <div
-            style={{
-              ...ctaItemStyle,
-              flexDirection: 'column',
-              padding: '12px 8px',
-              textAlign: 'center',
-            }}
-            onClick={addBuyProductCta}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'var(--accent-primary)';
-              e.currentTarget.style.background = 'var(--bg-tertiary)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border-primary)';
-              e.currentTarget.style.background = 'var(--bg-elevated)';
-            }}
-          >
-            {/* Buy Product Preview */}
-            <div style={{
-              width: '54px',
-              height: '32px',
-              background: '#ffffff',
-              borderRadius: '6px',
-              display: 'flex',
-              gap: '4px',
-              padding: '4px',
-              marginBottom: '6px',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-            }}>
-              {/* Image */}
-              <div style={{ width: '24px', height: '24px', background: '#e2e8f0', borderRadius: '4px' }}></div>
-              {/* Content */}
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                <div>
-                  <div style={{ width: '18px', height: '3px', background: '#1a1a2e', borderRadius: '1px', marginBottom: '2px' }}></div>
-                  <div style={{ width: '14px', height: '2px', background: '#94a3b8', borderRadius: '1px' }}></div>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ width: '10px', height: '3px', background: '#1a1a2e', borderRadius: '1px' }}></div>
-                  <div style={{ width: '14px', height: '6px', background: '#1a1a2e', borderRadius: '2px' }}></div>
-                </div>
-              </div>
-            </div>
-            <span style={{ fontSize: '9px', color: 'var(--text-secondary)' }}>Buy</span>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA List - Shows all CTAs on current slide */}
-      {mainCtas.length > 0 && (
-        <div style={{ marginBottom: '16px' }}>
-          <p style={sectionLabelStyle}>CTAs on this Slide</p>
-
-          {mainCtas.map((cta) => (
-            <div
-              key={cta.id}
-              style={ctaListItemStyle}
-              onClick={() => selectCtaElement(cta)}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'var(--accent-primary)';
-                e.currentTarget.style.background = 'var(--bg-tertiary)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'var(--border-primary)';
-                e.currentTarget.style.background = 'var(--bg-elevated)';
-              }}
+      <div className="p-4 space-y-6 overflow-y-auto flex-1">
+        {/* ADD CTA Section */}
+        <div>
+          <h3 className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-4 px-1">
+            Add CTA
+          </h3>
+          <div className="flex flex-col gap-3">
+            {/* Classic CTA */}
+            <button
+              onClick={addClassicCta}
+              className="w-full flex flex-col items-center justify-center py-4 px-3 bg-[var(--bg-tertiary)] border border-[var(--border-primary)] rounded-lg hover:bg-[var(--bg-hover)] hover:border-[var(--accent-primary)] transition-all group"
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                {/* CTA Type Icon */}
-                <div style={{ color: 'var(--accent-primary)' }}>
-                  {cta.custom?.ctaType === 'classic' && <ClassicIcon />}
-                  {cta.custom?.ctaType === 'swipe_up' && <SwipeUpIcon />}
-                  {cta.custom?.ctaType === 'image' && <ImageCtaIcon />}
-                  {cta.custom?.ctaType === 'product_card' && <ProductCardIcon />}
-                  {cta.custom?.ctaType === 'visit_product' && <ProductCardIcon />}
-                  {cta.custom?.ctaType === 'describe_product' && <ProductCardIcon />}
-                  {cta.custom?.ctaType === 'buy_product' && <ProductCardIcon />}
-                </div>
-                {/* CTA Info */}
-                <div>
-                  <div style={{ fontSize: '12px', fontWeight: '500' }}>
-                    {getCtaTypeLabel(cta.custom?.ctaType)}
-                  </div>
-                  <div style={{ fontSize: '10px', color: 'var(--text-muted)', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {cta.custom?.title || cta.custom?.text || cta.custom?.redirectUrl || 'No URL'}
-                  </div>
-                </div>
+              <div className="bg-[var(--info)] text-[var(--surface-light)] px-6 py-2.5 rounded-full text-[14px] font-bold shadow-sm transition-transform group-hover:scale-105">
+                Shop Now
               </div>
-              {/* Edit indicator */}
-              <div style={{ color: 'var(--text-muted)', fontSize: '10px' }}>→</div>
-            </div>
-          ))}
+              <span className="mt-2 text-[12px] text-[var(--text-muted)] font-medium">classic</span>
+            </button>
+
+            {/* Swipe Up CTA */}
+            <button
+              onClick={addSwipeUpCta}
+              className="w-full flex flex-col items-center justify-center py-4 px-3 bg-[var(--bg-tertiary)] border border-[var(--border-primary)] rounded-lg hover:bg-[var(--bg-hover)] hover:border-[var(--accent-primary)] transition-all group"
+            >
+              <SwipeUpIcon className="w-6 h-6 text-[var(--text-secondary)] mb-1 transition-transform group-hover:-translate-y-1" />
+              <span className="text-[14px] text-[var(--text-primary)] font-medium">Swipe Up</span>
+            </button>
+
+            {/* Image CTA */}
+            <button
+              onClick={openImagePicker}
+              className="w-full flex flex-col items-center justify-center py-4 px-3 bg-[var(--bg-tertiary)] border border-[var(--border-primary)] rounded-lg hover:bg-[var(--bg-hover)] hover:border-[var(--accent-primary)] transition-all group"
+            >
+              <div className="bg-[var(--bg-hover)] p-2.5 rounded-xl mb-1 group-hover:bg-[var(--border-primary)] transition-colors">
+                <ImageCtaIcon className="w-6 h-6 text-[var(--text-secondary)]" />
+              </div>
+              <span className="text-[14px] text-[var(--text-primary)] font-medium">Image CTA</span>
+            </button>
+          </div>
         </div>
-      )}
 
-      {/* Instructions */}
-      <p style={{
-        fontSize: '11px',
-        color: 'var(--text-muted)',
-        textAlign: 'center',
-        lineHeight: '1.5',
-        marginTop: '16px',
-      }}>
-        Click a CTA type to add it to canvas.
-        <br />
-        Select CTA on canvas to edit styles.
-      </p>
+        {/* PRODUCT CARDS Section */}
+        <div>
+          <h3 className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-4 px-1">
+            Product Cards
+          </h3>
+          <div className="grid grid-cols-3 gap-2 px-1">
+            {/* Visit Product */}
+            <button
+              onClick={addVisitProductCta}
+              className="aspect-square flex flex-col items-center justify-center p-2 bg-[var(--bg-tertiary)] border border-transparent rounded-lg hover:bg-[var(--bg-hover)] hover:border-[var(--border-primary)] transition-all group"
+            >
+              <div className="w-10 h-10 bg-[var(--text-primary)] rounded-lg flex items-center justify-center mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+                <VisitIcon className="w-5 h-5 text-[var(--bg-secondary)]" />
+              </div>
+              <span className="text-[12px] text-[var(--text-secondary)] font-medium">Visit</span>
+            </button>
 
-      {/* Animation keyframes - Storyly-style premium bounce */}
-      <style>{`
-        @keyframes storylyBouncePreview {
-          0% { 
-            transform: translateY(0); 
-            opacity: 1; 
-          }
-          25% { 
-            transform: translateY(-5px); 
-            opacity: 0.75; 
-          }
-          40% { 
-            transform: translateY(-4px); 
-            opacity: 0.8; 
-          }
-          55% { 
-            transform: translateY(-6px); 
-            opacity: 0.72; 
-          }
-          70% { 
-            transform: translateY(-3px); 
-            opacity: 0.85; 
-          }
-          100% { 
-            transform: translateY(0); 
-            opacity: 1; 
-          }
-        }
-      `}</style>
+            {/* Describe Product */}
+            <button
+              onClick={addDescribeProductCta}
+              className="aspect-square flex flex-col items-center justify-center p-2 bg-[var(--bg-tertiary)] border border-transparent rounded-lg hover:bg-[var(--bg-hover)] hover:border-[var(--border-primary)] transition-all group"
+            >
+              <div className="w-10 h-10 bg-[var(--text-primary)] rounded-lg flex items-center justify-center mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+                <DescribeIcon className="w-5 h-5 text-[var(--bg-secondary)]" />
+              </div>
+              <span className="text-[12px] text-[var(--text-secondary)] font-medium">Describe</span>
+            </button>
+
+            {/* Buy Product */}
+            <button
+              onClick={addBuyProductCta}
+              className="aspect-square flex flex-col items-center justify-center p-2 bg-[var(--bg-tertiary)] border border-transparent rounded-lg hover:bg-[var(--bg-hover)] hover:border-[var(--border-primary)] transition-all group"
+            >
+              <div className="w-10 h-10 bg-[var(--text-primary)] rounded-lg flex items-center justify-center mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+                <BuyIcon className="w-5 h-5 text-[var(--bg-secondary)]" />
+              </div>
+              <span className="text-[12px] text-[var(--text-secondary)] font-medium">Buy</span>
+            </button>
+          </div>
+
+          <p className="text-[11px] text-[var(--text-muted)] text-center mt-8 leading-relaxed italic px-2">
+            Click a CTA type to add it to canvas.<br /> Select CTA on canvas to edit styles.
+          </p>
+        </div>
+
+        {/* CTA List - Show all CTAs on current slide */}
+        {mainCtas.length > 0 && (
+          <div className="mt-4 pt-6 border-t border-[var(--border-primary)]">
+            <h3 className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-4 px-1">
+              CTAs on this Slide
+            </h3>
+
+            <div className="space-y-2">
+              {mainCtas.map((cta) => {
+                const isSelected = store.selectedElements.some((el) => el.id === cta.id);
+                return (
+                  <div
+                    key={cta.id}
+                    onClick={() => selectCtaElement(cta)}
+                    className={`
+                    flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all border
+                    ${isSelected
+                        ? 'bg-[var(--accent-soft)] border-[var(--accent-primary)] shadow-sm ring-1 ring-[var(--accent-primary)]'
+                        : 'bg-[var(--bg-secondary)] border-[var(--border-primary)] hover:border-[var(--border-accent)] hover:bg-[var(--bg-hover)]'
+                      }
+                  `}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-md ${isSelected ? 'bg-[var(--accent-primary)] text-[var(--surface-light)]' : 'bg-[var(--bg-tertiary)] text-[var(--text-muted)]'}`}>
+                        {cta.custom?.ctaType === 'classic' && <ClassicIcon className="w-4 h-4" />}
+                        {cta.custom?.ctaType === 'swipe_up' && <SwipeUpIcon className="w-4 h-4" />}
+                        {cta.custom?.ctaType === 'image' && <ImageCtaIcon className="w-4 h-4" />}
+                        {(cta.custom?.ctaType === 'visit_product' ||
+                          cta.custom?.ctaType === 'describe_product' ||
+                          cta.custom?.ctaType === 'buy_product' ||
+                          cta.custom?.ctaType === 'product_card') && <BuyIcon className="w-4 h-4" />}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className={`text-[13px] font-semibold ${isSelected ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>
+                          {getCtaTypeLabel(cta.custom?.ctaType)}
+                        </span>
+                        <span className="text-[11px] text-[var(--text-muted)] truncate max-w-[140px]">
+                          {cta.custom?.title || cta.custom?.text || cta.custom?.redirectUrl || 'No URL'}
+                        </span>
+                      </div>
+                    </div>
+                    {isSelected && (
+                      <div className="w-2 h-2 rounded-full bg-[var(--accent-primary)] animate-pulse" />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 });
