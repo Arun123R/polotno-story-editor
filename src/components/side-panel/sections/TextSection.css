@@ -72,7 +72,7 @@
     gap: 8px !important;
     background: var(--sidebar-bg, #ffffff) !important;
     border-bottom: 1px solid var(--sidebar-border, #e0e0e0) !important;
-    padding: 8px 8px 0 8px !important;
+    padding: 4px 8px 0 8px !important;
     margin: 0 !important;
     position: relative !important;
     width: 100% !important;
@@ -83,7 +83,10 @@
 .custom-text-section .polotno-side-panel-tab,
 .custom-text-section .bp5-tab,
 .custom-text-section [role="tab"] {
+    /* match Right Sidebar tab metrics */
     padding: 10px 16px !important;
+    height: auto !important;
+    line-height: normal !important;
     font-size: 14px !important;
     font-weight: 500 !important;
     color: var(--sidebar-text-secondary, #5a5a5a) !important;
@@ -246,24 +249,128 @@
    POLOTNO TEXT ITEMS STYLING
    ============================================ */
 
-/* Style text template items if they exist */
+/* Text template items: boxed cards with icon + title/subtitle */
 .custom-text-section .polotno-text-item,
 .custom-text-section .text-item,
 .custom-text-section [data-text-template] {
     background: var(--sidebar-bg-secondary, #ffffff) !important;
-    border: none !important;
-    border-bottom: 1px solid var(--sidebar-border, #e0e0e0) !important;
-    border-radius: 0 !important;
-    padding: 20px 16px !important;
-    margin: 0 !important;
+    border: 1px solid var(--sidebar-border, #e0e0e0) !important;
+    border-radius: 12px !important;
+    padding: 12px 16px !important;
+    margin: 8px 12px !important;
     cursor: pointer !important;
-    transition: all 0.2s ease !important;
+    transition: all 0.18s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
+    width: calc(100% - 24px) !important;
+}
+
+/* Left circular plus icon */
+.custom-text-section .polotno-text-item::before,
+.custom-text-section .text-item::before,
+.custom-text-section [data-text-template]::before {
+    content: '' !important;
+    display: block !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    background: var(--accent-soft, rgba(249,115,22,0.08)) !important;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'><path d='M12 7v10M7 12h10' stroke='%23F97316' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>") !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 18px 18px !important;
+    flex: 0 0 auto !important;
+}
+
+/* Text content styling inside the card */
+.custom-text-section .polotno-text-item * ,
+.custom-text-section .text-item * ,
+.custom-text-section [data-text-template] * {
+    color: var(--sidebar-text, #2d2d2d) !important;
+}
+
+.custom-text-section .polotno-text-item h1,
+.custom-text-section .polotno-text-item h2,
+.custom-text-section .polotno-text-item h3,
+.custom-text-section .text-item h1,
+.custom-text-section .text-item h2,
+.custom-text-section .text-item h3,
+.custom-text-section [data-text-template] h1,
+.custom-text-section [data-text-template] h2,
+.custom-text-section [data-text-template] h3 {
+    margin: 0 !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+}
+
+.custom-text-section .polotno-text-item p,
+.custom-text-section .polotno-text-item small,
+.custom-text-section .text-item p,
+.custom-text-section .text-item small,
+.custom-text-section [data-text-template] p,
+.custom-text-section [data-text-template] small,
+.custom-text-section .polotno-text-item span,
+.custom-text-section .text-item span,
+.custom-text-section [data-text-template] span {
+    margin: 0 !important;
+    font-size: 13px !important;
+    color: var(--sidebar-text-secondary, #6b7280) !important;
 }
 
 .custom-text-section .polotno-text-item:hover,
 .custom-text-section .text-item:hover,
 .custom-text-section [data-text-template]:hover {
-    background: var(--sidebar-bg-hover, #f5f5f5) !important;
+    border-color: var(--sidebar-accent, #F97316) !important;
+    box-shadow: 0 3px 6px rgba(249,115,22,0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Style Blueprint minimal buttons (the "Create" rows) as full-width boxed items (subtitle removed) */
+.custom-text-section .bp5-button.bp5-minimal {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    width: 100% !important;
+    margin: 8px 0 !important;
+    padding: 14px 16px !important;
+    border: 1px solid var(--sidebar-border, #e0e0e0) !important;
+    border-radius: 12px !important;
+    background: var(--sidebar-bg-secondary, #ffffff) !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
+    text-align: left !important;
+    justify-content: flex-start !important;
+    box-sizing: border-box !important;
+}
+
+/* Circular plus icon on the left of the button */
+.custom-text-section .bp5-button.bp5-minimal::before {
+    content: '' !important;
+    display: block !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    background: var(--accent-soft, rgba(249,115,22,0.08)) !important;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'><path d='M12 7v10M7 12h10' stroke='%23F97316' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>") !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 18px 18px !important;
+    flex: 0 0 auto !important;
+    margin-right: 8px !important;
+}
+
+/* Remove subtitle - keep only main label */
+.custom-text-section .bp5-button.bp5-minimal .bp5-button-text::after {
+    content: none !important;
+    display: none !important;
+}
+
+.custom-text-section .bp5-button.bp5-minimal:hover {
+    border-color: var(--sidebar-accent, #F97316) !important;
+    box-shadow: 0 3px 6px rgba(249,115,22,0.08) !important;
+    transform: translateY(-1px) !important;
 }
 
 /* ============================================
@@ -369,3 +476,181 @@
     --sidebar-input-bg: #141C2F;
     --sidebar-input-border: #2E3A59;
 }
+
+/* Final scoped override to precisely match Right Sidebar tab layout.
+     These rules are deliberately specific and scoped to .custom-text-section
+     to override the global Polotno icon-only tab rules in src/styles/index.css.
+*/
+.custom-text-section .polotno-side-tabs-container,
+.custom-text-section .bp5-tabs {
+    /* Expand the tab bar so the divider reaches the container edges
+       (accounting for outer container horizontal padding of 14px) */
+    width: calc(100% + 28px) !important;
+    margin-left: -14px !important;
+    margin-right: -14px !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    display: flex !important;
+    gap: 8px !important;
+    padding: 4px 8px 0 8px !important;
+    background: var(--sidebar-bg) !important;
+    border-bottom: none !important;
+}
+
+.custom-text-section .polotno-side-panel-tab,
+.custom-text-section .bp5-tab {
+    width: auto !important;
+    min-width: 0 !important;
+    padding: 10px 12px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: var(--sidebar-text-secondary) !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    border-radius: 8px 8px 0 0 !important;
+    margin: 0 !important;
+    margin-bottom: -1px !important;
+    text-align: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 1 !important;
+}
+
+.custom-text-section .polotno-side-panel-tab>div:nth-child(2),
+.custom-text-section .bp5-tab>span:not(.bp5-icon) {
+    display: inline !important;
+    font-size: inherit !important;
+    margin-left: 8px !important;
+}
+
+.custom-text-section .polotno-side-panel-tab[aria-selected="true"],
+.custom-text-section .polotno-side-panel-tab.active,
+.custom-text-section .bp5-tab[aria-selected="true"] {
+    color: var(--sidebar-accent) !important;
+    background: var(--sidebar-bg-secondary) !important;
+    border: 1px solid var(--sidebar-border) !important;
+    /* Make bottom border match content bg to hide underline */
+    border-bottom: 1px solid var(--sidebar-content-bg) !important;
+}
+
+/* Make content sections match Right Sidebar white card layout */
+.custom-text-section .settings-panel,
+.custom-text-section .section,
+.custom-text-section .polotno-section {
+    background: var(--sidebar-bg-secondary) !important;
+    border: 1px solid var(--sidebar-border) !important;
+    border-radius: 12px !important;
+    padding: 12px !important;
+    margin: 12px !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
+}
+
+.custom-text-section .settings-panel > .section:last-child,
+.custom-text-section .section:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* Remove any per-tab underline/indicator pseudo elements */
+.custom-text-section .polotno-side-panel-tab::after,
+.custom-text-section .polotno-side-panel-tab::before,
+.custom-text-section .bp5-tab::after,
+.custom-text-section .bp5-tab::before {
+    content: none !important;
+    display: none !important;
+}
+
+/* Ensure the header shows a single divider and content starts below it */
+.custom-text-section .polotno-side-tabs-container { border-bottom: 1px solid var(--sidebar-border) !important; }
+.custom-text-section .polotno-side-panel-content > *:first-child,
+.custom-text-section .bp5-tab-panel > *:first-child { margin-top: 8px !important; }
+
+/* ------------------------------------------------------------------
+   Upload font button: make it visually match the Upload section card
+   ------------------------------------------------------------------ */
+.custom-text-section label[for="polotno-font-upload"] {
+    border: 1px solid var(--sidebar-border) !important;
+    border-radius: 12px !important;
+    padding: 28px 16px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-top: 20px !important;
+    margin-bottom: 20px !important;
+    cursor: pointer !important;
+    background: var(--sidebar-bg-secondary) !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+}
+
+/* Make the inner button/icon stack like the Upload section */
+.custom-text-section label[for="polotno-font-upload"] button,
+.custom-text-section label[for="polotno-font-upload"] .bp5-button {
+    width: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 0 !important;
+}
+
+/* Hide any existing inline SVG and replace it with the Upload-style circular icon via ::before */
+.custom-text-section label[for="polotno-font-upload"] svg {
+    display: none !important;
+}
+
+.custom-text-section label[for="polotno-font-upload"]::before {
+    content: '' !important;
+    display: block !important;
+    width: 64px !important;
+    height: 64px !important;
+    border-radius: 50% !important;
+    margin-bottom: 16px !important;
+    background: var(--accent-soft, rgba(249,115,22,0.08)) !important;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'><path d='M12 16V4' stroke='%23F97316' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/><path d='M7 9L12 4L17 9' stroke='%23F97316' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/><path d='M20 16V18C20 19.1046 19.1046 20 18 20H6C4.89543 20 4 19.1046 4 18V16' stroke='%23F97316' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>") !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 40px 40px !important;
+}
+
+
+/* Header/text lines – mimic Upload section copy and sizes */
+.custom-text-section label[for="polotno-font-upload"] .bp5-button,
+.custom-text-section label[for="polotno-font-upload"] {
+    color: var(--sidebar-text) !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+}
+
+.custom-text-section label[for="polotno-font-upload"]::after {
+    content: "or drag and drop fonts here" !important;
+    display: block !important;
+    margin-top: 6px !important;
+    color: var(--sidebar-text-secondary) !important;
+    font-size: 13px !important;
+}
+
+/* remove the text label that showed file types (was overriding the icon) */
+.custom-text-section label[for="polotno-font-upload"]::before {
+    /* keep as icon background from earlier block; ensure no text */
+    content: '' !important;
+}
+
+/* Hide any Blueprint icon elements or inline svgs to avoid black fill behind our injected icon */
+.custom-text-section label[for="polotno-font-upload"] svg,
+.custom-text-section label[for="polotno-font-upload"] .bp5-icon,
+.custom-text-section label[for="polotno-font-upload"] i,
+.custom-text-section label[for="polotno-font-upload"] .icon {
+    display: none !important;
+    background: transparent !important;
+}
+
+/* Ensure no child elements add background color behind the pseudo-icon */
+.custom-text-section label[for="polotno-font-upload"] * {
+    background: transparent !important;
+}
+
+/* Ensure the hidden input is not visible but accessible */
+.custom-text-section #polotno-font-upload { display: none !important; }
