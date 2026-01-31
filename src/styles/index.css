@@ -386,9 +386,10 @@ html[data-theme="dark"] .bp5-tab[aria-selected="true"] svg {
     box-shadow: none !important;
     border: none !important;
     background-color: var(--bg-secondary) !important;
+    /* Match right-sidebar metrics: width 280px and standard horizontal padding */
     padding: 0 14px !important;
-    width: 310px !important;
-    max-width: 310px !important;
+    width: 280px !important;
+    max-width: 280px !important;
 }
 
 /* Main checkbox container styling */
