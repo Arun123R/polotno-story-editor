@@ -3,7 +3,7 @@ import './Topbar.css';
 
 import { ThemeToggleButton } from './ThemeToggleButton';
 
-export const Topbar = observer(({  projectName = 'Campaign Name', toolbar }) => {
+export const Topbar = observer(({ projectName = 'Campaign Name', toolbar }) => {
     const handlePreview = () => {
         // Preview functionality - can be implemented based on your needs
         console.log('Preview clicked');
@@ -21,9 +21,9 @@ export const Topbar = observer(({  projectName = 'Campaign Name', toolbar }) => 
                 {/* Logo */}
                 <div className="topbar-logo">
                     <img
-                      src="/AppStorys_logo_white-Dy7IWqWA.png"
-                      alt="AppStories Logo"
-                      style={{ height: "40px", width: "auto" }}
+                        src="/AppStorys_logo_white-Dy7IWqWA.png"
+                        alt="AppStories Logo"
+                        style={{ height: "37px", width: "auto" }}
                     />
                 </div>
 
@@ -60,18 +60,18 @@ export const Topbar = observer(({  projectName = 'Campaign Name', toolbar }) => 
             {/* Right Section - Status and Actions */}
             <div className="topbar-right">
                 {/* Save Status */}
-                <div className="topbar-status">
+                {/* <div className="topbar-status">
                     <span className="status-text">All changes saved</span>
                     <span className="status-dot">•</span>
                     <span className="status-text status-muted">Auto-saved</span>
-                </div>
+                </div> */}
 
                 {/* Action Buttons */}
                 <div className="topbar-actions">
-                    <ThemeToggleButton />
                     {toolbar}
+                    <ThemeToggleButton />
                     <button className="topbar-btn topbar-btn-secondary" onClick={handlePreview}>
-                        <svg
+                        {/* <svg
                             width="18"
                             height="18"
                             viewBox="0 0 24 24"
@@ -81,8 +81,8 @@ export const Topbar = observer(({  projectName = 'Campaign Name', toolbar }) => 
                         >
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                             <circle cx="12" cy="12" r="3" />
-                        </svg>
-                        <span>Preview</span>
+                        </svg> */}
+                        <span>Cancle</span>
                     </button>
 
 

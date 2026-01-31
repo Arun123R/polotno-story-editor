@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { SectionTab } from 'polotno/side-panel';
-import { Button } from '@blueprintjs/core';
+import { Button, Tooltip, Position } from '@blueprintjs/core';
 
 // Icons
 const UploadIcon = () => (
@@ -42,7 +42,7 @@ const VideoIcon = () => (
 
 // Tab Component
 export const UploadSectionTab = (props) => (
-    <SectionTab name="Upload" {...props}>
+    <SectionTab name="Upload" {...props} data-tooltip="Upload">
         <UploadIcon />
     </SectionTab>
 );

@@ -666,7 +666,7 @@ const InteractionButton = ({ type, onClick }) => {
     >
       {type === 'rating' ? (
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, color: 'inherit', padding: '0 10px', boxSizing: 'border-box' }}>
-          <div style={{ width: '100%', height: 110, borderRadius: 12, background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, boxSizing: 'border-box' }}>
+          <div style={{ width: '100%', height: 110, borderRadius: 12, background: 'var(--bg-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, boxSizing: 'border-box' }}>
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 8, paddingLeft: 8, paddingRight: 8 }}>
               <div style={{ fontSize: 11, fontWeight: 600, textAlign: 'center', lineHeight: 1.3, color: 'var(--text-primary)' }}>
                 Do you like my eyes?
@@ -686,7 +686,7 @@ const InteractionButton = ({ type, onClick }) => {
         </div>
       ) : type === 'quiz' ? (
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '0 10px', boxSizing: 'border-box' }}>
-          <div style={{ width: '100%', height: 110, borderRadius: 12, background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', padding: '10px', boxSizing: 'border-box', gap: 5 }}>
+          <div style={{ width: '100%', height: 110, borderRadius: 12, background: 'var(--bg-secondary)', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', padding: '10px', boxSizing: 'border-box', gap: 5 }}>
             <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>What is the largest...</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 8px', background: 'var(--bg-secondary)', borderRadius: 6, width: '100%', boxSizing: 'border-box', border: '1px solid var(--border-primary)' }}>
               <div style={{ width: 14, height: 14, borderRadius: '50%', background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -707,7 +707,7 @@ const InteractionButton = ({ type, onClick }) => {
         </div>
       ) : type === 'poll' ? (
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '0 10px', boxSizing: 'border-box' }}>
-          <div style={{ width: '100%', height: 110, borderRadius: 12, background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '14px', boxSizing: 'border-box', gap: 8, paddingLeft: 12, paddingRight: 12 }}>
+          <div style={{ width: '100%', height: 110, borderRadius: 12, background: 'var(--bg-secondary)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '14px', boxSizing: 'border-box', gap: 8, paddingLeft: 12, paddingRight: 12 }}>
             <div style={{ fontSize: 11, fontWeight: 600, textAlign: 'center', lineHeight: 1.3, color: 'var(--text-primary)' }}>
               Are you excited for the grand sale?
             </div>
@@ -727,12 +727,12 @@ const InteractionButton = ({ type, onClick }) => {
         </div>
       ) : type === 'reaction' ? (
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '0 10px', boxSizing: 'border-box' }}>
-          <div style={{ width: '100%', height: 110, borderRadius: 12, background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', boxSizing: 'border-box', gap: 16 }}>
-            <div style={{ width: 50, height: 50, borderRadius: '50%', background: 'var(--bg-secondary)', border: '1px solid var(--border-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
-              <span style={{ fontSize: 28 }}>👍</span>
+          <div style={{ width: '100%', height: 110, borderRadius: 12, background: 'var(--bg-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', boxSizing: 'border-box', gap: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ fontSize: 42 }}>👍</span>
             </div>
-            <div style={{ width: 50, height: 50, borderRadius: '50%', background: 'var(--bg-secondary)', border: '1px solid var(--border-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
-              <span style={{ fontSize: 28 }}>👎</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ fontSize: 42 }}>👎</span>
             </div>
           </div>
           <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)' }}>
@@ -741,7 +741,7 @@ const InteractionButton = ({ type, onClick }) => {
         </div>
       ) : type === 'countdown' ? (
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '0 10px', boxSizing: 'border-box' }}>
-          <div style={{ width: '100%', height: 110, borderRadius: 12, background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '10px', boxSizing: 'border-box', gap: 5 }}>
+          <div style={{ width: '100%', height: 110, borderRadius: 12, background: 'var(--bg-secondary)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '10px', boxSizing: 'border-box', gap: 5 }}>
             <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-primary)', textAlign: 'center' }}>
               It's almost my b-day!
             </div>
@@ -773,7 +773,7 @@ const InteractionButton = ({ type, onClick }) => {
         </div>
       ) : type === 'promo' ? (
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '0 10px', boxSizing: 'border-box' }}>
-          <div style={{ width: '100%', height: 110, borderRadius: 12, background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', boxSizing: 'border-box' }}>
+          <div style={{ width: '100%', height: 110, borderRadius: 12, background: 'var(--bg-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', boxSizing: 'border-box' }}>
             <div style={{ position: 'relative', background: 'var(--bg-secondary)', border: '2px dashed var(--border-primary)', borderRadius: 12, padding: '12px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, width: '85%' }}>
               <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Coupon</span>
               <div style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--bg-secondary)', border: '2px solid var(--border-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -787,7 +787,7 @@ const InteractionButton = ({ type, onClick }) => {
         </div>
       ) : type === 'question' ? (
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '0 10px', boxSizing: 'border-box' }}>
-          <div style={{ width: '100%', height: 110, borderRadius: 12, background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', boxSizing: 'border-box' }}>
+          <div style={{ width: '100%', height: 110, borderRadius: 12, background: 'var(--bg-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', boxSizing: 'border-box' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, width: '100%' }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', textAlign: 'center' }}>Ask a Question</div>
               <div style={{ fontSize: 10, color: 'var(--text-muted)', textAlign: 'center' }}>Tap to ask</div>
@@ -799,7 +799,7 @@ const InteractionButton = ({ type, onClick }) => {
         </div>
       ) : type === 'imageQuiz' ? (
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '0 10px', boxSizing: 'border-box' }}>
-          <div style={{ width: '100%', height: 110, borderRadius: 12, background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '12px', boxSizing: 'border-box', gap: 6, paddingLeft: 10, paddingRight: 10 }}>
+          <div style={{ width: '100%', height: 110, borderRadius: 12, background: 'var(--bg-secondary)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '12px', boxSizing: 'border-box', gap: 6, paddingLeft: 10, paddingRight: 10 }}>
             <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-primary)', textAlign: 'center', marginBottom: 2 }}>What is the largest species</div>
             <div style={{ display: 'flex', gap: 6, width: '100%', justifyContent: 'center' }}>
               <div style={{ flex: 1, borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border-primary)', height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', maxWidth: 50 }}>
