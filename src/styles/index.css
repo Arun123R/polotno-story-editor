@@ -141,8 +141,12 @@ body {
 }
 
 .appstorys-theme-toggle {
-    height: 32px;
-    padding: 0 10px;
+    height: 36px;
+    width: 35px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 8px;
     border: 1px solid var(--border-primary);
     background: transparent;
@@ -273,14 +277,17 @@ html[data-theme="dark"] .bp5-tab[aria-selected="true"],
 html[data-theme="dark"] .bp5-tab.bp5-selected,
 html[data-theme="dark"] .polotno-side-panel-tab:hover,
 html[data-theme="dark"] .bp5-tab:hover {
-    background-color: #1E2638 !important; /* Solid dark blue-gray highlight */
+    background-color: #1E2638 !important;
+    /* Solid dark blue-gray highlight */
     background: #1E2638 !important;
-    color: #FF7A1A !important; /* Force brand orange */
+    color: #FF7A1A !important;
+    /* Force brand orange */
 }
 
 html[data-theme="dark"] .polotno-side-panel-tab:not([aria-selected="true"]) svg,
 html[data-theme="dark"] .bp5-tab:not([aria-selected="true"]) svg {
-    color: #6B7280 !important; /* Muted gray for inactive icons */
+    color: #6B7280 !important;
+    /* Muted gray for inactive icons */
 }
 
 html[data-theme="dark"] .polotno-side-panel-tab[aria-selected="true"] svg,
@@ -1476,4 +1483,140 @@ div[style*="position: absolute"] {
 .polotno-side-tabs-container [class*="selected"] svg,
 .polotno-side-tabs-container [class*="selected"]:hover svg {
     color: var(--accent-primary) !important;
+}
+
+/* Force Tooltips to be on top */
+.bp5-portal,
+.bp5-tooltip,
+.bp5-popover,
+.bp3-portal,
+.bp3-tooltip,
+.bp3-popover {
+    z-index: 9999 !important;
+}
+
+
+/* Custom Tooltip for Sidebar Icons - Modern Design */
+.polotno-side-panel-tab,
+.bp5-tab {
+    position: relative;
+}
+
+/* Hide tooltip by default */
+.polotno-side-panel-tab::after,
+.bp5-tab::after {
+    content: none;
+}
+
+/* Tooltip arrow (before pseudo-element) */
+.polotno-side-panel-tab[data-tooltip]:not([data-tooltip=""])::before,
+.bp5-tab[data-tooltip]:not([data-tooltip=""])::before {
+    content: '';
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 8px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 5px 6px 5px 0;
+    border-color: transparent #2D3748 transparent transparent;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease 0.1s;
+    z-index: 10001;
+}
+
+/* Tooltip content (after pseudo-element) */
+.polotno-side-panel-tab[data-tooltip]:not([data-tooltip=""])::after,
+.bp5-tab[data-tooltip]:not([data-tooltip=""])::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 14px;
+    padding: 8px 14px;
+    background: linear-gradient(135deg, #2D3748 0%, #1A202C 100%);
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    border-radius: 8px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease 0.1s, transform 0.2s ease 0.1s;
+    z-index: 10000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15),
+        0 2px 4px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+/* Show tooltip on hover */
+.polotno-side-panel-tab[data-tooltip]:not([data-tooltip=""]):hover::before,
+.bp5-tab[data-tooltip]:not([data-tooltip=""]):hover::before,
+.polotno-side-panel-tab[data-tooltip]:not([data-tooltip=""]):hover::after,
+.bp5-tab[data-tooltip]:not([data-tooltip=""]):hover::after {
+    opacity: 1;
+}
+
+.polotno-side-panel-tab[data-tooltip]:not([data-tooltip=""]):hover::after,
+.bp5-tab[data-tooltip]:not([data-tooltip=""]):hover::after {
+    transform: translateY(-50%) translateX(2px);
+}
+
+/* Dark theme tooltip */
+html[data-theme="dark"] .polotno-side-panel-tab[data-tooltip]:not([data-tooltip=""])::before,
+html[data-theme="dark"] .bp5-tab[data-tooltip]:not([data-tooltip=""])::before {
+    border-color: transparent #F7FAFC transparent transparent;
+}
+
+html[data-theme="dark"] .polotno-side-panel-tab[data-tooltip]:not([data-tooltip=""])::after,
+html[data-theme="dark"] .bp5-tab[data-tooltip]:not([data-tooltip=""])::after {
+    background: linear-gradient(135deg, #F7FAFC 0%, #EDF2F7 100%);
+    color: #1A202C;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25),
+        0 2px 4px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(0, 0, 0, 0.05) inset;
+}
+
+/* Hide scrollbar for side panel content but keep scroll functionality */
+/* Global scrollbar hiding for Side Panel and its children */
+.polotno-side-panel *,
+.polotno-side-panel div,
+[class*="polotno-side-panel"] *,
+div[class*="go"] {
+    scrollbar-width: none !important;
+}
+
+.polotno-side-panel *::-webkit-scrollbar,
+.polotno-side-panel div::-webkit-scrollbar,
+[class*="polotno-side-panel"] *::-webkit-scrollbar,
+div[class*="go"]::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+}
+
+/* Specific targeted classes just in case */
+.polotno-panel-container,
+.go2913498543,
+.go4160152499,
+.polotno-side-panel-content,
+[class*="polotno-panel-container"],
+div[class*="go"][style*="overflow-y"] {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+.polotno-panel-container::-webkit-scrollbar,
+.go2913498543::-webkit-scrollbar,
+.go4160152499::-webkit-scrollbar,
+.polotno-side-panel-content::-webkit-scrollbar,
+[class*="polotno-panel-container"]::-webkit-scrollbar,
+div[class*="go"][style*="overflow-y"]::-webkit-scrollbar {
+    display: none !important;
 }

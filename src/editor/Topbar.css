@@ -197,19 +197,25 @@
     font-size: 16px;
 }
 
-/* Actions - Using grid to prevent toolbar expansion */
+/* Actions - Using flex for natural spacing */
 .topbar-actions {
-    display: grid !important;
-    grid-template-columns: auto 100px auto auto !important;
+    display: flex !important;
     align-items: center !important;
-    gap: 12px !important;
+    gap: 10px !important;
 }
 
-/* Lock the toolbar in its grid cell */
+/* Ensure toolbar doesn't take too much space and stays fixed */
 .topbar-actions .polotno-toolbar {
-    grid-column: 2 !important;
-    overflow: hidden !important;
-    max-width: 100px !important;
+    flex-shrink: 0 !important;
+    margin-right: 20px;
+    width: 60px !important;
+    /* Force fixed width for Undo/Redo only */
+    display: block !important;
+}
+
+/* Hide any execution or extra groups that Polotno adds */
+.topbar-actions .polotno-toolbar .bp5-navbar-group:not(:first-child) {
+    display: none !important;
 }
 
 .topbar-btn {

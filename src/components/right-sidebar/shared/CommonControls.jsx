@@ -392,54 +392,43 @@ export const DurationSection = observer(({ store, element }) => {
     if (!activePage) return;
   }, [store, activePage, store.currentTime]);
 
-  // Apply timing visibility for the currently selected element (scoped to right sidebar + selection only).
+  // Enforce visibility based on timing.
+  // We strictly assume that if Time Duration is involved (or playing), 
+  // the element's visibility is dictated by the timeline.
+  // This avoids "stuck" hidden states from legacy bugs or ambiguous user intents.
   useEffect(() => {
     if (!element || !activePage) return;
-
-    // Track base visibility per selected element to avoid permanently overwriting user visibility.
-    if (lastElementIdRef.current !== element.id) {
-      // restore old element visibility
-      if (lastElementIdRef.current && baseVisibleRef.current !== null) {
-        const prev = store.getElementById?.(lastElementIdRef.current);
-        if (prev) {
-          prev.set({ visible: baseVisibleRef.current });
-        }
-      }
-
-      baseVisibleRef.current = element.visible;
-      lastElementIdRef.current = element.id;
-    }
 
     const start = elementTiming.startTime;
     const end = elementTiming.endTime;
     const inRange = pageTimeMs >= start && pageTimeMs <= end;
-    const baseVisible = baseVisibleRef.current ?? true;
 
-    // Only enforce timing if the user has actually adjusted timing OR we are playing.
-    const hasCustomTiming =
-      Number.isFinite(element?.custom?.startTime) || Number.isFinite(element?.custom?.endTime);
-    const shouldEnforce = hasCustomTiming || store.isPlaying;
+    // Only enforce strict visibility (hiding) if we are PLAYING.
+    // If we are paused (editing/scrubbing), we MUST keep the selected element visible.
+    // Hiding a selected element while editing often leads to deselection or inability to adjust handles.
+    const shouldEnforceTransparency = store.isPlaying;
 
-    if (shouldEnforce) {
-      const nextVisible = Boolean(baseVisible && inRange);
-      if (element.visible !== nextVisible) {
-        element.set({ visible: nextVisible });
+    if (shouldEnforceTransparency) {
+      const shouldBeVisible = inRange;
+      if (element.visible !== shouldBeVisible) {
+        element.set({ visible: shouldBeVisible });
       }
     } else {
-      if (element.visible !== baseVisible) {
-        element.set({ visible: baseVisible });
+      // When paused (Edit Mode), always ensure the SELECTED element is visible.
+      // This allows the user to see and edit the element even if the playhead is outside its duration.
+      if (!element.visible) {
+        element.set({ visible: true });
       }
     }
 
     return () => {
-      // Restore when DurationSection unmounts (or when switching away from this element).
-      if (element && baseVisibleRef.current !== null) {
-        element.set({ visible: baseVisibleRef.current });
+      // CLEANUP: When unmounting (deselecting), ensure it is VISIBLE.
+      // This ensures that after editing, the element remains present on the canvas
+      // until the global playback logic takes over.
+      if (element && !element.visible) {
+        element.set({ visible: true });
       }
-      baseVisibleRef.current = null;
-      lastElementIdRef.current = null;
     };
-    // NOTE: intentionally depends on `element.id` via `element` itself.
   }, [store, activePage, element, elementTiming.startTime, elementTiming.endTime, pageTimeMs, store.isPlaying]);
 
   const seekToPageTime = useCallback(
@@ -599,7 +588,7 @@ export const DurationSection = observer(({ store, element }) => {
     startGlobalDrag(event, {
       captureTarget: event?.currentTarget,
       onMove: updateTimingFromEvent,
-      onEnd: () => {},
+      onEnd: () => { },
     });
   };
 
@@ -621,7 +610,7 @@ export const DurationSection = observer(({ store, element }) => {
     startGlobalDrag(event, {
       captureTarget: sliderRef.current,
       onMove,
-      onEnd: () => {},
+      onEnd: () => { },
     });
   };
 

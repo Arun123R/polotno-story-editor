@@ -85,16 +85,16 @@ const GridIcon = () => (
 const CustomTemplatesSection = {
   ...TemplatesSection,
   Tab: (props) => (
-    <SectionTab name="Templates" {...props}>
+    <SectionTab name="Templates" {...props} data-tooltip="Templates">
       <TemplatesIcon />
     </SectionTab>
-  ),
+  )
 };
 
 const CustomTextSection = {
   ...TextSection,
   Tab: (props) => (
-    <SectionTab name="Text" {...props}>
+    <SectionTab name="Text" {...props} data-tooltip="Text">
       <TextIcon />
     </SectionTab>
   ),
@@ -103,7 +103,7 @@ const CustomTextSection = {
 const CustomCtaSection = {
   ...CtaSection,
   Tab: (props) => (
-    <SectionTab name="Click" {...props}>
+    <SectionTab name="Click" {...props} data-tooltip="Click">
       <ClickIcon />
     </SectionTab>
   ),
@@ -113,7 +113,7 @@ const CustomCtaSection = {
 const CustomInteractiveSection = {
   ...InteractiveSection,
   Tab: (props) => (
-    <SectionTab name="Interactive" {...props}>
+    <SectionTab name="Interactive" {...props} data-tooltip="Interactive">
       <LightningIcon />
     </SectionTab>
   ),
@@ -124,7 +124,7 @@ const CustomInteractiveSection = {
 const CustomElementsSection = {
   ...ElementsSection,
   Tab: (props) => (
-    <SectionTab name="Elements" {...props}>
+    <SectionTab name="Elements" {...props} data-tooltip="Elements">
       <LayersIcon />
     </SectionTab>
   ),
@@ -133,7 +133,7 @@ const CustomElementsSection = {
 const CustomBackgroundSection = {
   ...BackgroundSection,
   Tab: (props) => (
-    <SectionTab name="Background" {...props}>
+    <SectionTab name="Background" {...props} data-tooltip="Background">
       <GridIcon />
     </SectionTab>
   ),
