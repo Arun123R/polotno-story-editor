@@ -1,7 +1,6 @@
 import { SidePanel, SectionTab } from 'polotno/side-panel';
 // Import default Polotno sections
 import {
-  TextSection,
   ElementsSection,
   UploadSection,
   BackgroundSection,
@@ -9,6 +8,7 @@ import {
 } from 'polotno/side-panel';
 
 import { TemplatesSection } from '../components/side-panel/sections/TemplatesSection';
+import { TextSection } from '../components/side-panel/sections/TextSection';
 
 // Import custom sections
 // Import custom sections

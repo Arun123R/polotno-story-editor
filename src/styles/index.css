@@ -273,14 +273,17 @@ html[data-theme="dark"] .bp5-tab[aria-selected="true"],
 html[data-theme="dark"] .bp5-tab.bp5-selected,
 html[data-theme="dark"] .polotno-side-panel-tab:hover,
 html[data-theme="dark"] .bp5-tab:hover {
-    background-color: #1E2638 !important; /* Solid dark blue-gray highlight */
+    background-color: #1E2638 !important;
+    /* Solid dark blue-gray highlight */
     background: #1E2638 !important;
-    color: #FF7A1A !important; /* Force brand orange */
+    color: #FF7A1A !important;
+    /* Force brand orange */
 }
 
 html[data-theme="dark"] .polotno-side-panel-tab:not([aria-selected="true"]) svg,
 html[data-theme="dark"] .bp5-tab:not([aria-selected="true"]) svg {
-    color: #6B7280 !important; /* Muted gray for inactive icons */
+    color: #6B7280 !important;
+    /* Muted gray for inactive icons */
 }
 
 html[data-theme="dark"] .polotno-side-panel-tab[aria-selected="true"] svg,
@@ -1091,18 +1094,41 @@ a:hover {
     box-shadow: var(--shadow-glow) !important;
 }
 
-/* Keep tab underline orange (text stays neutral) */
+/* Keep tab underline orange (text stays neutral) - EXCEPT for .custom-text-section */
 .bp5-tab-indicator-wrapper .bp5-tab-indicator,
 .bp5-tabs .bp5-tab-indicator {
     background: var(--gradient-primary) !important;
     background-color: var(--accent-primary) !important;
 }
 
-/* Text/My fonts tabs active state */
-[class*="go"] .bp5-tab[aria-selected="true"],
-.bp5-tabs .bp5-tab[aria-selected="true"] {
+/* HIDE tab indicator inside .custom-text-section (left Text panel) */
+.custom-text-section .bp5-tab-indicator-wrapper .bp5-tab-indicator,
+.custom-text-section .bp5-tabs .bp5-tab-indicator,
+.custom-text-section .bp5-tab-indicator-wrapper,
+.custom-text-section .bp5-tab-indicator {
+    display: none !important;
+    background: none !important;
+    background-color: transparent !important;
+    height: 0 !important;
+    width: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+/* Text/My fonts tabs active state - EXCEPT for .custom-text-section */
+[class*="go"] .bp5-tab[aria-selected="true"]:not(.custom-text-section *),
+.bp5-tabs:not(.custom-text-section .bp5-tabs) .bp5-tab[aria-selected="true"] {
     color: var(--accent-primary) !important;
     box-shadow: inset 0 -3px 0 var(--accent-primary) !important;
+}
+
+/* REMOVE underline from .custom-text-section tabs (left Text panel) */
+.custom-text-section .bp5-tab[aria-selected="true"],
+.custom-text-section [class*="go"] .bp5-tab[aria-selected="true"],
+.custom-text-section .bp5-tabs .bp5-tab[aria-selected="true"] {
+    color: var(--accent-primary) !important;
+    box-shadow: none !important;
+    border-bottom: none !important;
 }
 
 /* Play button in duration section */
