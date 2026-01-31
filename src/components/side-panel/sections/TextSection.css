@@ -1,0 +1,371 @@
+/* Custom Text Section Styles - Matching Right Sidebar Design System */
+
+/* ============================================
+   GLOBAL BLUEPRINT TAB INDICATOR OVERRIDE
+   This must come first with maximum specificity
+   ============================================ */
+
+/* Target Blueprint tab indicator globally within our wrapper */
+.custom-text-section .bp5-tabs .bp5-tab-indicator-wrapper,
+.custom-text-section .bp5-tabs .bp5-tab-indicator,
+.custom-text-section .bp5-tab-indicator-wrapper,
+.custom-text-section .bp5-tab-indicator,
+.bp5-tabs.polotno-side-tabs-container .bp5-tab-indicator-wrapper,
+.bp5-tabs.polotno-side-tabs-container .bp5-tab-indicator {
+    display: none !important;
+    height: 0 !important;
+    width: 0 !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    position: absolute !important;
+    left: -9999px !important;
+}
+
+/* Target possible pseudo-elements on active tabs */
+.custom-text-section .polotno-side-panel-tab[aria-selected="true"]::after,
+.custom-text-section .polotno-side-panel-tab[aria-selected="true"]::before,
+.polotno-side-panel-tab[aria-selected="true"]::after,
+.polotno-side-panel-tab[aria-selected="true"]::before,
+.bp5-tab[aria-selected="true"]::after,
+.bp5-tab[aria-selected="true"]::before {
+    content: none !important;
+    display: none !important;
+    border: none !important;
+    background: none !important;
+    height: 0 !important;
+    width: 0 !important;
+}
+
+/* Ensure no border-bottom acts as underline */
+.custom-text-section .polotno-side-panel-tab,
+.custom-text-section .bp5-tab {
+    border-bottom-color: transparent !important;
+    box-shadow: none !important;
+}
+
+/* Active tab should have bottom border matching background to hide underline */
+.custom-text-section .polotno-side-panel-tab.active,
+.custom-text-section .bp5-tab[aria-selected="true"] {
+    border-bottom-color: var(--sidebar-bg-secondary, #ffffff) !important;
+}
+
+/* Main container */
+.custom-text-section {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--sidebar-content-bg, #ffffff);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ============================================
+   TAB STYLING - POLOTNO SPECIFIC OVERRIDES
+   ============================================ */
+
+/* Target Polotno side panel tab container */
+.custom-text-section .polotno-side-tabs-container,
+.custom-text-section .bp5-tabs,
+.custom-text-section [role="tablist"] {
+    display: flex !important;
+    gap: 8px !important;
+    background: var(--sidebar-bg, #ffffff) !important;
+    border-bottom: 1px solid var(--sidebar-border, #e0e0e0) !important;
+    padding: 8px 8px 0 8px !important;
+    margin: 0 !important;
+    position: relative !important;
+    width: 100% !important;
+    box-shadow: none !important;
+}
+
+/* Target Polotno side panel tabs specifically */
+.custom-text-section .polotno-side-panel-tab,
+.custom-text-section .bp5-tab,
+.custom-text-section [role="tab"] {
+    padding: 10px 16px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: var(--sidebar-text-secondary, #5a5a5a) !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    border-radius: 8px 8px 0 0 !important;
+    cursor: pointer !important;
+    position: relative !important;
+    transition: all 0.2s ease !important;
+    flex: 1 !important;
+    text-align: center !important;
+    margin-bottom: -1px !important;
+    box-shadow: none !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    outline: none !important;
+}
+
+.custom-text-section .polotno-side-panel-tab:hover,
+.custom-text-section .bp5-tab:hover,
+.custom-text-section [role="tab"]:hover {
+    color: var(--sidebar-text, #2d2d2d) !important;
+    outline: none !important;
+}
+
+.custom-text-section .polotno-side-panel-tab:focus,
+.custom-text-section .bp5-tab:focus,
+.custom-text-section [role="tab"]:focus {
+    outline: none !important;
+}
+
+/* Active tab - Polotno specific */
+.custom-text-section .polotno-side-panel-tab.active,
+.custom-text-section .bp5-tab[aria-selected="true"],
+.custom-text-section .bp5-tab.bp5-active,
+.custom-text-section [role="tab"][aria-selected="true"] {
+    color: #FF7A1A !important;
+    background: var(--sidebar-bg-secondary, #ffffff) !important;
+    border: 1px solid var(--sidebar-border, #e0e0e0) !important;
+    border-bottom: 1px solid var(--sidebar-bg-secondary, #ffffff) !important;
+    box-shadow: none !important;
+}
+
+/* Remove ALL pseudo-elements that could create the underline indicator */
+.custom-text-section .polotno-side-panel-tab::before,
+.custom-text-section .polotno-side-panel-tab::after,
+.custom-text-section .polotno-side-panel-tab.active::before,
+.custom-text-section .polotno-side-panel-tab.active::after,
+.custom-text-section .bp5-tab::after,
+.custom-text-section .bp5-tab::before,
+.custom-text-section [role="tab"]::after,
+.custom-text-section [role="tab"]::before {
+    content: none !important;
+    display: none !important;
+    background: none !important;
+    border: none !important;
+    height: 0 !important;
+    width: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+/* Remove ALL pseudo-elements that create underlines/pills/indicators */
+.custom-text-section .bp5-tab::before,
+.custom-text-section .bp5-tab::after,
+.custom-text-section [role="tab"]::before,
+.custom-text-section [role="tab"]::after,
+.custom-text-section .polotno-tabs-container button::before,
+.custom-text-section .polotno-tabs-container button::after {
+    display: none !important;
+    content: none !important;
+    background: none !important;
+    border: none !important;
+    border-bottom: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+}
+
+/* ULTRA-AGGRESSIVE: Remove tab indicators - this removes the orange underline */
+.custom-text-section .bp5-tab-indicator,
+.custom-text-section .bp5-tab-indicator-wrapper,
+.custom-text-section .bp5-tabs .bp5-tab-indicator,
+.custom-text-section .bp5-tabs>.bp5-tab-indicator-wrapper,
+.custom-text-section .bp5-tabs .bp5-tab-indicator-wrapper,
+.custom-text-section div[class*="tab-indicator"],
+.custom-text-section div[class*="TabIndicator"],
+.custom-text-section span[class*="tab-indicator"],
+.custom-text-section span[class*="TabIndicator"] {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    max-height: 0 !important;
+    max-width: 0 !important;
+    background: none !important;
+    background-color: transparent !important;
+    border: none !important;
+    position: absolute !important;
+    left: -9999px !important;
+    top: -9999px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+}
+
+/* Remove any child indicator elements including SVG */
+.custom-text-section .bp5-tab>*[class*="indicator"],
+.custom-text-section .bp5-tab>*[class*="accent"],
+.custom-text-section .bp5-tab>*[class*="underline"],
+.custom-text-section .bp5-tab>div,
+.custom-text-section .bp5-tab>span,
+.custom-text-section [role="tab"]>*[class*="indicator"],
+.custom-text-section [role="tab"]>*[class*="accent"],
+.custom-text-section [role="tab"]>*[class*="underline"],
+.custom-text-section [role="tab"]>div:not([class*="text"]):not([class*="label"]),
+.custom-text-section [role="tab"]>span:not([class*="text"]):not([class*="label"]) {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+/* Target any SVG or colored elements that might be the underline */
+.custom-text-section .bp5-tabs svg,
+.custom-text-section .bp5-tabs rect,
+.custom-text-section .bp5-tabs path,
+.custom-text-section .bp5-tab-indicator-wrapper svg,
+.custom-text-section .bp5-tab-indicator-wrapper rect,
+.custom-text-section .bp5-tab-indicator-wrapper path {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+/* Force override any inline styles on indicator */
+.custom-text-section .bp5-tabs [style*="background"],
+.custom-text-section .bp5-tabs [style*="border-bottom"],
+.custom-text-section .bp5-tab-indicator[style] {
+    background: none !important;
+    background-color: transparent !important;
+    border-bottom: none !important;
+    display: none !important;
+}
+
+/* ============================================
+   CONTENT AREA
+   ============================================ */
+
+.custom-text-section .bp5-tab-panel,
+.custom-text-section [role="tabpanel"] {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 0 !important;
+    background: var(--sidebar-content-bg, #ffffff) !important;
+}
+
+/* ============================================
+   POLOTNO TEXT ITEMS STYLING
+   ============================================ */
+
+/* Style text template items if they exist */
+.custom-text-section .polotno-text-item,
+.custom-text-section .text-item,
+.custom-text-section [data-text-template] {
+    background: var(--sidebar-bg-secondary, #ffffff) !important;
+    border: none !important;
+    border-bottom: 1px solid var(--sidebar-border, #e0e0e0) !important;
+    border-radius: 0 !important;
+    padding: 20px 16px !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.custom-text-section .polotno-text-item:hover,
+.custom-text-section .text-item:hover,
+.custom-text-section [data-text-template]:hover {
+    background: var(--sidebar-bg-hover, #f5f5f5) !important;
+}
+
+/* ============================================
+   FONTS LIST
+   ============================================ */
+
+.fonts-list {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.fonts-search {
+    padding: 12px;
+    border-bottom: 1px solid var(--sidebar-border, #e0e0e0);
+}
+
+.fonts-search-input {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--sidebar-input-bg, #ffffff);
+    border: 1px solid var(--sidebar-input-border, #e0e0e0);
+    border-radius: 8px;
+    color: var(--sidebar-text, #2d2d2d);
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+}
+
+.fonts-search-input:focus {
+    border-color: var(--sidebar-accent, #F97316);
+}
+
+.fonts-grid {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.font-item {
+    background: var(--sidebar-bg-secondary, #ffffff);
+    border: 1px solid var(--sidebar-border, #e0e0e0);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.font-item:hover {
+    border-color: var(--sidebar-accent, #F97316);
+    box-shadow: 0 2px 4px rgba(249, 115, 22, 0.1);
+}
+
+.font-preview {
+    color: var(--sidebar-text, #2d2d2d);
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+.fonts-loading {
+    text-align: center;
+    padding: 20px;
+    color: var(--sidebar-text-secondary, #5a5a5a);
+    font-size: 13px;
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+
+.custom-text-section ::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-text-section ::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-text-section ::-webkit-scrollbar-thumb {
+    background: var(--sidebar-input-border, #e0e0e0);
+    border-radius: 3px;
+}
+
+.custom-text-section ::-webkit-scrollbar-thumb:hover {
+    background: var(--sidebar-text-muted, #999999);
+}
+
+/* ============================================
+   DARK THEME SUPPORT
+   ============================================ */
+
+:root[data-theme="dark"] .custom-text-section {
+    --sidebar-bg: #141C2F;
+    --sidebar-content-bg: #141C2F;
+    --sidebar-bg-secondary: #1A2340;
+    --sidebar-bg-hover: #1A2340;
+    --sidebar-border: #25304A;
+    --sidebar-text: #E5E7EB;
+    --sidebar-text-secondary: #9CA3AF;
+    --sidebar-text-muted: #6B7280;
+    --sidebar-accent: #F97316;
+    --sidebar-input-bg: #141C2F;
+    --sidebar-input-border: #2E3A59;
+}

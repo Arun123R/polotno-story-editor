@@ -25,22 +25,19 @@ export const CtaSettings = observer(({ store, element }) => {
   // Get current custom data
   const customData = element.custom || {};
 
+  // Mode: arrow-only when swipe_up and text is empty/whitespace
+  const isArrowOnlyMode = ctaType === 'swipe_up' && !(customData.text && String(customData.text).trim().length > 0);
+
+  // Ensure swipe_up elements don't inherit aspect-ratio constraints from canvas
+  if (ctaType === 'swipe_up' && element.keepRatio !== false) {
+    element.set({ keepRatio: false });
+  }
+
   // Check if it's a product card variant
   const isProductCardVariant = ['product_card', 'visit_product', 'describe_product', 'buy_product'].includes(ctaType);
 
   // Get CTA type label
-  const getCtaTypeLabel = () => {
-    switch (ctaType) {
-      case 'classic': return 'Classic CTA';
-      case 'swipe_up': return 'Swipe-Up CTA';
-      case 'image': return 'Image CTA';
-      case 'product_card': return 'Product Card';
-      case 'visit_product': return 'Visit Product';
-      case 'describe_product': return 'Describe Product';
-      case 'buy_product': return 'Buy Product';
-      default: return 'CTA';
-    }
-  };
+  
 
   // Regenerate SVG when data changes
   const regenerateSVG = useCallback((newCustomData) => {
@@ -68,9 +65,17 @@ export const CtaSettings = observer(({ store, element }) => {
   const setWidth = (value) => {
     const numValue = parseFloat(value);
     if (!isNaN(numValue) && numValue > 0) {
-      element.set({ width: numValue });
-      if (isSvgElement) {
-        setTimeout(() => regenerateSVG(customData), 0);
+      // For swipe_up, width controls the text pill only (convert px -> logical units)
+      if (ctaType === 'swipe_up' && isSvgElement) {
+        const LOGICAL_WIDTH = 500;
+        const elWidth = element.width || 1;
+        const pillLogical = (numValue * LOGICAL_WIDTH) / elWidth;
+        updateCustomData('pillW', pillLogical);
+      } else {
+        element.set({ width: numValue });
+        if (isSvgElement) {
+          setTimeout(() => regenerateSVG(customData), 0);
+        }
       }
     }
   };
@@ -78,9 +83,25 @@ export const CtaSettings = observer(({ store, element }) => {
   const setHeight = (value) => {
     const numValue = parseFloat(value);
     if (!isNaN(numValue) && numValue > 0) {
-      element.set({ height: numValue });
-      if (isSvgElement) {
-        setTimeout(() => regenerateSVG(customData), 0);
+      // For swipe_up, height controls the text pill only (convert px -> logical units)
+      if (ctaType === 'swipe_up' && isSvgElement) {
+        const FIXED_PILL_Y = 100;
+        const PAD_BOT = 10;
+        const LOGICAL_WIDTH = 500;
+        const elWidth = element.width || 1;
+        // compute pill logical height so that pill px = numValue on canvas
+        const pillLogical = (numValue * LOGICAL_WIDTH) / elWidth;
+        // compute new element height in px to preserve scale (keep element.width unchanged)
+        const logicalHeight = FIXED_PILL_Y + pillLogical + PAD_BOT;
+        const newElHeight = Math.round((elWidth / LOGICAL_WIDTH) * logicalHeight);
+        // apply new element height first so regeneration uses correct export size
+        element.set({ height: newElHeight });
+        updateCustomData('pillH', pillLogical);
+      } else {
+        element.set({ height: numValue });
+        if (isSvgElement) {
+          setTimeout(() => regenerateSVG(customData), 0);
+        }
       }
     }
   };
@@ -95,6 +116,11 @@ export const CtaSettings = observer(({ store, element }) => {
         backgroundEnabled: true
       });
     }
+  };
+
+  const getBgTransparent = () => customData.transparent === true;
+  const setBgTransparent = (value) => {
+    updateCustomData('transparent', !!value);
   };
 
   const setTextColor = (value) => {
@@ -117,7 +143,12 @@ export const CtaSettings = observer(({ store, element }) => {
   const setBorderRadius = (value) => {
     const radius = parseFloat(value);
     if (isSvgElement) {
-      updateCustomData('borderRadius', isNaN(radius) ? value : radius);
+      // For swipe_up, border radius targets the text pill only
+      if (ctaType === 'swipe_up') {
+        updateCustomData('pillBorderRadius', isNaN(radius) ? value : radius);
+      } else {
+        updateCustomData('borderRadius', isNaN(radius) ? value : radius);
+      }
     } else if (isTextElement && !isNaN(radius)) {
       element.set({ backgroundCornerRadius: radius });
     } else if (isImageElement && !isNaN(radius)) {
@@ -160,6 +191,8 @@ export const CtaSettings = observer(({ store, element }) => {
   const setArrowColor = (value) => {
     updateCustomData('arrowColor', value);
   };
+
+  const getArrowColor = () => customData.arrowColor ?? CTA_DEFAULTS[ctaType]?.arrowColor ?? '#ffffff';
 
   const setArrowSize = (value) => {
     const numValue = parseInt(value);
@@ -336,6 +369,12 @@ export const CtaSettings = observer(({ store, element }) => {
       }
       return CTA_DEFAULTS[ctaType]?.borderRadius ?? 12;
     }
+    // For swipe_up, use pillBorderRadius (logical units expressed in px for UI)
+    if (ctaType === 'swipe_up') {
+      // fallback to pillH/2 if no explicit pillBorderRadius
+      const pillH = customData.pillH ?? 110;
+      return customData.pillBorderRadius ?? Math.round(pillH / 2);
+    }
     return customData.borderRadius ?? CTA_DEFAULTS[ctaType]?.borderRadius ?? 25;
   };
   const getBorderWidth = () => {
@@ -351,10 +390,27 @@ export const CtaSettings = observer(({ store, element }) => {
     return customData.borderColor ?? CTA_DEFAULTS[ctaType]?.borderColor ?? '#ffffff';
   };
   const getFontSize = () => customData.fontSize ?? CTA_DEFAULTS[ctaType]?.fontSize ?? 16;
-  const getArrowColor = () => customData.arrowColor ?? CTA_DEFAULTS[ctaType]?.arrowColor ?? '#ffffff';
   const getArrowSize = () => customData.arrowSize ?? CTA_DEFAULTS[ctaType]?.arrowSize ?? 28;
   const getArrowAnimation = () => customData.arrowAnimation !== false;
   const getRedirectUrl = () => customData.redirectUrl ?? '';
+
+  // Helpers to map pill logical dimensions <-> px shown in UI for swipe_up
+  const LOGICAL_WIDTH = 500;
+  const FIXED_PILL_Y = 100;
+  const PILL_PAD_BOT = 10;
+  const getPillLogicalW = () => customData.pillW ?? LOGICAL_WIDTH * 0.9;
+  const getPillLogicalH = () => customData.pillH ?? 110;
+  const getPillWidthPx = () => {
+    const elWidth = element.width || 1;
+    const pillLogical = getPillLogicalW();
+    return Math.round((pillLogical / LOGICAL_WIDTH) * elWidth);
+  };
+  const getPillHeightPx = () => {
+    const pillH = getPillLogicalH();
+    const logicalHeight = FIXED_PILL_Y + pillH + PILL_PAD_BOT;
+    const elHeight = element.height || 1;
+    return Math.round((pillH / logicalHeight) * elHeight);
+  };
 
   // Product Card specific getters - Updated for variants
   const getProductTitle = () => customData.title ?? CTA_DEFAULTS[ctaType]?.title ?? 'Product Name';
@@ -503,22 +559,6 @@ export const CtaSettings = observer(({ store, element }) => {
 
   return (
     <div className="settings-panel cta-settings">
-      {/* CTA Type Badge */}
-      <div style={{
-        padding: '10px 16px',
-        background: 'linear-gradient(90deg,#ff6b35,#f7931e)',
-        color: '#ffffff',
-        fontSize: '12px',
-        fontWeight: '600',
-        textAlign: 'center',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '8px',
-      }}>
-        <span style={{ fontSize: '16px' }}>🔗</span>
-        <span>{getCtaTypeLabel()}</span>
-      </div>
 
       {/* Tab Navigation */}
       <div className="sidebar-tabs">
@@ -880,7 +920,7 @@ export const CtaSettings = observer(({ store, element }) => {
                       <input
                         type="number"
                         className="position-input"
-                        value={Math.round(element.width ?? 0)}
+                        value={ctaType === 'swipe_up' ? Math.round(getPillWidthPx()) : Math.round(element.width ?? 0)}
                         onChange={(e) => setWidth(e.target.value)}
                       />
                       <label>W</label>
@@ -889,7 +929,7 @@ export const CtaSettings = observer(({ store, element }) => {
                       <input
                         type="number"
                         className="position-input"
-                        value={Math.round(element.height ?? 0)}
+                        value={ctaType === 'swipe_up' ? Math.round(getPillHeightPx()) : Math.round(element.height ?? 0)}
                         onChange={(e) => setHeight(e.target.value)}
                       />
                       <label>H</label>
@@ -897,6 +937,24 @@ export const CtaSettings = observer(({ store, element }) => {
                   </div>
                 </div>
               </div>
+
+              {/* Arrow Size - moved here so it's grouped with W/H (swipe_up only) */}
+              {ctaType === 'swipe_up' && (
+                <div className="control-row">
+                  <span className="control-label">Arrow Size</span>
+                  <div className="control-value">
+                    <input
+                      type="number"
+                      className="position-input"
+                      value={getArrowSize()}
+                      onChange={(e) => setArrowSize(e.target.value)}
+                      min={12}
+                      max={200}
+                    />
+                    <span style={{ color: 'var(--sidebar-text-muted)', fontSize: 11 }}>px</span>
+                  </div>
+                </div>
+              )}
 
               <div className="control-row">
                 <span className="control-label">Rotation</span>
@@ -975,50 +1033,44 @@ export const CtaSettings = observer(({ store, element }) => {
                   </div>
                 </div>
               )}
-
-              {/* Text Color - for classic, swipe_up */}
               {(ctaType === 'classic' || ctaType === 'swipe_up') && (
                 <div className="control-row">
-                  <span className="control-label">Text Color</span>
+                  <span className="control-label">Transparent</span>
                   <div className="control-value">
-                    <ColorPicker
-                      value={getTextColor()}
-                      onChange={setTextColor}
-                    />
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                      <input type="checkbox" checked={getBgTransparent()} onChange={(e) => setBgTransparent(e.target.checked)} style={{ width: 16, height: 16, cursor: 'pointer' }} />
+                      <span style={{ fontSize: 12, color: 'var(--sidebar-text-muted)' }}>Make background transparent</span>
+                    </label>
                   </div>
                 </div>
               )}
 
-              {/* Arrow Color - for swipe_up only */}
-              {ctaType === 'swipe_up' && (
-                <div className="control-row">
-                  <span className="control-label">Arrow Color</span>
-                  <div className="control-value">
-                    <ColorPicker
-                      value={getArrowColor()}
-                      onChange={setArrowColor}
-                    />
+              {/* Text / Arrow Color - mode-aware */}
+              {(ctaType === 'classic' || ctaType === 'swipe_up') && (
+                isArrowOnlyMode ? (
+                  <div className="control-row">
+                    <span className="control-label">Arrow Color</span>
+                    <div className="control-value">
+                      <ColorPicker
+                        value={getArrowColor()}
+                        onChange={setArrowColor}
+                      />
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="control-row">
+                    <span className="control-label">Text Color</span>
+                    <div className="control-value">
+                      <ColorPicker
+                        value={getTextColor()}
+                        onChange={setTextColor}
+                      />
+                    </div>
+                  </div>
+                )
               )}
 
-              {/* Arrow Size - for swipe_up only */}
-              {ctaType === 'swipe_up' && (
-                <div className="control-row">
-                  <span className="control-label">Arrow Size</span>
-                  <div className="control-value">
-                    <input
-                      type="number"
-                      className="position-input"
-                      value={getArrowSize()}
-                      onChange={(e) => setArrowSize(e.target.value)}
-                      min={12}
-                      max={72}
-                    />
-                    <span style={{ color: 'var(--sidebar-text-muted)', fontSize: 11 }}>px</span>
-                  </div>
-                </div>
-              )}
+              
 
               {/* Arrow Animation Toggle - for swipe_up only */}
               {ctaType === 'swipe_up' && (
@@ -1040,8 +1092,8 @@ export const CtaSettings = observer(({ store, element }) => {
                 </div>
               )}
 
-              {/* Font Size - for classic, swipe_up */}
-              {(ctaType === 'classic' || ctaType === 'swipe_up') && (
+              {/* Font Size - for classic, and swipe_up only in text mode */}
+              {(ctaType === 'classic' || (ctaType === 'swipe_up' && !isArrowOnlyMode)) && (
                 <div className="control-row">
                   <span className="control-label">Font Size</span>
                   <div className="control-value">

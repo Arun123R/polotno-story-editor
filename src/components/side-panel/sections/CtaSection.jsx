@@ -392,89 +392,168 @@ function generateClassicCtaSVG(data, width, height) {
   `)}`;
 }
 
+export const getSwipeUpHeight = (data) => {
+  const arrowSize = data.arrowSize ? Number(data.arrowSize) : 52;
+  const arrowGap = data.arrowGap !== undefined ? Number(data.arrowGap) : 15;
+  const pillHeight = data.pillH !== undefined ? Number(data.pillH) : 90;
+  const paddingBottom = 10;
+  const paddingTop = 10;
+  return paddingBottom + pillHeight + arrowGap + arrowSize + paddingTop;
+};
+
 function generateSwipeUpCtaSVG(data, width, height) {
+  const LOGICAL_WIDTH = 500;
   const text = data?.text || ''; // Empty by default (optional)
   const arrowColor = data?.arrowColor || '#ffffff';
   const textColor = data?.textColor || '#ffffff';
   const bgColor = data?.bgColor || '#000000'; // Solid black like reference images
+  const isTransparent = data?.transparent === true;
   const fontSize = data?.fontSize || Math.max(24, height * 0.2); // Scale with height, min 24px
 
   const hasText = text.trim().length > 0;
 
-  // Pill button dimensions - adaptive but scaled to canvas size
-  // Use percentages of canvas dimensions for proper scaling
-  const pillWidth = hasText ? width * 0.85 : width * 0.4; // 85% or 40% of canvas width
-  const pillHeight = hasText ? height * 0.9 : height * 0.7; // 90% or 70% of canvas height
-  const pillX = (width - pillWidth) / 2;
-  const pillY = (height - pillHeight) / 2;
-  const pillRadius = pillHeight / 2;
+  if (hasText) {
+    // Pill height/width can be provided via data (logical units); fall back to defaults
+    const pillH = data.pillH !== undefined ? Number(data.pillH) : 110;
+    const padBot = 10;
+    
+    const chevronSize = data.arrowSize ? Number(data.arrowSize) : 52;
+    const gap = data.arrowGap !== undefined ? Number(data.arrowGap) : 15;
+    
+    // TEXT PILL: Fixed at absolute position (never moves)
+    const FIXED_PILL_Y = 100;  // Always at Y=100 (stable position)
+    const pillY = FIXED_PILL_Y;
+    // Slightly wider pill for better visual balance (keeps arrow outside)
+    const pillW = data.pillW !== undefined ? Number(data.pillW) : LOGICAL_WIDTH * 0.9;
+    const pillX = (LOGICAL_WIDTH - pillW) / 2;
+    const pillRad = data.pillBorderRadius !== undefined ? Number(data.pillBorderRadius) : pillH / 2;
+    
+    // ARROW: Positioned above pill, moves UP when gap increases
+    const arrowVisBot = pillY - gap;
+    const arrowCY = arrowVisBot - (chevronSize / 3);
+    const arrowCX = LOGICAL_WIDTH / 2;
+    
+    // VIEWBOX HEIGHT: Grows to fit arrow at top + pill at fixed position + bottom padding
+    const logicalHeight = pillY + pillH + padBot;
+    
+    const textCY = pillY + pillH / 2;
 
-  // Arrow chevron dimensions - scaled to canvas, very large
-  const chevronSize = Math.min(width, height) * 0.35; // 35% of smaller dimension (~52px)
-  const arrowCenterX = width / 2;
-  const arrowCenterY = hasText ? pillY + pillHeight * 0.35 : pillY + pillHeight / 2;
-
-  // Text position (only if text exists)
-  const textY = pillY + pillHeight * 0.8;
-
-  return `data:image/svg+xml;utf8,${encodeURIComponent(`
-    <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-      <style>
-        @keyframes bounce {
-          0%, 100% {
-            transform: translateY(0);
-            opacity: 1;
+    return `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${LOGICAL_WIDTH} ${logicalHeight}">
+        <style>
+          @keyframes bounce {
+            0%, 100% {
+              transform: translateY(0);
+              opacity: 1;
+            }
+            50% {
+              transform: translateY(-6px);
+              opacity: 0.85;
+            }
           }
-          50% {
-            transform: translateY(-6px);
-            opacity: 0.85;
+          .swipe-button {
+            animation: bounce 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            transform-origin: center center;
           }
-        }
-        .swipe-button {
-          animation: bounce 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-          transform-origin: center center;
-        }
-      </style>
-      
-      <!-- Single pill-shaped button (adapts to content) -->
-      <g class="swipe-button">
-        <!-- Pill background -->
-        <rect 
-          x="${pillX}" 
-          y="${pillY}" 
-          width="${pillWidth}" 
-          height="${pillHeight}" 
-          rx="${pillRadius}" 
-          fill="${bgColor}"
-        />
+        </style>
         
-        <!-- Chevron up arrow -->
-        <path 
-          d="M ${arrowCenterX - chevronSize} ${arrowCenterY + chevronSize / 3} 
-             L ${arrowCenterX} ${arrowCenterY - chevronSize / 3} 
-             L ${arrowCenterX + chevronSize} ${arrowCenterY + chevronSize / 3}"
-          stroke="${arrowColor}"
-          stroke-width="4"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          fill="none"
-        />
-        
-        ${hasText ? `
-          <!-- Text label (only if text exists) -->
+        <g class="swipe-button">
+          <!-- Text pill (main container) -->
+          <rect 
+            x="${pillX}" 
+            y="${pillY}" 
+            width="${pillW}" 
+            height="${pillH}" 
+            rx="${pillRad}" 
+            fill="${isTransparent ? 'transparent' : bgColor}"
+          />
+          
+          <!-- Chevron up arrow (black like container, floats above) -->
+          <path 
+            d="M ${arrowCX - chevronSize} ${arrowCY + chevronSize / 3} 
+               L ${arrowCX} ${arrowCY - chevronSize / 3} 
+               L ${arrowCX + chevronSize} ${arrowCY + chevronSize / 3}"
+            stroke="${isTransparent ? arrowColor : bgColor}"
+            stroke-width="5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            fill="none"
+          />
+          
+          <!-- Text label -->
           <text 
-            x="${width / 2}" 
-            y="${textY}" 
+            x="${LOGICAL_WIDTH / 2}" 
+            y="${textCY}" 
             text-anchor="middle" 
+            dominant-baseline="middle"
             fill="${textColor}" 
             font-size="${fontSize}" 
             font-weight="600" 
             font-family="Inter, -apple-system, sans-serif"
           >${escapeXml(text)}</text>
-        ` : ''}
-      </g>
-    </svg>
-  `)}`;
+        </g>
+      </svg>
+    `)}`;
+  } else {
+    // When no text: Arrow-only mode — container acts as arrow background
+    const pillW = data.pillW !== undefined ? Number(data.pillW) : LOGICAL_WIDTH * 0.4;
+    const pillH = data.pillH !== undefined ? Number(data.pillH) : 90;
+    const padTop = 10;
+    const padBot = 10;
+    const pillX = (LOGICAL_WIDTH - pillW) / 2;
+    const logicalHeight = pillH + padTop + padBot;
+    const pillY = (logicalHeight - pillH) / 2;
+    const pillRadius = data.pillBorderRadius !== undefined ? Number(data.pillBorderRadius) : pillH / 2;
+
+    const chevronSize = data.arrowSize ? Number(data.arrowSize) : Math.min(pillW, pillH) * 0.5;
+    const arrowCenterX = LOGICAL_WIDTH / 2;
+    const arrowCenterY = pillY + pillH / 2;
+
+    return `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${LOGICAL_WIDTH} ${logicalHeight}">
+        <style>
+          @keyframes bounce {
+            0%, 100% {
+              transform: translateY(0);
+              opacity: 1;
+            }
+            50% {
+              transform: translateY(-6px);
+              opacity: 0.85;
+            }
+          }
+          .swipe-button {
+            animation: bounce 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            transform-origin: center center;
+          }
+        </style>
+        
+        <g class="swipe-button">
+          <!-- Single pill for arrow only -->
+          <rect 
+            x="${pillX}" 
+            y="${pillY}" 
+            width="${pillW}" 
+            height="${pillH}" 
+            rx="${pillRadius}" 
+            fill="${isTransparent ? 'transparent' : bgColor}"
+          />
+          
+          <!-- Chevron up arrow -->
+          <path 
+            d="M ${arrowCenterX - chevronSize} ${arrowCenterY + chevronSize / 3} 
+               L ${arrowCenterX} ${arrowCenterY - chevronSize / 3} 
+               L ${arrowCenterX + chevronSize} ${arrowCenterY + chevronSize / 3}"
+            stroke="${arrowColor}"
+            stroke-width="4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            fill="none"
+          />
+        </g>
+      </svg>
+    `)}`;
+  }
 }
 
 function generateDescribeProductSVG(data, width, height) {
@@ -692,8 +771,7 @@ function generateVisitProductSVG(data, width, height) {
 
   // Calculate positions
   const titleY = cardPaddingY + titleFontSize;
-  // eslint-disable-next-line no-unused-vars
-  const priceAreaY = height - cardPaddingY - priceFontSize - pricePadding;
+   
 
   // Arrow position (right side, vertically centered with title)
   const arrowX = width - cardPaddingX - arrowButtonSize / 2;
@@ -1037,37 +1115,7 @@ export const CtaSectionPanel = observer(({ store }) => {
   };
 
   // Add Product Card with default placeholder
-  // eslint-disable-next-line no-unused-vars
-  const addDefaultProductCard = () => {
-    const page = store.activePage;
-    if (!page) return;
-
-    const dims = CTA_DIMENSIONS.product_card;
-    const pos = CTA_POSITIONS.product_card;
-    const defaults = CTA_DEFAULTS.product_card;
-
-    const exportDims = mapBaselineExportToCurrent(dims);
-    const exportPos = mapBaselineExportToCurrent(pos);
-    const canvasRect = toCanvasRect({ ...exportPos, ...exportDims });
-
-    const svgContent = generateCtaSVG('product_card', defaults, dims.width, dims.height);
-
-    const element = page.addElement({
-      type: 'svg',
-      x: canvasRect.x,
-      y: canvasRect.y,
-      width: canvasRect.width,
-      height: canvasRect.height,
-      src: svgContent,
-      keepRatio: false,
-      custom: {
-        ctaType: 'product_card',
-        ...defaults,
-      }
-    });
-
-    store.selectElements([element.id]);
-  };
+   
 
   // Add Visit Product CTA (No image, text + arrow)
   const addVisitProductCta = () => {
@@ -1180,7 +1228,7 @@ export const CtaSectionPanel = observer(({ store }) => {
   );
 
   return (
-    <div className="flex flex-col h-full bg-[var(--bg-secondary)] text-[var(--text-primary)] font-sans">
+    <div className="flex flex-col h-full bg-(--bg-secondary) text-(--text-primary) font-sans">
       {/* Hidden file inputs */}
       <input
         ref={imageInputRef}
@@ -1200,92 +1248,100 @@ export const CtaSectionPanel = observer(({ store }) => {
       <div className="p-4 space-y-6 overflow-y-auto flex-1">
         {/* ADD CTA Section */}
         <div>
-          <h3 className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-4 px-1">
+          <h3 className="text-[12px] font-bold text-(--text-muted) uppercase tracking-wider mb-4 px-1">
             Add CTA
           </h3>
           <div className="flex flex-col gap-3">
             {/* Classic CTA */}
             <button
               onClick={addClassicCta}
-              className="w-full flex flex-col items-center justify-center py-4 px-3 bg-[var(--bg-tertiary)] border border-[var(--border-primary)] rounded-lg hover:bg-[var(--bg-hover)] hover:border-[var(--accent-primary)] transition-all group"
+              className="w-full flex flex-col items-center justify-center py-4 px-3 bg-(--bg-tertiary) border border-(--border-primary) rounded-lg hover:bg-(--bg-hover) hover:border-(--accent-primary) transition-all group"
             >
-              <div className="bg-[var(--info)] text-[var(--surface-light)] px-6 py-2.5 rounded-full text-[14px] font-bold shadow-sm transition-transform group-hover:scale-105">
+              <div className="bg-(--info) text-(--surface-light) px-6 py-2.5 rounded-full text-[14px] font-bold shadow-sm transition-transform group-hover:scale-105">
                 Shop Now
               </div>
-              <span className="mt-2 text-[12px] text-[var(--text-muted)] font-medium">classic</span>
+              <span className="mt-2 text-[12px] text-(--text-muted) font-medium">classic</span>
             </button>
 
             {/* Swipe Up CTA */}
             <button
               onClick={addSwipeUpCta}
-              className="w-full flex flex-col items-center justify-center py-4 px-3 bg-[var(--bg-tertiary)] border border-[var(--border-primary)] rounded-lg hover:bg-[var(--bg-hover)] hover:border-[var(--accent-primary)] transition-all group"
+              className="w-full flex flex-col items-center justify-center py-4 px-3 bg-(--bg-tertiary) border border-(--border-primary) rounded-lg hover:bg-(--bg-hover) hover:border-(--accent-primary) transition-all group"
             >
-              <SwipeUpIcon className="w-6 h-6 text-[var(--text-secondary)] mb-1 transition-transform group-hover:-translate-y-1" />
-              <span className="text-[14px] text-[var(--text-primary)] font-medium">Swipe Up</span>
+              {(() => {
+                // Use an existing swipe_up CTA on the page for preview if available
+                const existing = mainCtas.find((c) => c.custom?.ctaType === 'swipe_up');
+                const previewData = existing ? existing.custom : CTA_DEFAULTS.swipe_up;
+                const previewSvg = generateCtaSVG('swipe_up', previewData, 180, 60);
+                return (
+                  <img src={previewSvg} alt="Swipe Up preview" style={{ width: 140, height: 36, objectFit: 'contain' }} className="mb-1" />
+                );
+              })()}
+              <span className="text-[14px] text-(--text-primary) font-medium">Swipe Up</span>
             </button>
 
             {/* Image CTA */}
             <button
               onClick={openImagePicker}
-              className="w-full flex flex-col items-center justify-center py-4 px-3 bg-[var(--bg-tertiary)] border border-[var(--border-primary)] rounded-lg hover:bg-[var(--bg-hover)] hover:border-[var(--accent-primary)] transition-all group"
+              className="w-full flex flex-col items-center justify-center py-4 px-3 bg-(--bg-tertiary) border border-(--border-primary) rounded-lg hover:bg-(--bg-hover) hover:border-(--accent-primary) transition-all group"
             >
-              <div className="bg-[var(--bg-hover)] p-2.5 rounded-xl mb-1 group-hover:bg-[var(--border-primary)] transition-colors">
-                <ImageCtaIcon className="w-6 h-6 text-[var(--text-secondary)]" />
+              <div className="bg-(--bg-hover) p-2.5 rounded-xl mb-1 group-hover:bg-(--border-primary) transition-colors">
+                <ImageCtaIcon className="w-6 h-6 text-(--text-secondary)" />
               </div>
-              <span className="text-[14px] text-[var(--text-primary)] font-medium">Image CTA</span>
+              <span className="text-[14px] text-(--text-primary) font-medium">Image CTA</span>
             </button>
           </div>
         </div>
 
         {/* PRODUCT CARDS Section */}
         <div>
-          <h3 className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-4 px-1">
+          <h3 className="text-[12px] font-bold text-(--text-muted) uppercase tracking-wider mb-4 px-1">
             Product Cards
           </h3>
           <div className="grid grid-cols-3 gap-2 px-1">
             {/* Visit Product */}
             <button
               onClick={addVisitProductCta}
-              className="aspect-square flex flex-col items-center justify-center p-2 bg-[var(--bg-tertiary)] border border-transparent rounded-lg hover:bg-[var(--bg-hover)] hover:border-[var(--border-primary)] transition-all group"
+              className="aspect-square flex flex-col items-center justify-center p-2 bg-(--bg-tertiary) border border-transparent rounded-lg hover:bg-(--bg-hover) hover:border-(--border-primary) transition-all group"
             >
-              <div className="w-10 h-10 bg-[var(--text-primary)] rounded-lg flex items-center justify-center mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
-                <VisitIcon className="w-5 h-5 text-[var(--bg-secondary)]" />
+              <div className="w-10 h-10 bg-(--text-primary) rounded-lg flex items-center justify-center mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+                <VisitIcon className="w-5 h-5 text-(--bg-secondary)" />
               </div>
-              <span className="text-[12px] text-[var(--text-secondary)] font-medium">Visit</span>
+              <span className="text-[12px] text-(--text-secondary) font-medium">Visit</span>
             </button>
 
             {/* Describe Product */}
             <button
               onClick={addDescribeProductCta}
-              className="aspect-square flex flex-col items-center justify-center p-2 bg-[var(--bg-tertiary)] border border-transparent rounded-lg hover:bg-[var(--bg-hover)] hover:border-[var(--border-primary)] transition-all group"
+              className="aspect-square flex flex-col items-center justify-center p-2 bg-(--bg-tertiary) border border-transparent rounded-lg hover:bg-(--bg-hover) hover:border-(--border-primary) transition-all group"
             >
-              <div className="w-10 h-10 bg-[var(--text-primary)] rounded-lg flex items-center justify-center mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
-                <DescribeIcon className="w-5 h-5 text-[var(--bg-secondary)]" />
+              <div className="w-10 h-10 bg-(--text-primary) rounded-lg flex items-center justify-center mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+                <DescribeIcon className="w-5 h-5 text-(--bg-secondary)" />
               </div>
-              <span className="text-[12px] text-[var(--text-secondary)] font-medium">Describe</span>
+              <span className="text-[12px] text-(--text-secondary) font-medium">Describe</span>
             </button>
 
             {/* Buy Product */}
             <button
               onClick={addBuyProductCta}
-              className="aspect-square flex flex-col items-center justify-center p-2 bg-[var(--bg-tertiary)] border border-transparent rounded-lg hover:bg-[var(--bg-hover)] hover:border-[var(--border-primary)] transition-all group"
+              className="aspect-square flex flex-col items-center justify-center p-2 bg-(--bg-tertiary) border border-transparent rounded-lg hover:bg-(--bg-hover) hover:border-(--border-primary) transition-all group"
             >
-              <div className="w-10 h-10 bg-[var(--text-primary)] rounded-lg flex items-center justify-center mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
-                <BuyIcon className="w-5 h-5 text-[var(--bg-secondary)]" />
+              <div className="w-10 h-10 bg-(--text-primary) rounded-lg flex items-center justify-center mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+                <BuyIcon className="w-5 h-5 text-(--bg-secondary)" />
               </div>
-              <span className="text-[12px] text-[var(--text-secondary)] font-medium">Buy</span>
+              <span className="text-[12px] text-(--text-secondary) font-medium">Buy</span>
             </button>
           </div>
 
-          <p className="text-[11px] text-[var(--text-muted)] text-center mt-8 leading-relaxed italic px-2">
+          <p className="text-[11px] text-(--text-muted) text-center mt-8 leading-relaxed italic px-2">
             Click a CTA type to add it to canvas.<br /> Select CTA on canvas to edit styles.
           </p>
         </div>
 
         {/* CTA List - Show all CTAs on current slide */}
         {mainCtas.length > 0 && (
-          <div className="mt-4 pt-6 border-t border-[var(--border-primary)]">
-            <h3 className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-4 px-1">
+          <div className="mt-4 pt-6 border-t border-(--border-primary)">
+            <h3 className="text-[12px] font-bold text-(--text-muted) uppercase tracking-wider mb-4 px-1">
               CTAs on this Slide
             </h3>
 
@@ -1298,14 +1354,15 @@ export const CtaSectionPanel = observer(({ store }) => {
                     onClick={() => selectCtaElement(cta)}
                     className={`
                     flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all border
-                    ${isSelected
-                        ? 'bg-[var(--accent-soft)] border-[var(--accent-primary)] shadow-sm ring-1 ring-[var(--accent-primary)]'
-                        : 'bg-[var(--bg-secondary)] border-[var(--border-primary)] hover:border-[var(--border-accent)] hover:bg-[var(--bg-hover)]'
-                      }
+                    ${
+                      isSelected
+                        ? 'bg-(--accent-soft) border-(--accent-primary) shadow-sm ring-1 ring-(--accent-primary)'
+                        : 'bg-(--bg-secondary) border-(--border-primary) hover:border-(--border-accent) hover:bg-(--bg-hover)'
+                    }
                   `}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-md ${isSelected ? 'bg-[var(--accent-primary)] text-[var(--surface-light)]' : 'bg-[var(--bg-tertiary)] text-[var(--text-muted)]'}`}>
+                      <div className={`p-2 rounded-md ${isSelected ? 'bg-(--accent-primary) text-(--surface-light)' : 'bg-(--bg-tertiary) text-(--text-muted)'}`}>
                         {cta.custom?.ctaType === 'classic' && <ClassicIcon className="w-4 h-4" />}
                         {cta.custom?.ctaType === 'swipe_up' && <SwipeUpIcon className="w-4 h-4" />}
                         {cta.custom?.ctaType === 'image' && <ImageCtaIcon className="w-4 h-4" />}
@@ -1315,16 +1372,16 @@ export const CtaSectionPanel = observer(({ store }) => {
                           cta.custom?.ctaType === 'product_card') && <BuyIcon className="w-4 h-4" />}
                       </div>
                       <div className="flex flex-col">
-                        <span className={`text-[13px] font-semibold ${isSelected ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>
+                        <span className={`text-[13px] font-semibold ${isSelected ? 'text-(--text-primary)' : 'text-(--text-secondary)'}`}>
                           {getCtaTypeLabel(cta.custom?.ctaType)}
                         </span>
-                        <span className="text-[11px] text-[var(--text-muted)] truncate max-w-[140px]">
+                        <span className="text-[11px] text-(--text-muted) truncate max-w-35">
                           {cta.custom?.title || cta.custom?.text || cta.custom?.redirectUrl || 'No URL'}
                         </span>
                       </div>
                     </div>
                     {isSelected && (
-                      <div className="w-2 h-2 rounded-full bg-[var(--accent-primary)] animate-pulse" />
+                      <div className="w-2 h-2 rounded-full bg-(--accent-primary) animate-pulse" />
                     )}
                   </div>
                 );
