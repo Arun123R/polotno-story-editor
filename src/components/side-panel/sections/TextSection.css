@@ -542,7 +542,7 @@ html[data-theme="dark"] .custom-text-section .bp5-tab[aria-selected="true"] svg 
 }
 
 .font-item-remove:hover {
-    background: rgba(0,0,0,0.05);
+    background: rgba(0, 0, 0, 0.05);
     color: var(--sidebar-text, #2d2d2d);
 }
 
@@ -965,4 +965,137 @@ html[data-theme="dark"] .custom-text-section .bp5-tab[aria-selected="true"] svg 
 /* Ensure the hidden input is not visible but accessible */
 .custom-text-section #polotno-font-upload {
     display: none !important;
+}
+
+/* ============================================
+   NEW STYLES FOR PRESETS TAB
+   ============================================ */
+
+.add-text-group {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.text-options-separator {
+    height: 1px;
+    background: var(--sidebar-border, #e0e0e0);
+    margin: 24px 0;
+    width: 100%;
+}
+
+.text-option-section {
+    margin-bottom: 24px;
+}
+
+.text-option-section:last-child {
+    margin-bottom: 0;
+}
+
+.text-option-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--sidebar-text-secondary, #6b7280);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}
+
+/* Font Family List */
+.font-family-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.font-family-item {
+    width: 100%;
+    text-align: left;
+    padding: 12px 16px;
+    background: var(--sidebar-bg-secondary, #ffffff);
+    border: 1px solid var(--sidebar-border, #e0e0e0);
+    border-radius: 8px;
+    color: var(--sidebar-text, #2d2d2d);
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Remove default outline/focus ring */
+.font-family-item:focus,
+.font-family-item:focus-visible {
+    outline: none;
+    border-color: var(--sidebar-border, #e0e0e0);
+}
+
+.font-family-item:hover {
+    border-color: var(--accent-primary);
+    background: var(--accent-soft);
+    box-shadow: none;
+}
+
+.font-family-item.active {
+    background: var(--accent-soft, rgba(249, 115, 22, 0.08));
+    color: var(--sidebar-accent, #F97316);
+    font-weight: 600;
+    /* Ensure no border color change on active unless hovered */
+    border-color: var(--sidebar-border, #e0e0e0);
+    outline: none;
+}
+
+/* Remove the black dot */
+.font-family-item.active::after {
+    display: none;
+}
+
+/* Text Color Grid */
+.text-color-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+}
+
+.text-color-item {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
+    position: relative;
+    padding: 0;
+}
+
+.text-color-item:hover {
+    transform: scale(1.15);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+}
+
+.text-color-item.active {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 2px var(--sidebar-content-bg, #ffffff), 0 0 0 4px var(--sidebar-accent, #F97316);
+    z-index: 2;
+}
+
+/* Dark theme adjustments for new elements */
+:root[data-theme="dark"] .font-family-item {
+    background: var(--sidebar-bg-secondary, #1A2340);
+    border-color: var(--sidebar-border, #25304A);
+    color: var(--sidebar-text, #E5E7EB);
+}
+
+:root[data-theme="dark"] .font-family-item:hover {
+    background: var(--sidebar-bg-hover, #232d4b);
+}
+
+:root[data-theme="dark"] .text-color-item {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+:root[data-theme="dark"] .text-color-item.active {
+    box-shadow: 0 0 0 2px var(--sidebar-content-bg, #141C2F), 0 0 0 4px var(--sidebar-accent, #F97316);
 }
