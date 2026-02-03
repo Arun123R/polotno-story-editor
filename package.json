@@ -13,6 +13,7 @@
     "@blueprintjs/core": "^6.4.1",
     "@blueprintjs/icons": "^6.3.2",
     "@tailwindcss/vite": "^4.1.18",
+    "axios": "^1.13.4",
     "mobx": "^6.15.0",
     "mobx-react-lite": "^4.1.1",
     "nanoid": "^5.0.9",

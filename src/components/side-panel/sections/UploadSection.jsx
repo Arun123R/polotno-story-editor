@@ -45,7 +45,73 @@ export const UploadSectionPanel = observer(({ store }) => {
     // State for uploaded files (images and videos)
     const [uploadedImages, setUploadedImages] = useState([]);
 
-    const processFile = (file, fileType = 'any') => {
+    // Helper to add element to canvas with proper sizing
+    const addElementToCanvas = (fileUrl, type) => {
+        if (!store.activePage) return;
+
+        const pageWidth = store.width;
+        // Default aspect ratio 16:9
+        let aspectRatio = 16 / 9;
+
+        if (type === 'image') {
+            const img = new Image();
+            img.onload = () => {
+                aspectRatio = img.width / img.height;
+                const width = pageWidth;
+                const height = width / aspectRatio;
+
+                store.activePage.addElement({
+                    type: 'image',
+                    src: fileUrl,
+                    x: 0,
+                    y: 0,
+                    width,
+                    height
+                });
+            };
+            img.src = fileUrl;
+        } else {
+            // Video
+            const video = document.createElement('video');
+            video.preload = 'metadata';
+            video.onloadedmetadata = () => {
+                const vWidth = video.videoWidth;
+                const vHeight = video.videoHeight;
+                if (vWidth && vHeight) {
+                    aspectRatio = vWidth / vHeight;
+                }
+                const width = pageWidth;
+                const height = width / aspectRatio;
+
+                store.activePage.addElement({
+                    type: 'video',
+                    src: fileUrl,
+                    x: 0,
+                    y: 0,
+                    width,
+                    height
+                });
+            };
+            video.onerror = () => {
+                // Fallback
+                const width = pageWidth;
+                const height = width / aspectRatio;
+                store.activePage.addElement({
+                    type: 'video',
+                    src: fileUrl,
+                    x: 0,
+                    y: 0,
+                    width,
+                    height
+                });
+            };
+            video.src = fileUrl;
+        }
+    };
+
+    // Handle file upload (images and videos)
+    const handleFileUpload = (e, fileType = 'any') => {
+        const file = e.target.files?.[0];
         if (!file) return;
 
         // Validate file type
@@ -71,29 +137,13 @@ export const UploadSectionPanel = observer(({ store }) => {
         const reader = new FileReader();
         reader.onload = (event) => {
             const fileUrl = event.target.result;
+            const type = isVideo ? 'video' : 'image';
+
             // Add to uploaded files at the beginning
-            setUploadedImages((prev) => [{ url: fileUrl, type: isVideo ? 'video' : 'image' }, ...prev]);
+            setUploadedImages(prev => [{ url: fileUrl, type }, ...prev]);
 
             // Add to canvas immediately
-            if (isImage) {
-                store.activePage.addElement({
-                    type: 'image',
-                    src: fileUrl,
-                    x: 100,
-                    y: 100,
-                    width: 300,
-                    height: 300
-                });
-            } else if (isVideo) {
-                store.activePage.addElement({
-                    type: 'video',
-                    src: fileUrl,
-                    x: 100,
-                    y: 100,
-                    width: 400,
-                    height: 300
-                });
-            }
+            addElementToCanvas(fileUrl, type);
         };
         reader.readAsDataURL(file);
     };
@@ -113,8 +163,42 @@ export const UploadSectionPanel = observer(({ store }) => {
         setUploadedImages(prev => prev.filter((_, index) => index !== indexToDelete));
     };
 
+    // Handle drag and drop
+    const [isDragOver, setIsDragOver] = useState(false);
+
+    const handleDragEnter = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragOver(true);
+    };
+
+    const handleDragLeave = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragOver(false);
+    };
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+    };
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragOver(false);
+
+        const files = e.dataTransfer.files;
+        if (files && files.length > 0) {
+            // Process the first file
+            const file = files[0];
+            const fakeEvent = { target: { files: [file], value: '' } };
+            handleFileUpload(fakeEvent);
+        }
+    };
+
     return (
-        <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }} data-drop-zone="upload">
             {/* Header */}
             <div style={{ padding: '0 0 16px 0' }}>
                 <h2 style={{
@@ -133,6 +217,8 @@ export const UploadSectionPanel = observer(({ store }) => {
             <div
                 className={`studio-card ${isDragActive ? 'drag-active' : ''}`}
                 style={{
+                    border: isDragOver ? '2px solid #3b82f6' : '1px solid var(--border-primary)',
+                    borderRadius: '12px',
                     padding: '32px 16px',
                     display: 'flex',
                     flexDirection: 'column',
@@ -140,34 +226,15 @@ export const UploadSectionPanel = observer(({ store }) => {
                     justifyContent: 'center',
                     marginBottom: '20px',
                     cursor: 'pointer',
+                    backgroundColor: isDragOver ? 'rgba(59, 130, 246, 0.05)' : 'var(--bg-secondary)',
+                    boxShadow: isDragOver ? '0 0 0 3px rgba(59, 130, 246, 0.1)' : '0 1px 2px rgba(0,0,0,0.05)',
+                    transition: 'all 0.2s ease'
                 }}
                 onClick={() => fileInputRef.current?.click()}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click();
-                }}
-                onDragEnter={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setIsDragActive(true);
-                }}
-                onDragOver={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }}
-                onDragLeave={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setIsDragActive(false);
-                }}
-                onDrop={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setIsDragActive(false);
-                    const droppedFile = e.dataTransfer.files?.[0];
-                    if (droppedFile) processFile(droppedFile, 'any');
-                }}
+                onDragEnter={handleDragEnter}
+                onDragLeave={handleDragLeave}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
             >
                 <div style={{
                     width: '64px',
@@ -181,22 +248,25 @@ export const UploadSectionPanel = observer(({ store }) => {
                         width: '64px',
                         height: '64px',
                         borderRadius: '50%',
-                        backgroundColor: 'var(--accent-soft)',
+                        backgroundColor: isDragOver ? 'rgba(59, 130, 246, 0.15)' : 'var(--accent-soft)',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        transition: 'all 0.2s ease'
                     }}>
                         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             {/* Upload arrow */}
-                            <path d="M12 16V4" stroke="#f97316" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M7 9L12 4L17 9" stroke="#f97316" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M12 16V4" stroke={isDragOver ? '#3b82f6' : '#f97316'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M7 9L12 4L17 9" stroke={isDragOver ? '#3b82f6' : '#f97316'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                             {/* Tray/base */}
-                            <path d="M20 16V18C20 19.1046 19.1046 20 18 20H6C4.89543 20 4 19.1046 4 18V16" stroke="#f97316" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M20 16V18C20 19.1046 19.1046 20 18 20H6C4.89543 20 4 19.1046 4 18V16" stroke={isDragOver ? '#3b82f6' : '#f97316'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                     </div>
                 </div>
 
-                <p style={{ margin: '0 0 8px 0', fontWeight: '600', color: 'var(--text-primary)', fontSize: '14px' }}>Click to upload</p>
+                <p style={{ margin: '0 0 8px 0', fontWeight: '600', color: 'var(--text-primary)', fontSize: '14px' }}>
+                    {isDragOver ? 'Drop to upload' : 'Click to upload'}
+                </p>
                 <p style={{ margin: '0 0 8px 0', color: 'var(--text-secondary)', fontSize: '13px' }}>or drag and drop files here</p>
                 <p style={{ margin: '0', color: 'var(--text-muted)', fontSize: '11px' }}>PNG, JPG, GIF, MP4 up to 10MB</p>
                 <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept="image/*,video/*" style={{ display: 'none' }} />
@@ -310,16 +380,7 @@ export const UploadSectionPanel = observer(({ store }) => {
                                         objectFit: 'cover'
                                     }}
                                     draggable="true"
-                                    onClick={() => {
-                                        store.activePage.addElement({
-                                            type: 'image',
-                                            src: src,
-                                            x: 100,
-                                            y: 100,
-                                            width: 200,
-                                            height: 200
-                                        });
-                                    }}
+                                    onClick={() => addElementToCanvas(src, 'image')}
                                 />
                             ) : src.type === 'video' ? (
                                 // Video element
@@ -333,16 +394,7 @@ export const UploadSectionPanel = observer(({ store }) => {
                                         height: '100%',
                                         objectFit: 'cover'
                                     }}
-                                    onClick={() => {
-                                        store.activePage.addElement({
-                                            type: 'video',
-                                            src: src.url,
-                                            x: 100,
-                                            y: 100,
-                                            width: 400,
-                                            height: 300
-                                        });
-                                    }}
+                                    onClick={() => addElementToCanvas(src.url, 'video')}
                                 />
                             ) : (
                                 // Image element
@@ -358,16 +410,7 @@ export const UploadSectionPanel = observer(({ store }) => {
                                         objectFit: 'cover'
                                     }}
                                     draggable="true"
-                                    onClick={() => {
-                                        store.activePage.addElement({
-                                            type: 'image',
-                                            src: src.url,
-                                            x: 100,
-                                            y: 100,
-                                            width: 200,
-                                            height: 200
-                                        });
-                                    }}
+                                    onClick={() => addElementToCanvas(src.url, 'image')}
                                 />
                             )}
 

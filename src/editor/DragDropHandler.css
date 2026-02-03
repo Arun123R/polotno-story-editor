@@ -1,0 +1,107 @@
+/* Drag Drop Overlay */
+.drag-drop-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Drag Drop Indicator */
+.drag-drop-indicator {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: 3px dashed rgba(255, 255, 255, 0.8);
+    border-radius: 24px;
+    padding: 48px 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* Drag Drop Icon */
+.drag-drop-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Drag Drop Text */
+.drag-drop-text {
+    text-align: center;
+    color: white;
+}
+
+.drag-drop-text h3 {
+    margin: 0 0 8px 0;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.drag-drop-text p {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+/* Canvas-specific overlay */
+.drag-drop-overlay--canvas .drag-drop-indicator {
+    background: linear-gradient(135deg, #FFB088 0%, #FF9A76 100%);
+}
+
+/* Upload panel-specific overlay */
+.drag-drop-overlay--upload .drag-drop-indicator {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}

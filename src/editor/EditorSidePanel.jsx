@@ -179,7 +179,7 @@ export const EditorSidePanel = ({ store }) => {
       <SidePanel
         store={store}
         sections={sections}
-        defaultSection="templates"
+        defaultSection="text"
       />
     </div>
   );

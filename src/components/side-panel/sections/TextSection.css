@@ -1,6 +1,65 @@
 /* Custom Text Section Styles - Matching Right Sidebar Design System */
 
 /* ============================================
+   ULTRA-SPECIFIC OVERRIDES FOR WHITE TEXT
+   Must override global index.css orange colors
+   ============================================ */
+
+/* Override global orange color from index.css lines 283, 295 */
+html .custom-text-section .polotno-side-panel-tab[aria-selected="true"],
+html .custom-text-section .bp5-tab[aria-selected="true"],
+html .custom-text-section .bp5-tab.bp5-selected,
+html .custom-text-section .polotno-side-panel-tab.active,
+html .custom-text-section .bp5-tab.bp5-active {
+    color: var(--sidebar-text-white, #ffffff) !important;
+    background: var(--sidebar-accent, #FF6B1A) !important;
+}
+
+/* MAXIMUM SPECIFICITY - Target exact element structure */
+html body .custom-text-section .bp5-tab[aria-selected="true"][role="tab"],
+html body .custom-text-section .bp5-tab[aria-selected="true"][data-tab-id],
+html body .custom-text-section div.bp5-tab[aria-selected="true"],
+html body .custom-text-section div[role="tab"][aria-selected="true"] {
+    color: #ffffff !important;
+    background: var(--sidebar-accent, #FF6B1A) !important;
+}
+
+/* Force white for all child elements */
+html .custom-text-section .polotno-side-panel-tab[aria-selected="true"] *,
+html .custom-text-section .bp5-tab[aria-selected="true"] *,
+html .custom-text-section .bp5-tab.bp5-selected *,
+html .custom-text-section .polotno-side-panel-tab.active *,
+html .custom-text-section .bp5-tab.bp5-active * {
+    color: var(--sidebar-text-white, #ffffff) !important;
+}
+
+/* Force white for SVG icons in active tabs */
+html .custom-text-section .polotno-side-panel-tab[aria-selected="true"] svg,
+html .custom-text-section .bp5-tab[aria-selected="true"] svg,
+html .custom-text-section .bp5-tab.bp5-selected svg {
+    color: var(--sidebar-text-white, #ffffff) !important;
+}
+
+/* Dark theme overrides */
+html[data-theme="dark"] .custom-text-section .polotno-side-panel-tab[aria-selected="true"],
+html[data-theme="dark"] .custom-text-section .bp5-tab[aria-selected="true"],
+html[data-theme="dark"] .custom-text-section .bp5-tab.bp5-selected {
+    color: var(--sidebar-text-white, #ffffff) !important;
+    background: var(--sidebar-accent, #FF6B1A) !important;
+}
+
+html[data-theme="dark"] .custom-text-section .polotno-side-panel-tab[aria-selected="true"] *,
+html[data-theme="dark"] .custom-text-section .bp5-tab[aria-selected="true"] *,
+html[data-theme="dark"] .custom-text-section .bp5-tab.bp5-selected * {
+    color: var(--sidebar-text-white, #ffffff) !important;
+}
+
+html[data-theme="dark"] .custom-text-section .polotno-side-panel-tab[aria-selected="true"] svg,
+html[data-theme="dark"] .custom-text-section .bp5-tab[aria-selected="true"] svg {
+    color: var(--sidebar-text-white, #ffffff) !important;
+}
+
+/* ============================================
    GLOBAL BLUEPRINT TAB INDICATOR OVERRIDE
    This must come first with maximum specificity
    ============================================ */
@@ -64,22 +123,24 @@
    TAB STYLING - POLOTNO SPECIFIC OVERRIDES
    ============================================ */
 
-/* Target Polotno side panel tab container */
+/* Target Polotno side panel tab container - Modern pill-style */
 .custom-text-section .polotno-side-tabs-container,
 .custom-text-section .bp5-tabs,
 .custom-text-section [role="tablist"] {
     display: flex !important;
     gap: 8px !important;
     background: var(--sidebar-bg, #ffffff) !important;
-    border-bottom: 1px solid var(--sidebar-border, #e0e0e0) !important;
-    padding: 4px 8px 0 8px !important;
+    border-bottom: none !important;
+    padding: 16px 12px 12px 12px !important;
     margin: 0 !important;
     position: relative !important;
     width: 100% !important;
     box-shadow: none !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
-/* Target Polotno side panel tabs specifically */
+/* Target Polotno side panel tabs specifically - Modern pill-style */
 .custom-text-section .polotno-side-panel-tab,
 .custom-text-section .bp5-tab,
 .custom-text-section [role="tab"] {
@@ -89,26 +150,28 @@
     line-height: normal !important;
     font-size: 14px !important;
     font-weight: 500 !important;
-    color: var(--sidebar-text-secondary, #5a5a5a) !important;
+    color: var(--sidebar-text, #000000) !important;
     background: transparent !important;
-    border: 1px solid transparent !important;
-    border-radius: 8px 8px 0 0 !important;
+    border: none !important;
+    border-radius: 12px !important;
     cursor: pointer !important;
     position: relative !important;
-    transition: all 0.2s ease !important;
+    transition: all 0.25s ease !important;
     flex: 1 !important;
     text-align: center !important;
-    margin-bottom: -1px !important;
+    margin-bottom: 0 !important;
     box-shadow: none !important;
     text-transform: none !important;
     letter-spacing: normal !important;
     outline: none !important;
+    white-space: nowrap !important;
+    min-width: 0 !important;
 }
 
 .custom-text-section .polotno-side-panel-tab:hover,
 .custom-text-section .bp5-tab:hover,
 .custom-text-section [role="tab"]:hover {
-    color: var(--sidebar-text, #2d2d2d) !important;
+    color: var(--sidebar-text, #000000) !important;
     outline: none !important;
 }
 
@@ -118,16 +181,52 @@
     outline: none !important;
 }
 
-/* Active tab - Polotno specific */
+/* Active tab - Polotno specific - Modern pill-style */
 .custom-text-section .polotno-side-panel-tab.active,
 .custom-text-section .bp5-tab[aria-selected="true"],
 .custom-text-section .bp5-tab.bp5-active,
 .custom-text-section [role="tab"][aria-selected="true"] {
-    color: #FF7A1A !important;
-    background: var(--sidebar-bg-secondary, #ffffff) !important;
-    border: 1px solid var(--sidebar-border, #e0e0e0) !important;
-    border-bottom: 1px solid var(--sidebar-bg-secondary, #ffffff) !important;
+    color: var(--sidebar-text-white, #ffffff) !important;
+    background: var(--sidebar-accent, #FF6B1A) !important;
+    border: none !important;
     box-shadow: none !important;
+}
+
+/* Ensure all child elements in active tabs are white */
+.custom-text-section .polotno-side-panel-tab.active *,
+.custom-text-section .bp5-tab[aria-selected="true"] *,
+.custom-text-section .bp5-tab.bp5-active *,
+.custom-text-section [role="tab"][aria-selected="true"] * {
+    color: var(--sidebar-text-white, #ffffff) !important;
+}
+
+/* Ultra-specific overrides for direct children */
+.custom-text-section .polotno-side-panel-tab.active>div,
+.custom-text-section .polotno-side-panel-tab.active>span,
+.custom-text-section .polotno-side-panel-tab[aria-selected="true"]>div,
+.custom-text-section .polotno-side-panel-tab[aria-selected="true"]>span,
+.custom-text-section .bp5-tab[aria-selected="true"]>div,
+.custom-text-section .bp5-tab[aria-selected="true"]>span,
+.custom-text-section .bp5-tab.bp5-active>div,
+.custom-text-section .bp5-tab.bp5-active>span,
+.custom-text-section [role="tab"][aria-selected="true"]>div,
+.custom-text-section [role="tab"][aria-selected="true"]>span {
+    color: var(--sidebar-text-white, #ffffff) !important;
+}
+
+/* Override any inherited text color */
+.custom-text-section .polotno-side-panel-tab.active,
+.custom-text-section .polotno-side-panel-tab[aria-selected="true"],
+.custom-text-section .bp5-tab[aria-selected="true"],
+.custom-text-section .bp5-tab.bp5-active {
+    color: var(--sidebar-text-white, #ffffff) !important;
+}
+
+.custom-text-section .polotno-side-panel-tab.active *,
+.custom-text-section .polotno-side-panel-tab[aria-selected="true"] *,
+.custom-text-section .bp5-tab[aria-selected="true"] *,
+.custom-text-section .bp5-tab.bp5-active * {
+    color: inherit !important;
 }
 
 /* Remove ALL pseudo-elements that could create the underline indicator */
@@ -263,7 +362,7 @@
     display: flex !important;
     align-items: center !important;
     gap: 12px !important;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
     width: calc(100% - 24px) !important;
 }
 
@@ -276,7 +375,7 @@
     width: 36px !important;
     height: 36px !important;
     border-radius: 50% !important;
-    background: var(--accent-soft, rgba(249,115,22,0.08)) !important;
+    background: var(--accent-soft, rgba(249, 115, 22, 0.08)) !important;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'><path d='M12 7v10M7 12h10' stroke='%23F97316' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>") !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
@@ -285,8 +384,8 @@
 }
 
 /* Text content styling inside the card */
-.custom-text-section .polotno-text-item * ,
-.custom-text-section .text-item * ,
+.custom-text-section .polotno-text-item *,
+.custom-text-section .text-item *,
 .custom-text-section [data-text-template] * {
     color: var(--sidebar-text, #2d2d2d) !important;
 }
@@ -324,7 +423,7 @@
 .custom-text-section .text-item:hover,
 .custom-text-section [data-text-template]:hover {
     border-color: var(--sidebar-accent, #F97316) !important;
-    box-shadow: 0 3px 6px rgba(249,115,22,0.08) !important;
+    box-shadow: 0 3px 6px rgba(249, 115, 22, 0.08) !important;
     transform: translateY(-1px) !important;
 }
 
@@ -339,7 +438,7 @@
     border: 1px solid var(--sidebar-border, #e0e0e0) !important;
     border-radius: 12px !important;
     background: var(--sidebar-bg-secondary, #ffffff) !important;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
     text-align: left !important;
     justify-content: flex-start !important;
     box-sizing: border-box !important;
@@ -352,7 +451,7 @@
     width: 36px !important;
     height: 36px !important;
     border-radius: 50% !important;
-    background: var(--accent-soft, rgba(249,115,22,0.08)) !important;
+    background: var(--accent-soft, rgba(249, 115, 22, 0.08)) !important;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'><path d='M12 7v10M7 12h10' stroke='%23F97316' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>") !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
@@ -369,7 +468,7 @@
 
 .custom-text-section .bp5-button.bp5-minimal:hover {
     border-color: var(--sidebar-accent, #F97316) !important;
-    box-shadow: 0 3px 6px rgba(249,115,22,0.08) !important;
+    box-shadow: 0 3px 6px rgba(249, 115, 22, 0.08) !important;
     transform: translateY(-1px) !important;
 }
 
@@ -636,6 +735,33 @@
     --sidebar-accent: #F97316;
     --sidebar-input-bg: #141C2F;
     --sidebar-input-border: #2E3A59;
+    --sidebar-text-white: #ffffff;
+}
+
+/* Light theme - add white text variable */
+.custom-text-section {
+    --sidebar-text-white: #ffffff;
+}
+
+/* Dark theme tab adjustments */
+:root[data-theme="dark"] .custom-text-section .polotno-side-panel-tab,
+:root[data-theme="dark"] .custom-text-section .bp5-tab,
+:root[data-theme="dark"] .custom-text-section [role="tab"] {
+    color: var(--sidebar-text, #E5E7EB) !important;
+}
+
+:root[data-theme="dark"] .custom-text-section .polotno-side-panel-tab:hover,
+:root[data-theme="dark"] .custom-text-section .bp5-tab:hover,
+:root[data-theme="dark"] .custom-text-section [role="tab"]:hover {
+    color: var(--sidebar-text, #E5E7EB) !important;
+}
+
+:root[data-theme="dark"] .custom-text-section .polotno-side-panel-tab.active,
+:root[data-theme="dark"] .custom-text-section .bp5-tab[aria-selected="true"],
+:root[data-theme="dark"] .custom-text-section .bp5-tab.bp5-active,
+:root[data-theme="dark"] .custom-text-section [role="tab"][aria-selected="true"] {
+    color: var(--sidebar-text-white, #ffffff) !important;
+    background: var(--sidebar-accent, #FF6B1A) !important;
 }
 
 /* Final scoped override to precisely match Right Sidebar tab layout.
@@ -653,29 +779,32 @@
     max-width: none !important;
     display: flex !important;
     gap: 8px !important;
-    padding: 4px 8px 0 8px !important;
+    padding: 16px 12px 12px 12px !important;
     background: var(--sidebar-bg) !important;
     border-bottom: none !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .custom-text-section .polotno-side-panel-tab,
 .custom-text-section .bp5-tab {
     width: auto !important;
     min-width: 0 !important;
-    padding: 10px 12px !important;
+    padding: 10px 16px !important;
     font-size: 14px !important;
     font-weight: 500 !important;
-    color: var(--sidebar-text-secondary) !important;
+    color: var(--sidebar-text, #000000) !important;
     background: transparent !important;
-    border: 1px solid transparent !important;
-    border-radius: 8px 8px 0 0 !important;
+    border: none !important;
+    border-radius: 12px !important;
     margin: 0 !important;
-    margin-bottom: -1px !important;
     text-align: center !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     flex: 1 !important;
+    transition: all 0.25s ease !important;
+    white-space: nowrap !important;
 }
 
 .custom-text-section .polotno-side-panel-tab>div:nth-child(2),
@@ -685,14 +814,29 @@
     margin-left: 8px !important;
 }
 
+/* Force white color for child elements in active tabs */
+.custom-text-section .polotno-side-panel-tab[aria-selected="true"]>div,
+.custom-text-section .polotno-side-panel-tab.active>div,
+.custom-text-section .bp5-tab[aria-selected="true"]>span,
+.custom-text-section .bp5-tab[aria-selected="true"]>div,
+.custom-text-section .polotno-side-panel-tab[aria-selected="true"]>span,
+.custom-text-section .polotno-side-panel-tab.active>span {
+    color: var(--sidebar-text-white, #ffffff) !important;
+}
+
 .custom-text-section .polotno-side-panel-tab[aria-selected="true"],
 .custom-text-section .polotno-side-panel-tab.active,
 .custom-text-section .bp5-tab[aria-selected="true"] {
-    color: var(--sidebar-accent) !important;
-    background: var(--sidebar-bg-secondary) !important;
-    border: 1px solid var(--sidebar-border) !important;
-    /* Make bottom border match content bg to hide underline */
-    border-bottom: 1px solid var(--sidebar-content-bg) !important;
+    color: var(--sidebar-text-white, #ffffff) !important;
+    background: var(--sidebar-accent, #FF6B1A) !important;
+    border: none !important;
+}
+
+/* Ensure all child elements in active tabs are white */
+.custom-text-section .polotno-side-panel-tab[aria-selected="true"] *,
+.custom-text-section .polotno-side-panel-tab.active *,
+.custom-text-section .bp5-tab[aria-selected="true"] * {
+    color: var(--sidebar-text-white, #ffffff) !important;
 }
 
 /* Make content sections match Right Sidebar white card layout */
@@ -704,10 +848,10 @@
     border-radius: 12px !important;
     padding: 12px !important;
     margin: 12px !important;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
 }
 
-.custom-text-section .settings-panel > .section:last-child,
+.custom-text-section .settings-panel>.section:last-child,
 .custom-text-section .section:last-child {
     margin-bottom: 0 !important;
 }
@@ -722,9 +866,14 @@
 }
 
 /* Ensure the header shows a single divider and content starts below it */
-.custom-text-section .polotno-side-tabs-container { border-bottom: 1px solid var(--sidebar-border) !important; }
-.custom-text-section .polotno-side-panel-content > *:first-child,
-.custom-text-section .bp5-tab-panel > *:first-child { margin-top: 8px !important; }
+.custom-text-section .polotno-side-tabs-container {
+    border-bottom: 1px solid var(--sidebar-border) !important;
+}
+
+.custom-text-section .polotno-side-panel-content>*:first-child,
+.custom-text-section .bp5-tab-panel>*:first-child {
+    margin-top: 8px !important;
+}
 
 /* ------------------------------------------------------------------
    Upload font button: make it visually match the Upload section card
@@ -741,7 +890,7 @@
     margin-bottom: 20px !important;
     cursor: pointer !important;
     background: var(--sidebar-bg-secondary) !important;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
 }
 
 /* Make the inner button/icon stack like the Upload section */
@@ -769,7 +918,7 @@
     height: 64px !important;
     border-radius: 50% !important;
     margin-bottom: 16px !important;
-    background: var(--accent-soft, rgba(249,115,22,0.08)) !important;
+    background: var(--accent-soft, rgba(249, 115, 22, 0.08)) !important;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'><path d='M12 16V4' stroke='%23F97316' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/><path d='M7 9L12 4L17 9' stroke='%23F97316' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/><path d='M20 16V18C20 19.1046 19.1046 20 18 20H6C4.89543 20 4 19.1046 4 18V16' stroke='%23F97316' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>") !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
@@ -814,4 +963,6 @@
 }
 
 /* Ensure the hidden input is not visible but accessible */
-.custom-text-section #polotno-font-upload { display: none !important; }
+.custom-text-section #polotno-font-upload {
+    display: none !important;
+}

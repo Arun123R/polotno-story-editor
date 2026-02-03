@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useCallback } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Workspace } from "polotno/canvas/workspace";
 import { FitZoomButtons } from './FitZoomButtons';
+import { DragDropHandler } from './DragDropHandler';
 import { useKonvaShapeFlips } from '../hooks/useKonvaShapeFlips';
 
 /**
@@ -27,7 +28,7 @@ const useKonvaPageClipping = (store, containerRef) => {
 
     const pageWidth = store.width;
     const pageHeight = store.height;
-    
+
     if (!pageWidth || !pageHeight) {
       console.log('[PageClip] Page dimensions not available');
       return false;
@@ -38,52 +39,52 @@ const useKonvaPageClipping = (store, containerRef) => {
     // Iterate through all stages (usually just one for Polotno)
     stages.forEach((stage) => {
       const layers = stage.getLayers();
-      
+
       layers.forEach((layer) => {
         // Find all groups in the layer
         const groups = layer.find('Group');
-        
+
         groups.forEach((group) => {
           // Check if this group contains a background rect matching page size
           const children = group.getChildren();
           if (children.length === 0) return;
-          
+
           // Look for page-like groups (have a background rect at 0,0 with page dimensions)
           let isPageGroup = false;
-          
+
           children.forEach((child) => {
             if (child.getClassName() === 'Rect') {
               const w = child.width();
               const h = child.height();
               const x = child.x();
               const y = child.y();
-              
+
               // Check if this rect matches page dimensions
-              if (Math.abs(w - pageWidth) < 5 && 
-                  Math.abs(h - pageHeight) < 5 &&
-                  Math.abs(x) < 5 && Math.abs(y) < 5) {
+              if (Math.abs(w - pageWidth) < 5 &&
+                Math.abs(h - pageHeight) < 5 &&
+                Math.abs(x) < 5 && Math.abs(y) < 5) {
                 isPageGroup = true;
               }
             }
           });
-          
+
           if (isPageGroup) {
             // Apply clip function to this group
             const currentClip = group.clipFunc();
-            
+
             // Only apply if not already set
             if (!currentClip) {
               group.clipFunc((ctx) => {
                 ctx.rect(0, 0, pageWidth, pageHeight);
               });
-              
+
               console.log('[PageClip] Applied clipFunc to group:', group._id);
               clipped = true;
             }
           }
         });
       });
-      
+
       // Force redraw
       if (clipped) {
         stage.batchDraw();
@@ -131,9 +132,10 @@ const useKonvaPageClipping = (store, containerRef) => {
   }, [store.width, store.height, store.activePage?.id, applyClipping]);
 };
 
+
+
 /**
- * EditorWorkspace - Main workspace component that wraps Polotno's Workspace
- * with additional functionality including page bounds clipping.
+ * EditorWorkspace - Main workspace component
  */
 export const EditorWorkspace = observer(({ store }) => {
   const containerRef = useRef(null);
@@ -153,27 +155,22 @@ export const EditorWorkspace = observer(({ store }) => {
   }, [store]);
 
   return (
-    <div
-      ref={containerRef}
-      className="workspace-backdrop"
-      style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}
-    >
-      <Workspace
-        store={store}
-        backgroundColor="transparent"
-        activePageBorderColor="#FF7A1A"
-        layout="horizontal"
-      />
+    <DragDropHandler store={store}>
+      <div
+        ref={containerRef}
+        className="workspace-backdrop"
+        style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}
+        data-drop-zone="canvas"
+      >
+        <Workspace
+          store={store}
+          backgroundColor="transparent"
+          activePageBorderColor="#FF7A1A"
+          layout="horizontal"
+        />
 
-      {/* Interactive Preview Overlay - positioned on top of canvas */}
-      {/* Note: This is disabled for now as Polotno handles its own rendering.
-          The interactive elements use text type with custom metadata,
-          and the visual preview is approximated through the background property.
-          For full live previews, consider implementing a custom Polotno extension
-          or using the preview mode. */}
-      {/* <InteractiveOverlay store={store} containerRef={containerRef} /> */}
-
-      <FitZoomButtons store={store} />
-    </div>
+        <FitZoomButtons store={store} />
+      </div>
+    </DragDropHandler>
   );
 });

@@ -1,17 +1,103 @@
 import { observer } from 'mobx-react-lite';
+import { useState, useEffect } from 'react';
 import './Topbar.css';
 
 import { ThemeToggleButton } from './ThemeToggleButton';
+import { handleSave } from '../utils/canvasSave.js';
+import { createStoryGroup } from '../services/groupService.js';
 
-export const Topbar = observer(({ projectName = 'Campaign Name', toolbar }) => {
+export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar, groupId: propGroupId, slideId }) => {
+    const [isSaving, setIsSaving] = useState(false);
+    const [currentGroupId, setCurrentGroupId] = useState(propGroupId || 'demo-group-id');
+    const [isCreatingGroup, setIsCreatingGroup] = useState(false);
+
+    // Disabled auto-create group to prevent 401 errors
+    // Uncomment this when you have auth tokens set
+    /*
+    useEffect(() => {
+        const initializeGroup = async () => {
+            if (propGroupId) {
+                console.log('📁 Using provided groupId:', propGroupId);
+                setCurrentGroupId(propGroupId);
+                return;
+            }
+
+            console.log('📁 No groupId provided, creating new story group...');
+            setIsCreatingGroup(true);
+
+            try {
+                const result = await createStoryGroup({
+                    name: projectName || 'New Story Campaign',
+                    description: 'Created from Polotno Editor',
+                    isActive: true,
+                });
+
+                if (result.success && result.groupId) {
+                    const newGroupId = result.groupId;
+                    console.log('✅ Story group created with ID:', newGroupId);
+                    setCurrentGroupId(newGroupId);
+                } else {
+                    console.error('❌ Failed to create story group:', result.error);
+                    console.warn('⚠️ Using fallback groupId: demo-group-id');
+                    setCurrentGroupId('demo-group-id');
+                    alert(`Failed to create story group: ${result.error}\nUsing fallback group ID.`);
+                }
+            } catch (error) {
+                console.error('❌ Error creating story group:', error);
+                console.error('❌ Error details:', error.message, error.stack);
+                console.warn('⚠️ Using fallback groupId: demo-group-id');
+                setCurrentGroupId('demo-group-id');
+                alert(`Error creating story group: ${error.message}\nUsing fallback group ID.`);
+            } finally {
+                setIsCreatingGroup(false);
+            }
+        };
+
+        initializeGroup();
+    }, [propGroupId, projectName]);
+    */
+
     const handlePreview = () => {
         // Preview functionality - can be implemented based on your needs
         console.log('Preview clicked');
     };
 
-    const handlePublish = () => {
-        // Publish functionality - can be implemented based on your needs
-        console.log('Publish clicked');
+    const handleSaveClick = async () => {
+        if (!currentGroupId) {
+            alert('No group ID available. Please wait for group creation to complete.');
+            return;
+        }
+
+        console.log('🔵 [TOPBAR] Save button clicked!');
+        console.log('🔵 [TOPBAR] Using groupId:', currentGroupId);
+        setIsSaving(true);
+
+        try {
+            const result = await handleSave({
+                store, // Pass store explicitly
+                groupId: currentGroupId,
+                slideId: slideId || null,
+                slideMetadata: {
+                    description: projectName || 'Created from Polotno Editor',
+                    enableCTA: false,
+                },
+                onSuccess: (data) => {
+                    console.log('✅ [TOPBAR] Save successful:', data);
+                    alert('Slide saved successfully!');
+                },
+                onError: (error) => {
+                    console.error('❌ [TOPBAR] Save failed:', error);
+                    alert(`Failed to save: ${error}`);
+                },
+            });
+
+            console.log('🔵 [TOPBAR] Save result:', result);
+        } catch (error) {
+            console.error('❌ [TOPBAR] Save error:', error);
+            alert(`Error: ${error.message}`);
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
@@ -53,7 +139,9 @@ export const Topbar = observer(({ projectName = 'Campaign Name', toolbar }) => {
 
 
                     <span className="breadcrumb-separator">›</span>
-                    <span className="breadcrumb-item breadcrumb-current">{projectName}</span>
+                    <span className="breadcrumb-item breadcrumb-current">
+                        {projectName}
+                    </span>
                 </div>
             </div>
 
@@ -87,8 +175,13 @@ export const Topbar = observer(({ projectName = 'Campaign Name', toolbar }) => {
 
 
 
-                    <button className="topbar-btn topbar-btn-primary" onClick={handlePublish}>
-                        Save
+                    <button
+                        className="topbar-btn topbar-btn-primary"
+                        onClick={handleSaveClick}
+                        disabled={isSaving || isCreatingGroup || !currentGroupId}
+                        style={{ opacity: (isSaving || isCreatingGroup || !currentGroupId) ? 0.6 : 1 }}
+                    >
+                        {isSaving ? 'Saving...' : isCreatingGroup ? 'Preparing...' : 'Save'}
                     </button>
                 </div>
             </div>
