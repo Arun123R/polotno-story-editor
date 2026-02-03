@@ -148,15 +148,7 @@ export const UploadSectionPanel = observer(({ store }) => {
         reader.readAsDataURL(file);
     };
 
-    // Handle file upload (images and videos)
-    const handleFileUpload = (e, fileType = 'any') => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        processFile(file, fileType);
 
-        // Reset input
-        e.target.value = '';
-    };
 
     // Handle delete file
     const handleDeleteImage = (indexToDelete) => {
@@ -215,20 +207,15 @@ export const UploadSectionPanel = observer(({ store }) => {
 
             {/* Upload Zone */}
             <div
-                className={`studio-card ${isDragActive ? 'drag-active' : ''}`}
+                className={`studio-card ${isDragOver ? 'drag-active' : ''}`}
                 style={{
-                    border: isDragOver ? '2px solid #3b82f6' : '1px solid var(--border-primary)',
-                    borderRadius: '12px',
                     padding: '32px 16px',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
                     marginBottom: '20px',
-                    cursor: 'pointer',
-                    backgroundColor: isDragOver ? 'rgba(59, 130, 246, 0.05)' : 'var(--bg-secondary)',
-                    boxShadow: isDragOver ? '0 0 0 3px rgba(59, 130, 246, 0.1)' : '0 1px 2px rgba(0,0,0,0.05)',
-                    transition: 'all 0.2s ease'
+                    cursor: 'pointer'
                 }}
                 onClick={() => fileInputRef.current?.click()}
                 onDragEnter={handleDragEnter}
@@ -248,7 +235,7 @@ export const UploadSectionPanel = observer(({ store }) => {
                         width: '64px',
                         height: '64px',
                         borderRadius: '50%',
-                        backgroundColor: isDragOver ? 'rgba(59, 130, 246, 0.15)' : 'var(--accent-soft)',
+                        backgroundColor: 'var(--accent-soft)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -256,10 +243,10 @@ export const UploadSectionPanel = observer(({ store }) => {
                     }}>
                         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             {/* Upload arrow */}
-                            <path d="M12 16V4" stroke={isDragOver ? '#3b82f6' : '#f97316'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M7 9L12 4L17 9" stroke={isDragOver ? '#3b82f6' : '#f97316'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M12 16V4" stroke="#f97316" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M7 9L12 4L17 9" stroke="#f97316" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                             {/* Tray/base */}
-                            <path d="M20 16V18C20 19.1046 19.1046 20 18 20H6C4.89543 20 4 19.1046 4 18V16" stroke={isDragOver ? '#3b82f6' : '#f97316'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M20 16V18C20 19.1046 19.1046 20 18 20H6C4.89543 20 4 19.1046 4 18V16" stroke="#f97316" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                     </div>
                 </div>
@@ -277,48 +264,48 @@ export const UploadSectionPanel = observer(({ store }) => {
                 <button
                     className="studio-card"
                     onClick={() => {
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.accept = 'image/*';
-                    input.onchange = (e) => handleFileUpload(e, 'image');
-                    input.click();
-                }}
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = 'image/*';
+                        input.onchange = (e) => handleFileUpload(e, 'image');
+                        input.click();
+                    }}
                     style={{
-                    flex: 1,
-                    padding: '12px',
-                    color: 'var(--text-primary)',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '8px'
-                }}>
+                        flex: 1,
+                        padding: '12px',
+                        color: 'var(--text-primary)',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '8px'
+                    }}>
                     <ImageIcon />
                     Upload Image
                 </button>
                 <button
                     className="studio-card"
                     onClick={() => {
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.accept = 'video/*';
-                    input.onchange = (e) => handleFileUpload(e, 'video');
-                    input.click();
-                }}
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = 'video/*';
+                        input.onchange = (e) => handleFileUpload(e, 'video');
+                        input.click();
+                    }}
                     style={{
-                    flex: 1,
-                    padding: '12px',
-                    color: 'var(--text-primary)',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '8px'
-                }}>
+                        flex: 1,
+                        padding: '12px',
+                        color: 'var(--text-primary)',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '8px'
+                    }}>
                     <VideoIcon />
                     Upload Video
                 </button>
