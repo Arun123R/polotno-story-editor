@@ -3,6 +3,32 @@ import { observer } from 'mobx-react-lite';
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
+export const TrashIcon = (props) => (
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+    focusable="false"
+    {...props}
+  >
+    {/* Lid line */}
+    <path d="M4 7h16" />
+    {/* Handle */}
+    <path d="M9 7V6a3 3 0 0 1 6 0v1" />
+    {/* Bin body */}
+    <path d="M7 7h10v13a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V7z" />
+    {/* Inner bars */}
+    <path d="M10 11v7" />
+    <path d="M14 11v7" />
+  </svg>
+);
+
 const formatTimeMMSS = (ms) => {
   const safeMs = Number.isFinite(ms) ? Math.max(0, ms) : 0;
   const totalSeconds = Math.floor(safeMs / 1000);
@@ -317,7 +343,7 @@ export const ActionButtons = observer(({ store, element }) => {
         <span>✦</span> Save
       </button>
       <button className="action-btn delete" onClick={handleDelete}>
-        <span>🗑</span> Delete
+        <span><TrashIcon /></span> Delete
       </button>
     </div>
   );
@@ -374,8 +400,6 @@ export const DurationSection = observer(({ store, element }) => {
   }, [element, slideMuted, elementMuted]);
 
   const sliderRef = useRef(null);
-  const baseVisibleRef = useRef(null);
-  const lastElementIdRef = useRef(null);
   const dragCleanupRef = useRef(null);
 
   useEffect(() => {
