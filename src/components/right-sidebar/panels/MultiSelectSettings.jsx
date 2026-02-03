@@ -1,4 +1,5 @@
 import { observer } from 'mobx-react-lite';
+import { TrashIcon } from '../shared/CommonControls';
 
 /**
  * Multi-element selection settings panel - Storyly-inspired dark theme
@@ -137,13 +138,15 @@ export const MultiSelectSettings = observer(({ store }) => {
           </div>
         </div>
 
-        {/* Action Buttons */}
+      </div>
+
+      <div className="settings-footer">
         <div className="action-buttons">
           <button className="action-btn save" onClick={handleDuplicateAll}>
             <span>📋</span> Duplicate All
           </button>
           <button className="action-btn delete" onClick={handleDeleteAll}>
-            <span>🗑</span> Delete All
+            <span><TrashIcon /></span> Delete All
           </button>
         </div>
       </div>

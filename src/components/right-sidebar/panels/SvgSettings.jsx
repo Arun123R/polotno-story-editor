@@ -1,7 +1,8 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
-import { DurationSection, AnimationSection } from '../shared/CommonControls';
+import { DurationSection, AnimationSection, TrashIcon } from '../shared/CommonControls';
 import { ColorPicker } from '../shared/ColorPicker';
+import { getElementFlipState, toggleElementFlip } from '../../../utils/elementFlip';
 
 /**
  * SVG element settings panel - Storyly-inspired dark theme
@@ -18,6 +19,12 @@ export const SvgSettings = observer(({ store, element, elements = [], isMultiSel
   // Helper to apply changes to all selected elements
   const applyToAll = (changes) => {
     targetElements.forEach(el => el.set(changes));
+  };
+
+  const flipState = getElementFlipState(element);
+
+  const toggleFlipForAll = (axis) => {
+    targetElements.forEach((el) => toggleElementFlip(el, axis));
   };
 
   return (
@@ -203,15 +210,15 @@ export const SvgSettings = observer(({ store, element, elements = [], isMultiSel
                 <div className="control-value">
                   <div className="alignment-group">
                     <button
-                      className={`align-btn ${element.flipX ? 'active' : ''}`}
-                      onClick={() => applyToAll({ flipX: !element.flipX })}
+                      className={`align-btn ${flipState.flipX ? 'active' : ''}`}
+                      onClick={() => toggleFlipForAll('flipX')}
                       title="Flip Horizontal"
                     >
                       ↔
                     </button>
                     <button
-                      className={`align-btn ${element.flipY ? 'active' : ''}`}
-                      onClick={() => applyToAll({ flipY: !element.flipY })}
+                      className={`align-btn ${flipState.flipY ? 'active' : ''}`}
+                      onClick={() => toggleFlipForAll('flipY')}
                       title="Flip Vertical"
                     >
                       ↕
@@ -223,21 +230,22 @@ export const SvgSettings = observer(({ store, element, elements = [], isMultiSel
 
             {/* Duration Section */}
             <DurationSection store={store} element={element} />
-
-            {/* Action Buttons */}
-            <div className="action-buttons">
-              <button
-                className="action-btn delete"
-                onClick={() => store.deleteElements(targetElements.map(el => el.id))}
-              >
-                <span>🗑</span> {isMultiSelect ? 'Delete All' : 'Delete'}
-              </button>
-            </div>
           </>
         ) : (
           /* Animation Tab */
           <AnimationSection store={store} element={element} />
         )}
+      </div>
+
+      <div className="settings-footer">
+        <div className="action-buttons">
+          <button
+            className="action-btn delete"
+            onClick={() => store.deleteElements(targetElements.map((el) => el.id))}
+          >
+            <span><TrashIcon /></span> {isMultiSelect ? 'Delete All' : 'Delete'}
+          </button>
+        </div>
       </div>
     </div>
   );

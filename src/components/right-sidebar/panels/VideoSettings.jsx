@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
-import { DurationSection, AnimationSection } from '../shared/CommonControls';
+import { DurationSection, AnimationSection, TrashIcon } from '../shared/CommonControls';
 
 /**
  * Video element settings panel - Storyly-inspired dark theme
@@ -235,21 +235,22 @@ export const VideoSettings = observer(({ store, element, elements = [], isMultiS
 
             {/* Duration Section */}
             <DurationSection store={store} element={element} />
-
-            {/* Action Buttons */}
-            <div className="action-buttons">
-              <button
-                className="action-btn delete"
-                onClick={() => store.deleteElements(targetElements.map(el => el.id))}
-              >
-                <span>🗑</span> {isMultiSelect ? 'Delete All' : 'Delete'}
-              </button>
-            </div>
           </>
         ) : (
           /* Animation Tab */
           <AnimationSection store={store} element={element} />
         )}
+      </div>
+
+      <div className="settings-footer">
+        <div className="action-buttons">
+          <button
+            className="action-btn delete"
+            onClick={() => store.deleteElements(targetElements.map((el) => el.id))}
+          >
+            <span><TrashIcon /></span> {isMultiSelect ? 'Delete All' : 'Delete'}
+          </button>
+        </div>
       </div>
     </div>
   );

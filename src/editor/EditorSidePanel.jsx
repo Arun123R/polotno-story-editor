@@ -63,13 +63,35 @@ const UploadIcon = () => (
   </svg>
 );
 
-const LayersIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polygon points="12 2 2 7 12 12 22 7 12 2" />
-    <polyline points="2 17 12 22 22 17" />
-    <polyline points="2 12 12 17 22 12" />
+const ElementsIcon = () => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    {/* Heart (top-left) */}
+    <path d="M4.5 7.5 
+      C4.5 6 6 5 7.8 6.5 
+      C9.6 5 11.2 6 11.2 7.5 
+      C11.2 9.7 7.8 12 7.8 12 
+      C7.8 12 4.5 9.7 4.5 7.5 Z" />
+
+    {/* Triangle (top-right) */}
+    <polygon points="13.8 11.2 20.5 11.2 17.2 4.8" />
+
+    {/* Square (bottom-left) */}
+    <rect x="5.2" y="15.8" width="5.8" height="5.8" rx="1" />
+
+    {/* Circle (bottom-right) */}
+    <circle cx="17.5" cy="18.5" r="3" />
   </svg>
 );
+
 
 const GridIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -125,7 +147,7 @@ const CustomElementsSection = {
   ...ElementsSection,
   Tab: (props) => (
     <SectionTab name="Elements" {...props} data-tooltip="Elements">
-      <LayersIcon />
+      <ElementsIcon />
     </SectionTab>
   ),
 };

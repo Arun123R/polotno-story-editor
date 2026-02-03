@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { useState, useEffect } from 'react';
-import { DurationSection } from '../shared/CommonControls';
+import { DurationSection, TrashIcon } from '../shared/CommonControls';
 import { ColorPicker } from '../shared/ColorPicker';
 import { getStorePresetName } from '../../../utils/scale';
 import { setStorePreset } from '../../../store/polotnoStore';
@@ -116,18 +116,6 @@ export const PageSettings = observer(({ store }) => {
         {/* Duration Section */}
         <DurationSection store={store} />
 
-        {/* Page Actions */}
-        <div className="action-buttons">
-          <button
-            className="action-btn delete"
-            onClick={() => store.deletePages([activePage.id])}
-            disabled={store.pages.length <= 1}
-            style={{ opacity: store.pages.length <= 1 ? 0.5 : 1 }}
-          >
-            <span>🗑</span> Delete
-          </button>
-        </div>
-
         {/* Page Info */}
         <div
           style={{
@@ -138,6 +126,19 @@ export const PageSettings = observer(({ store }) => {
           }}
         >
           Page {store.pages.indexOf(activePage) + 1} of {store.pages.length}
+        </div>
+      </div>
+
+      <div className="settings-footer">
+        <div className="action-buttons">
+          <button
+            className="action-btn delete"
+            onClick={() => store.deletePages([activePage.id])}
+            disabled={store.pages.length <= 1}
+            style={{ opacity: store.pages.length <= 1 ? 0.5 : 1 }}
+          >
+            <span><TrashIcon /></span> Delete
+          </button>
         </div>
       </div>
     </div>

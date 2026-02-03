@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite';
 import { Workspace } from "polotno/canvas/workspace";
 import { FitZoomButtons } from './FitZoomButtons';
 import { DragDropHandler } from './DragDropHandler';
+import { useKonvaShapeFlips } from '../hooks/useKonvaShapeFlips';
 
 /**
  * useKonvaPageClipping - Hook that directly accesses the Konva stage
@@ -141,6 +142,9 @@ export const EditorWorkspace = observer(({ store }) => {
 
   // Apply Konva-level clipping to page groups
   useKonvaPageClipping(store, containerRef);
+
+  // Sync custom flip flags for shapes (figure/line) onto Konva nodes.
+  useKonvaShapeFlips(store, containerRef);
 
   useEffect(() => {
     const id = requestAnimationFrame(() => {
