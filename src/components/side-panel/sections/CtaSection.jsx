@@ -1255,7 +1255,7 @@ export const CtaSectionPanel = observer(({ store }) => {
             {/* Classic CTA */}
             <button
               onClick={addClassicCta}
-              className="w-full flex flex-col items-center justify-center py-4 px-3 bg-(--bg-tertiary) border border-(--border-primary) rounded-lg hover:bg-(--bg-hover) hover:border-(--accent-primary) transition-all group"
+              className="studio-card w-full flex flex-col items-center justify-center py-4 px-3 group"
             >
               <div className="bg-(--info) text-(--surface-light) px-6 py-2.5 rounded-full text-[14px] font-bold shadow-sm transition-transform group-hover:scale-105">
                 Shop Now
@@ -1266,7 +1266,7 @@ export const CtaSectionPanel = observer(({ store }) => {
             {/* Swipe Up CTA */}
             <button
               onClick={addSwipeUpCta}
-              className="w-full flex flex-col items-center justify-center py-4 px-3 bg-(--bg-tertiary) border border-(--border-primary) rounded-lg hover:bg-(--bg-hover) hover:border-(--accent-primary) transition-all group"
+              className="studio-card w-full flex flex-col items-center justify-center py-4 px-3 group"
             >
               {(() => {
                 // Use an existing swipe_up CTA on the page for preview if available
@@ -1283,7 +1283,7 @@ export const CtaSectionPanel = observer(({ store }) => {
             {/* Image CTA */}
             <button
               onClick={openImagePicker}
-              className="w-full flex flex-col items-center justify-center py-4 px-3 bg-(--bg-tertiary) border border-(--border-primary) rounded-lg hover:bg-(--bg-hover) hover:border-(--accent-primary) transition-all group"
+              className="studio-card w-full flex flex-col items-center justify-center py-4 px-3 group"
             >
               <div className="bg-(--bg-hover) p-2.5 rounded-xl mb-1 group-hover:bg-(--border-primary) transition-colors">
                 <ImageCtaIcon className="w-6 h-6 text-(--text-secondary)" />
@@ -1302,7 +1302,7 @@ export const CtaSectionPanel = observer(({ store }) => {
             {/* Visit Product */}
             <button
               onClick={addVisitProductCta}
-              className="aspect-square flex flex-col items-center justify-center p-2 bg-(--bg-tertiary) border border-transparent rounded-lg hover:bg-(--bg-hover) hover:border-(--border-primary) transition-all group"
+              className="studio-card aspect-square flex flex-col items-center justify-center p-2 group"
             >
               <div className="w-10 h-10 bg-(--text-primary) rounded-lg flex items-center justify-center mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
                 <VisitIcon className="w-5 h-5 text-(--bg-secondary)" />
@@ -1313,7 +1313,7 @@ export const CtaSectionPanel = observer(({ store }) => {
             {/* Describe Product */}
             <button
               onClick={addDescribeProductCta}
-              className="aspect-square flex flex-col items-center justify-center p-2 bg-(--bg-tertiary) border border-transparent rounded-lg hover:bg-(--bg-hover) hover:border-(--border-primary) transition-all group"
+              className="studio-card aspect-square flex flex-col items-center justify-center p-2 group"
             >
               <div className="w-10 h-10 bg-(--text-primary) rounded-lg flex items-center justify-center mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
                 <DescribeIcon className="w-5 h-5 text-(--bg-secondary)" />
@@ -1324,7 +1324,7 @@ export const CtaSectionPanel = observer(({ store }) => {
             {/* Buy Product */}
             <button
               onClick={addBuyProductCta}
-              className="aspect-square flex flex-col items-center justify-center p-2 bg-(--bg-tertiary) border border-transparent rounded-lg hover:bg-(--bg-hover) hover:border-(--border-primary) transition-all group"
+              className="studio-card aspect-square flex flex-col items-center justify-center p-2 group"
             >
               <div className="w-10 h-10 bg-(--text-primary) rounded-lg flex items-center justify-center mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
                 <BuyIcon className="w-5 h-5 text-(--bg-secondary)" />

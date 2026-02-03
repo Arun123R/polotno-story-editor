@@ -639,29 +639,18 @@ const InteractionButton = ({ type, onClick }) => {
 
   return (
     <button
+      className="studio-card"
       onClick={onClick}
       style={{
         height: 160,
-        border: '1px solid var(--border-primary)',
         borderRadius: 16,
-        background: 'var(--bg-secondary)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 8,
         cursor: 'pointer',
-        transition: 'all 0.2s',
-        boxShadow: 'none',
         outline: 'none',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-2px)';
-        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = 'none';
       }}
     >
       {type === 'rating' ? (
@@ -1017,16 +1006,14 @@ export const InteractiveSectionPanel = observer(({ store }) => {
                 <button
                   key={el.id}
                   onClick={() => store.selectElements([el.id])}
+                  className={`studio-card ${isSelected ? 'is-selected' : ''}`}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: 10,
                     padding: '10px 12px',
-                    background: isSelected ? '#FFF3E8' : 'var(--bg-elevated)',
-                    border: isSelected ? '1px solid #FFF3E8' : '1px solid var(--border-primary)',
                     borderRadius: 8,
                     cursor: 'pointer',
-                    transition: 'all 0.2s',
                     width: '100%',
                     textAlign: 'left',
                     outline: 'none',

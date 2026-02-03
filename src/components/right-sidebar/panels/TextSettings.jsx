@@ -1,10 +1,9 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import {
-  PositionSection,
-  ActionButtons,
   DurationSection,
   AnimationSection,
+  TrashIcon,
 } from '../shared/CommonControls';
 import { ColorPicker } from '../shared/ColorPicker';
 
@@ -108,16 +107,6 @@ export const TextSettings = observer(({ store, element, elements = [], isMultiSe
 
             {/* Duration Section */}
             <DurationSection store={store} element={element} />
-
-            {/* Action Buttons */}
-            <div className="action-buttons">
-              <button
-                className="action-btn delete"
-                onClick={() => store.deleteElements(targetElements.map(el => el.id))}
-              >
-                <span>🗑</span> {isMultiSelect ? 'Delete All' : 'Delete'}
-              </button>
-            </div>
           </>
         ) : activeTab === 'style' ? (
           <>
@@ -342,21 +331,22 @@ export const TextSettings = observer(({ store, element, elements = [], isMultiSe
 
             {/* Duration Section */}
             <DurationSection store={store} element={element} />
-
-            {/* Action Buttons */}
-            <div className="action-buttons">
-              <button
-                className="action-btn delete"
-                onClick={() => store.deleteElements(targetElements.map(el => el.id))}
-              >
-                <span>🗑</span> {isMultiSelect ? 'Delete All' : 'Delete'}
-              </button>
-            </div>
           </>
         ) : (
           /* Animation Tab */
           <AnimationSection store={store} element={element} />
         )}
+      </div>
+
+      <div className="settings-footer">
+        <div className="action-buttons">
+          <button
+            className="action-btn delete"
+            onClick={() => store.deleteElements(targetElements.map((el) => el.id))}
+          >
+            <span><TrashIcon /></span> {isMultiSelect ? 'Delete All' : 'Delete'}
+          </button>
+        </div>
       </div>
     </div>
   );
