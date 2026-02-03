@@ -5,6 +5,7 @@ import {
   AppearanceSection,
   AnimationSection,
   DurationSection,
+  TrashIcon,
 } from '../shared/CommonControls';
 import { ColorPicker } from '../shared/ColorPicker';
 import {
@@ -1050,11 +1051,22 @@ export const InteractiveSettings = observer(({ store, element }) => {
         {activeTab === 'animation' && (
           <AnimationSection store={store} element={element} />
         )}
+
+        {/* Duration Section - In scrollable middle content */}
+        <div style={{ paddingBottom: 16 }}>
+          <DurationSection store={store} element={element} />
+        </div>
       </div>
 
-      {/* Duration Section - At bottom, visible on all tabs */}
-      <div style={{ paddingBottom: 16 }}>
-        <DurationSection store={store} element={element} />
+      <div className="settings-footer">
+        <div className="action-buttons">
+          <button
+            className="action-btn delete"
+            onClick={() => store.deleteElements([element.id])}
+          >
+            <span><TrashIcon /></span> Delete
+          </button>
+        </div>
       </div>
     </div>
   );

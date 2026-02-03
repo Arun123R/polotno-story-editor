@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { useState, useRef, useCallback } from 'react';
-import { AnimationSection } from '../shared/CommonControls';
+import { AnimationSection, DurationSection, TrashIcon } from '../shared/CommonControls';
 import { ColorPicker } from '../shared/ColorPicker';
 import { generateCtaSVG, CTA_DEFAULTS } from '../../side-panel/sections/CtaSection';
 import { toCanvas, toExport } from '../../../utils/scale';
@@ -861,15 +861,8 @@ export const CtaSettings = observer(({ store, element }) => {
               )}
             </div>
 
-            {/* Delete Button */}
-            <div className="action-buttons">
-              <button
-                className="action-btn delete"
-                onClick={() => store.deleteElements([element.id])}
-              >
-                <span>🗑</span> Delete CTA
-              </button>
-            </div>
+            {/* Duration Section (same timing model as other elements) */}
+            <DurationSection store={store} element={element} />
           </>
         )}
 
@@ -2019,6 +2012,17 @@ export const CtaSettings = observer(({ store, element }) => {
         {activeTab === 'animation' && (
           <AnimationSection store={store} element={element} />
         )}
+      </div>
+
+      <div className="settings-footer">
+        <div className="action-buttons">
+          <button
+            className="action-btn delete"
+            onClick={() => store.deleteElements([element.id])}
+          >
+            <span><TrashIcon /></span> Delete CTA
+          </button>
+        </div>
       </div>
     </div>
   );

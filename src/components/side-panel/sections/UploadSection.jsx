@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { SectionTab } from 'polotno/side-panel';
@@ -12,18 +13,6 @@ const UploadIcon = () => (
     </svg>
 );
 
-const UploadCloudIcon = () => (
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 16L12 8" stroke="#F97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M9 11L12 8L15 11" stroke="#F97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M8 16H16" stroke="#F97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        <rect x="3" y="3" width="18" height="18" rx="2" stroke="#3B82F6" strokeWidth="2" />
-        <path d="M7 3V21" stroke="#3B82F6" strokeWidth="2" strokeDasharray="2 2" />
-        <path d="M17 3V21" stroke="#3B82F6" strokeWidth="2" strokeDasharray="2 2" />
-        <path d="M3 7H21" stroke="#3B82F6" strokeWidth="2" strokeDasharray="2 2" />
-        <path d="M3 17H21" stroke="#3B82F6" strokeWidth="2" strokeDasharray="2 2" />
-    </svg>
-);
 
 const ImageIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -50,7 +39,8 @@ export const UploadSectionTab = (props) => (
 // Panel Component
 export const UploadSectionPanel = observer(({ store }) => {
     const fileInputRef = useRef(null);
-    const videoInputRef = useRef(null);
+
+    const [isDragActive, setIsDragActive] = useState(false);
 
     // State for uploaded files (images and videos)
     const [uploadedImages, setUploadedImages] = useState([]);
@@ -156,6 +146,13 @@ export const UploadSectionPanel = observer(({ store }) => {
             addElementToCanvas(fileUrl, type);
         };
         reader.readAsDataURL(file);
+    };
+
+    // Handle file upload (images and videos)
+    const handleFileUpload = (e, fileType = 'any') => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        processFile(file, fileType);
 
         // Reset input
         e.target.value = '';
@@ -218,6 +215,7 @@ export const UploadSectionPanel = observer(({ store }) => {
 
             {/* Upload Zone */}
             <div
+                className={`studio-card ${isDragActive ? 'drag-active' : ''}`}
                 style={{
                     border: isDragOver ? '2px solid #3b82f6' : '1px solid var(--border-primary)',
                     borderRadius: '12px',
@@ -276,18 +274,18 @@ export const UploadSectionPanel = observer(({ store }) => {
 
             {/* Action Buttons */}
             <div style={{ display: 'flex', gap: '12px', marginBottom: '30px' }}>
-                <button onClick={() => {
+                <button
+                    className="studio-card"
+                    onClick={() => {
                     const input = document.createElement('input');
                     input.type = 'file';
                     input.accept = 'image/*';
                     input.onchange = (e) => handleFileUpload(e, 'image');
                     input.click();
-                }} style={{
+                }}
+                    style={{
                     flex: 1,
                     padding: '12px',
-                    backgroundColor: 'var(--bg-secondary)',
-                    border: '1px solid var(--border-primary)',
-                    borderRadius: '8px',
                     color: 'var(--text-primary)',
                     fontSize: '13px',
                     fontWeight: '600',
@@ -300,18 +298,18 @@ export const UploadSectionPanel = observer(({ store }) => {
                     <ImageIcon />
                     Upload Image
                 </button>
-                <button onClick={() => {
+                <button
+                    className="studio-card"
+                    onClick={() => {
                     const input = document.createElement('input');
                     input.type = 'file';
                     input.accept = 'video/*';
                     input.onchange = (e) => handleFileUpload(e, 'video');
                     input.click();
-                }} style={{
+                }}
+                    style={{
                     flex: 1,
                     padding: '12px',
-                    backgroundColor: 'var(--bg-secondary)',
-                    border: '1px solid var(--border-primary)',
-                    borderRadius: '8px',
                     color: 'var(--text-primary)',
                     fontSize: '13px',
                     fontWeight: '600',
