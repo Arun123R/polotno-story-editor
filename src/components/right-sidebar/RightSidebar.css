@@ -65,36 +65,39 @@
   background: var(--sidebar-content-bg);
 }
 
-/* Tab Navigation - Clean style with gray border on active */
+/* Tab Navigation - Modern pill-style design matching reference */
 .sidebar-tabs {
   display: flex;
   gap: 8px;
   background: var(--sidebar-bg);
-  border-bottom: 1px solid var(--sidebar-border);
-  padding: 8px 8px 0 8px;
+  border-bottom: none;
+  padding: 16px 12px 12px 12px;
   margin: 0;
   position: relative;
   width: 100%;
+  align-items: center;
+  justify-content: center;
 }
 
 .sidebar-tab {
   padding: 10px 16px;
   font-size: 14px;
   font-weight: 500;
-  color: var(--sidebar-text-secondary);
+  color: #000000;
   background: transparent;
-  border: 1px solid transparent;
-  border-radius: 8px 8px 0 0;
+  border: none;
+  border-radius: 12px;
   cursor: pointer;
   position: relative;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   flex: 1;
   text-align: center;
-  margin-bottom: -1px;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 .sidebar-tab:hover {
-  color: var(--sidebar-text);
+  color: #000000;
   outline: none;
 }
 
@@ -103,16 +106,23 @@
 }
 
 .sidebar-tab.active {
-  color: #FF7A1A !important;
-  background: var(--sidebar-bg-secondary);
-  border: 1px solid var(--sidebar-border) !important;
-  border-bottom: 1px solid var(--sidebar-bg-secondary) !important;
+  color: #ffffff !important;
+  background: #FF6B1A;
+  border: none;
 }
 
-/* Remove the hiding of accent line */
-.sidebar-tab.active::after {
-  content: none;
-  display: none;
+/* Dark theme adjustments */
+:root[data-theme="dark"] .sidebar-tab {
+  color: #E5E7EB;
+}
+
+:root[data-theme="dark"] .sidebar-tab:hover {
+  color: #E5E7EB;
+}
+
+:root[data-theme="dark"] .sidebar-tab.active {
+  color: #ffffff !important;
+  background: #FF6B1A;
 }
 
 /* Settings Panel Base */
@@ -610,7 +620,7 @@
   margin-right: 16px;
   padding-top: 16px;
   border-top: 1px solid var(--sidebar-border);
-  
+
 }
 
 .action-btn {
