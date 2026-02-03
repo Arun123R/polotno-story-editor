@@ -59,9 +59,23 @@ const UploadIcon = ({ size = 64 }) => {
  * IMPORTANT: This is a UI-only refactor. All Polotno functionality is preserved.
  */
 
+const PRESET_FONTS = [
+  'Inter',
+  'Roboto',
+  'Playfair Display',
+  'Montserrat'
+];
+
+const PRESET_COLORS = [
+  '#000000', '#FFFFFF', '#FF5C5C', '#4ECDC4', '#45B7D1',
+  '#FFA07A', '#98D8C8', '#F7D754', '#C792EA', '#8795A1'
+];
+
 const CustomTextPanel = observer(({ store }) => {
-  const [activeTopTab, setActiveTopTab] = useState('text');
+  const [activeTopTab, setActiveTopTab] = useState('presets');
   const [isFontDragActive, setIsFontDragActive] = useState(false);
+  const [selectedFont, setSelectedFont] = useState('Inter');
+  const [selectedColor, setSelectedColor] = useState('#000000');
   const fileInputRef = useRef(null);
 
   const scaleFactor = useMemo(() => {
@@ -103,33 +117,38 @@ const CustomTextPanel = observer(({ store }) => {
   const addHeading = () => {
     addText({
       text: 'Heading',
-      fontFamily: 'Roboto',
+      fontFamily: selectedFont,
       fontSize: Math.round(48 * scaleFactor),
       fontWeight: 'bold',
+      fill: selectedColor,
     });
   };
 
   const addSubheading = () => {
     addText({
       text: 'Subheading',
-      fontFamily: 'Roboto',
+      fontFamily: selectedFont,
       fontSize: Math.round(28 * scaleFactor),
       fontWeight: '500',
+      fill: selectedColor,
     });
   };
 
   const addBody = () => {
     addText({
       text: 'Body text',
-      fontFamily: 'Roboto',
+      fontFamily: selectedFont,
       fontSize: Math.round(18 * scaleFactor),
       fontWeight: 'normal',
+      fill: selectedColor,
     });
   };
 
-  // Ensure fonts are loaded for canvas rendering.
+  // Ensure preset fonts are loaded
   useEffect(() => {
-    store?.loadFont?.('Roboto');
+    PRESET_FONTS.forEach(font => {
+      store?.loadFont?.(font);
+    });
   }, [store]);
 
   useEffect(() => {
@@ -200,21 +219,18 @@ const CustomTextPanel = observer(({ store }) => {
 
   return (
     <div className="custom-text-section">
-      {/* Keep top tabs: Text | My fonts */}
       <Tabs id="text-panel-tabs" large={true} onChange={(id) => setActiveTopTab(id)} selectedTabId={activeTopTab}>
-        <Tab id="text" title="Text" />
-        <Tab id="font" title="My fonts" />
+        <Tab id="presets" title="Presets" />
+        <Tab id="custom" title="Custom" />
       </Tabs>
 
-      {activeTopTab === 'text' && (
+      {activeTopTab === 'presets' && (
         <div className="text-panel-body">
-          <div className="add-text-title">ADD TEXT</div>
-
-          <div className="add-text-cards">
+          <div className="add-text-group">
             <button type="button" className="add-text-card" onClick={addHeading}>
               <span className="add-text-plus" aria-hidden="true">+</span>
               <span className="add-text-card-text">
-                <span className="add-text-card-title">Add Heading</span>
+                <span className="add-text-card-title" style={{ fontFamily: selectedFont, color: selectedColor }}>Add Heading</span>
                 <span className="add-text-card-subtitle">Preview text style</span>
               </span>
             </button>
@@ -222,7 +238,7 @@ const CustomTextPanel = observer(({ store }) => {
             <button type="button" className="add-text-card" onClick={addSubheading}>
               <span className="add-text-plus" aria-hidden="true">+</span>
               <span className="add-text-card-text">
-                <span className="add-text-card-title">Add Subheading</span>
+                <span className="add-text-card-title" style={{ fontFamily: selectedFont, color: selectedColor, fontSize: '1.1em' }}>Add Subheading</span>
                 <span className="add-text-card-subtitle">Preview text style</span>
               </span>
             </button>
@@ -230,15 +246,48 @@ const CustomTextPanel = observer(({ store }) => {
             <button type="button" className="add-text-card" onClick={addBody}>
               <span className="add-text-plus" aria-hidden="true">+</span>
               <span className="add-text-card-text">
-                <span className="add-text-card-title">Add Body Text</span>
+                <span className="add-text-card-title" style={{ fontFamily: selectedFont, color: selectedColor, fontSize: '0.9em', fontWeight: 'normal' }}>Add Body Text</span>
                 <span className="add-text-card-subtitle">Preview text style</span>
               </span>
             </button>
           </div>
+
+          <div className="text-options-separator" />
+
+          <div className="text-option-section">
+            <div className="text-option-title">FONT FAMILY</div>
+            <div className="font-family-list">
+              {PRESET_FONTS.map(font => (
+                <button
+                  key={font}
+                  className={`font-family-item ${selectedFont === font ? 'active' : ''}`}
+                  onClick={() => setSelectedFont(font)}
+                  style={{ fontFamily: font }}
+                >
+                  {font}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="text-option-section">
+            <div className="text-option-title">TEXT COLOR</div>
+            <div className="text-color-grid">
+              {PRESET_COLORS.map(color => (
+                <button
+                  key={color}
+                  className={`text-color-item ${selectedColor === color ? 'active' : ''}`}
+                  onClick={() => setSelectedColor(color)}
+                  style={{ backgroundColor: color }}
+                  aria-label={`Select color ${color}`}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
-      {activeTopTab === 'font' && (
+      {activeTopTab === 'custom' && (
         <div className="fonts-panel">
           <div
             className={`studio-card fonts-upload-card ${isFontDragActive ? 'drag-active' : ''}`}
@@ -273,7 +322,7 @@ const CustomTextPanel = observer(({ store }) => {
                 key={`${font.fontFamily}-${idx}`}
                 className="font-item"
                 style={{ fontFamily: font.fontFamily }}
-                onClick={() => addText({ text: 'Cool text', fontFamily: font.fontFamily, fontSize: Math.round(48 * scaleFactor) })}
+                onClick={() => addText({ text: 'Cool text', fontFamily: font.fontFamily, fontSize: Math.round(48 * scaleFactor), fill: selectedColor })}
               >
                 <div className="font-item-name">{font.fontFamily}</div>
                 <button
