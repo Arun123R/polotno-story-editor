@@ -82,6 +82,18 @@ const toolbarComponents = {
   DownloadButton: observer(({ store }) => {
     const [loading, setLoading] = React.useState(false);
 
+    const getActivePages = React.useCallback(() => {
+      const pages = Array.isArray(store.pages) ? store.pages : [];
+      return pages.filter((p) => p?.custom?.isActive !== false);
+    }, [store]);
+
+    const getActiveDesignJSON = React.useCallback(() => {
+      const design = store.toJSON();
+      const pages = Array.isArray(design.pages) ? design.pages : [];
+      const activePages = pages.filter((p) => p?.custom?.isActive !== false);
+      return { ...design, pages: activePages };
+    }, [store]);
+
     const baseName = React.useMemo(() => {
       try {
         const tokens = [];
@@ -106,16 +118,36 @@ const toolbarComponents = {
 
     const onSaveAsImage = () => {
       const pixelRatio = getDefaultExportPixelRatio(store);
-      store.pages.forEach((p, idx) => {
-        const suffix = store.pages.length > 1 ? `-${idx + 1}` : '';
+      const pages = getActivePages();
+      if (pages.length === 0) {
+        alert('No active slides to export. Enable at least one slide.');
+        return;
+      }
+      pages.forEach((p, idx) => {
+        const suffix = pages.length > 1 ? `-${idx + 1}` : '';
         store.saveAsImage({ pageId: p.id, fileName: `${baseName}${suffix}.png`, pixelRatio });
       });
     };
 
     const onSaveAsPDF = async () => {
       setLoading(true);
+      let fullDesign;
       try {
-        await store.saveAsPDF({ fileName: `${baseName}.pdf` });
+        fullDesign = store.toJSON();
+        const activeDesign = getActiveDesignJSON();
+        if (!Array.isArray(activeDesign.pages) || activeDesign.pages.length === 0) {
+          alert('No active slides to export. Enable at least one slide.');
+          return;
+        }
+
+        // Polotno's PDF export exports all pages from the current store.
+        // Temporarily load only active pages for export.
+        store.loadJSON(activeDesign, true);
+        try {
+          await store.saveAsPDF({ fileName: `${baseName}.pdf` });
+        } finally {
+          store.loadJSON(fullDesign, true);
+        }
       } finally {
         setLoading(false);
       }
@@ -124,7 +156,11 @@ const toolbarComponents = {
     const onSaveAsVideo = async () => {
       setLoading(true);
       try {
-        const design = store.toJSON();
+        const design = getActiveDesignJSON();
+        if (!Array.isArray(design.pages) || design.pages.length === 0) {
+          alert('No active slides to export. Enable at least one slide.');
+          return;
+        }
         const api = getAPI();
         const key = getKey();
 

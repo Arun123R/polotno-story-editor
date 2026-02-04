@@ -167,6 +167,10 @@ const serializeElement = (element) => {
 const serializePage = (page) => {
     if (!page) return null;
 
+    const bg = typeof page.background === 'string' ? page.background : '#ffffff';
+    const isUrlLike = /^(data:|blob:|https?:\/\/)/i.test(String(bg).trim());
+    const isGradient = String(bg).includes('linear-gradient');
+
     return {
         id: page.id,
 
@@ -175,8 +179,9 @@ const serializePage = (page) => {
         height: page.height,
 
         // Background
-        background: page.background || '#ffffff',
-        backgroundImage: page.backgroundImage || '',
+        background: bg || '#ffffff',
+        // Backward-compatible field for older payload consumers.
+        backgroundImage: isUrlLike && !isGradient ? bg : '',
 
         // Duration (in milliseconds)
         duration: page.duration || 5000,
@@ -552,11 +557,11 @@ export const loadCanvasFromPayload = (payload) => {
             const page = store.addPage();
 
             // Set page properties
-            if (pageData.background) {
-                page.set({ background: pageData.background });
-            }
-            if (pageData.backgroundImage) {
-                page.set({ backgroundImage: pageData.backgroundImage });
+            const incomingBackground = pageData.background || '';
+            const incomingBackgroundImage = pageData.backgroundImage || '';
+            const resolvedBackground = incomingBackground || incomingBackgroundImage;
+            if (resolvedBackground) {
+                page.set({ background: resolvedBackground });
             }
             if (pageData.duration) {
                 page.set({ duration: pageData.duration });

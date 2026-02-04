@@ -11,11 +11,50 @@ import {
   getStoreWorkingSize,
 } from '../utils/scale';
 import { detectPresetFromDimensions, getStoreExportScale } from '../utils/scale';
+import {
+  applySlideBackgroundToPage,
+  inferSlideBackgroundFromPage,
+  normalizeSlideBackground,
+} from '../utils/slideBackground';
 
 export const store = createStore({
   key: 'TXsh4gxnlODn4eJrqeDi',
   showCredit: true,
 });
+
+const isPageActive = (page) => {
+  return page?.custom?.isActive !== false;
+};
+
+const ensurePageIsActiveFlag = (page) => {
+  if (!page || typeof page.set !== 'function') return;
+  const custom = page.custom || {};
+  if (custom.isActive === undefined) {
+    page.set({ custom: { ...custom, isActive: true } });
+  }
+};
+
+const ensurePageBackgroundObject = (page) => {
+  if (!page || typeof page.set !== 'function') return;
+  const custom = page.custom || {};
+  if (custom.background === undefined) {
+    const inferred = inferSlideBackgroundFromPage(page);
+    page.set({ custom: { ...custom, background: inferred } });
+  } else {
+    // Normalize in place to keep schema stable.
+    const normalized = normalizeSlideBackground(custom.background);
+    try {
+      const a = JSON.stringify(normalized);
+      const b = JSON.stringify(custom.background);
+      if (a !== b) {
+        page.set({ custom: { ...custom, background: normalized } });
+      }
+    } catch {
+      // If stringify fails for some reason, do a best-effort update.
+      page.set({ custom: { ...custom, background: normalized } });
+    }
+  }
+};
 
 const SCALE_KEYS = [
   'width',
@@ -210,6 +249,53 @@ export const getDefaultExportPixelRatio = (targetStore = store) => {
 
 const DEFAULT_PAGE_DURATION = store.pages?.[0]?.duration ?? 5000;
 
+// 0) Ensure each page has custom.isActive (default true) for slide status.
+reaction(
+  () => (Array.isArray(store.pages) ? store.pages.map((p) => p?.id).join('|') : 'no-pages'),
+  () => {
+    try {
+      (store.pages || []).forEach((p) => {
+        ensurePageIsActiveFlag(p);
+        ensurePageBackgroundObject(p);
+        applySlideBackgroundToPage(p);
+      });
+    } catch {
+      // never block UI
+    }
+  },
+  { fireImmediately: true }
+);
+
+// Ensure background gets applied when it changes (including after loadJSON).
+reaction(
+  () => {
+    const pages = Array.isArray(store.pages) ? store.pages : [];
+    return pages
+      .map((p) => {
+        const bg = p?.custom?.background;
+        const colorType = bg?.color?.type || 'solid';
+        const solid = bg?.color?.solid || '';
+        const g = bg?.color?.gradient || {};
+        const mediaUrl = bg?.media?.mediaUrl || '';
+        const sizing = bg?.media?.sizing || '';
+        const position = bg?.media?.position || '';
+        return `${p?.id}:c:${colorType}:${solid}:${g.from || ''}:${g.to || ''}:${g.direction || ''}:m:${mediaUrl}:${sizing}:${position}`;
+      })
+      .join('|');
+  },
+  () => {
+    try {
+      (store.pages || []).forEach((p) => {
+        ensurePageBackgroundObject(p);
+        applySlideBackgroundToPage(p);
+      });
+    } catch {
+      // ignore
+    }
+  },
+  { fireImmediately: true }
+);
+
 const normalizeDurationMs = (value) => {
   if (!Number.isFinite(value) || value <= 0) return null;
   // Heuristic: values under 1000 are most likely seconds.
@@ -288,6 +374,66 @@ reaction(
       // Never block UI.
     }
   }
+);
+
+// 4) Skip inactive slides during playback.
+reaction(
+  () => {
+    const page = store.activePage;
+    const pages = Array.isArray(store.pages) ? store.pages : [];
+    return {
+      isPlaying: store.isPlaying,
+      activePageId: page?.id,
+      activePageIsActive: isPageActive(page),
+      pagesKey: pages.map((p) => `${p?.id}:${isPageActive(p) ? 1 : 0}`).join('|'),
+      currentTime: store.currentTime,
+    };
+  },
+  ({ isPlaying, activePageId, activePageIsActive }) => {
+    try {
+      if (!isPlaying) return;
+      if (!activePageId) return;
+      if (activePageIsActive) return;
+
+      const pages = Array.isArray(store.pages) ? store.pages : [];
+      if (pages.length === 0) return;
+
+      const currentIndex = pages.findIndex((p) => p?.id === activePageId);
+      const findNextActive = () => {
+        for (let i = currentIndex + 1; i < pages.length; i++) {
+          if (isPageActive(pages[i])) return pages[i];
+        }
+        for (let i = 0; i < Math.max(0, currentIndex); i++) {
+          if (isPageActive(pages[i])) return pages[i];
+        }
+        return null;
+      };
+
+      const next = findNextActive();
+      if (!next) {
+        // Nothing to play.
+        if (typeof store._togglePlaying === 'function') {
+          store._togglePlaying(false);
+        } else {
+          store.isPlaying = false;
+        }
+        return;
+      }
+
+      const nextTime = Number.isFinite(next.startTime) ? next.startTime : store.currentTime;
+      if (typeof store.setCurrentTime === 'function') {
+        store.setCurrentTime(nextTime);
+      } else {
+        store.currentTime = nextTime;
+      }
+      if (typeof store.checkActivePage === 'function') {
+        store.checkActivePage();
+      }
+    } catch {
+      // ignore
+    }
+  },
+  { fireImmediately: false }
 );
 
 // 2) Recompute page duration when timed media is added/removed/changed.

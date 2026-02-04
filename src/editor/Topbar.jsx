@@ -1,15 +1,14 @@
 import { observer } from 'mobx-react-lite';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import './Topbar.css';
 
 import { ThemeToggleButton } from './ThemeToggleButton';
 import { handleSave } from '../utils/canvasSave.js';
-import { createStoryGroup } from '../services/groupService.js';
 
 export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar, groupId: propGroupId, slideId }) => {
     const [isSaving, setIsSaving] = useState(false);
-    const [currentGroupId, setCurrentGroupId] = useState(propGroupId || 'demo-group-id');
-    const [isCreatingGroup, setIsCreatingGroup] = useState(false);
+    const [currentGroupId, _setCurrentGroupId] = useState(propGroupId || 'demo-group-id');
+    const [isCreatingGroup, _setIsCreatingGroup] = useState(false);
 
     // Disabled auto-create group to prevent 401 errors
     // Uncomment this when you have auth tokens set
@@ -80,6 +79,7 @@ export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar,
                 slideMetadata: {
                     description: projectName || 'Created from Polotno Editor',
                     enableCTA: false,
+                    isActive: store?.activePage?.custom?.isActive !== false,
                 },
                 onSuccess: (data) => {
                     console.log('✅ [TOPBAR] Save successful:', data);

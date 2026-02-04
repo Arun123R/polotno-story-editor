@@ -593,6 +593,32 @@ html[data-theme="dark"] .bp5-tab[aria-selected="true"] svg {
     box-shadow: var(--shadow-accent) !important;
 }
 
+/* Inactive slides in timeline */
+.polotno-page-thumbnail[data-slide-active="false"],
+.go3162374498[data-slide-active="false"] {
+    opacity: 0.4;
+}
+
+.polotno-page-thumbnail[data-slide-active="false"],
+.go3162374498[data-slide-active="false"] {
+    position: relative;
+}
+
+.polotno-page-thumbnail[data-slide-active="false"]::after,
+.go3162374498[data-slide-active="false"]::after {
+    content: "Inactive";
+    position: absolute;
+    left: 6px;
+    bottom: 6px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 600;
+    background: rgba(0, 0, 0, 0.65);
+    color: #fff;
+    pointer-events: none;
+}
+
 /* Add page button */
 .polotno-add-page-button,
 .go1234567890 {

@@ -51,10 +51,18 @@ export const SaveButton = observer(({
             console.log('🔵 [SAVE] Calling save function...');
             console.log('🔵 [SAVE] slideId?', slideId, '- Will', slideId ? 'UPDATE' : 'CREATE');
 
+            const resolvedSlideMetadata = {
+                ...slideMetadata,
+                isActive:
+                    typeof slideMetadata.isActive === 'boolean'
+                        ? slideMetadata.isActive
+                        : (store?.activePage?.custom?.isActive !== false),
+            };
+
             // Determine if creating new or updating existing
             const result = slideId
-                ? await updateExistingSlide(slideId, groupId, slideMetadata)
-                : await saveAsNewSlide(groupId, slideMetadata);
+                ? await updateExistingSlide(slideId, groupId, resolvedSlideMetadata)
+                : await saveAsNewSlide(groupId, resolvedSlideMetadata);
 
             console.log('🔵 [SAVE] Save result:', result);
 

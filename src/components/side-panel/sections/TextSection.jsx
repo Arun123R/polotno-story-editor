@@ -224,8 +224,9 @@ const CustomTextPanel = observer(({ store }) => {
         <Tab id="custom" title="Custom" />
       </Tabs>
 
-      {activeTopTab === 'presets' && (
-        <div className="text-panel-body">
+      <div className="text-panel-scroll">
+        {activeTopTab === 'presets' && (
+          <div className="text-panel-body">
           <div className="add-text-group">
             <button type="button" className="add-text-card" onClick={addHeading}>
               <span className="add-text-plus" aria-hidden="true">+</span>
@@ -285,10 +286,10 @@ const CustomTextPanel = observer(({ store }) => {
             </div>
           </div>
         </div>
-      )}
+        )}
 
-      {activeTopTab === 'custom' && (
-        <div className="fonts-panel">
+        {activeTopTab === 'custom' && (
+          <div className="fonts-panel">
           <div
             className={`studio-card fonts-upload-card ${isFontDragActive ? 'drag-active' : ''}`}
             role="button"
@@ -339,8 +340,9 @@ const CustomTextPanel = observer(({ store }) => {
               </div>
             ))}
           </div>
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 });
