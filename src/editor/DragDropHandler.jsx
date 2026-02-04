@@ -1,6 +1,24 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
+import Konva from 'konva';
 import './DragDropHandler.css';
+import { applySlideBackgroundToPage, normalizeSlideBackground } from '../utils/slideBackground';
+
+// Supported file types
+const SUPPORTED_IMAGE_TYPES = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'];
+const SUPPORTED_VIDEO_TYPES = ['video/mp4'];
+const SUPPORTED_TYPES = [...SUPPORTED_IMAGE_TYPES, ...SUPPORTED_VIDEO_TYPES];
+
+// File size limit (10MB)
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+const isFileSupported = (file) => {
+    return SUPPORTED_TYPES.includes(file.type);
+};
+
+const isFileSizeValid = (file) => {
+    return file.size <= MAX_FILE_SIZE;
+};
 
 /**
  * DragDropHandler - Manages drag-and-drop file upload for the canvas editor
@@ -11,32 +29,150 @@ export const DragDropHandler = observer(({ store, children, onFileUpload }) => {
     const [dropTarget, setDropTarget] = useState(null); // 'canvas' or 'upload'
     const dragCounter = React.useRef(0);
 
-    // Supported file types
-    const SUPPORTED_IMAGE_TYPES = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'];
-    const SUPPORTED_VIDEO_TYPES = ['video/mp4'];
-    const SUPPORTED_TYPES = [...SUPPORTED_IMAGE_TYPES, ...SUPPORTED_VIDEO_TYPES];
-
-    // File size limit (10MB)
-    const MAX_FILE_SIZE = 10 * 1024 * 1024;
-
-    /**
-     * Validate if file is supported
-     */
-    const isFileSupported = (file) => {
-        return SUPPORTED_TYPES.includes(file.type);
-    };
-
-    /**
-     * Validate file size
-     */
-    const isFileSizeValid = (file) => {
-        return file.size <= MAX_FILE_SIZE;
-    };
-
     /**
      * Process and upload files
      */
-    const processFiles = useCallback((files, targetElement) => {
+    const getStageForActivePage = useCallback(() => {
+        const pageId = store?.activePage?.id;
+        if (!pageId) return null;
+        return Konva.stages?.find((s) => s?.getAttr && s.getAttr('pageId') === pageId) || null;
+    }, [store]);
+
+    const findElementModelUnderClientPoint = useCallback((clientX, clientY) => {
+        const stage = getStageForActivePage();
+        if (!stage || typeof stage.getIntersection !== 'function') return null;
+
+        const container = stage.container && stage.container();
+        if (!container || typeof container.getBoundingClientRect !== 'function') return null;
+        const rect = container.getBoundingClientRect();
+        const pos = {
+            x: clientX - rect.left,
+            y: clientY - rect.top,
+        };
+
+        let node = stage.getIntersection(pos);
+        while (node) {
+            if (typeof node.hasName === 'function' && node.hasName('element')) break;
+            if (typeof node.getName === 'function' && node.getName() === 'element') break;
+            node = typeof node.getParent === 'function' ? node.getParent() : null;
+        }
+
+        if (!node || typeof node.id !== 'function') return null;
+        const elementId = node.id();
+        if (!elementId) return null;
+
+        const model = store?.getElementById ? store.getElementById(elementId) : null;
+        if (!model) return null;
+
+        // Never treat our background media layer as a target element.
+        if (model?.custom?.role === 'background-media') return null;
+
+        return model;
+    }, [getStageForActivePage, store]);
+
+    const extractDominantColorFromUrl = useCallback((url) => {
+        return new Promise((resolve) => {
+            if (!url) return resolve(null);
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+                try {
+                    const canvas = document.createElement('canvas');
+                    const size = 24;
+                    canvas.width = size;
+                    canvas.height = size;
+                    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                    ctx.drawImage(img, 0, 0, size, size);
+                    const { data } = ctx.getImageData(0, 0, size, size);
+                    let r = 0;
+                    let g = 0;
+                    let b = 0;
+                    let count = 0;
+                    for (let i = 0; i < data.length; i += 4) {
+                        const a = data[i + 3];
+                        if (a < 16) continue;
+                        r += data[i];
+                        g += data[i + 1];
+                        b += data[i + 2];
+                        count++;
+                    }
+                    if (!count) return resolve(null);
+                    r = Math.round(r / count);
+                    g = Math.round(g / count);
+                    b = Math.round(b / count);
+                    const toHex = (v) => v.toString(16).padStart(2, '0').toUpperCase();
+                    resolve(`#${toHex(r)}${toHex(g)}${toHex(b)}`);
+                } catch {
+                    resolve(null);
+                }
+            };
+            img.onerror = () => resolve(null);
+            img.src = url;
+        });
+    }, []);
+
+    const setImageAsBackgroundMedia = useCallback(async (fileUrl) => {
+        const page = store?.activePage;
+        if (!page) return;
+
+        const custom = page.custom || {};
+        const currentBg = normalizeSlideBackground(custom.background);
+        const prevMedia = currentBg.media || {
+            mediaUrl: '',
+            sizing: 'fit',
+            position: 'bottom-center',
+        };
+        const nextBg = {
+            ...currentBg,
+            media: {
+                ...prevMedia,
+                mediaUrl: fileUrl,
+            },
+        };
+
+        // Apply media immediately.
+        page.set({ custom: { ...custom, background: nextBg } });
+        applySlideBackgroundToPage(page);
+
+        // Optional premium touch: if still default white solid, set dominant color.
+        const isDefaultSolid =
+            nextBg?.color?.type === 'solid' &&
+            typeof nextBg?.color?.solid === 'string' &&
+            nextBg.color.solid.trim().toUpperCase() === '#FFFFFF';
+
+        if (isDefaultSolid) {
+            const dominant = await extractDominantColorFromUrl(fileUrl);
+            if (dominant) {
+                const custom2 = page.custom || {};
+                const normalized2 = normalizeSlideBackground(custom2.background);
+                const patched = {
+                    ...normalized2,
+                    color: { type: 'solid', solid: dominant },
+                };
+                page.set({ custom: { ...custom2, background: patched } });
+                applySlideBackgroundToPage(page);
+            }
+        }
+    }, [extractDominantColorFromUrl, store]);
+
+    const replaceElementMedia = useCallback((targetElement, fileUrl) => {
+        if (!targetElement || !fileUrl) return false;
+
+        // Only replace media-like elements. If drop is on text/figure/etc, treat as background instead.
+        const type = targetElement.type;
+        if (!['image', 'video', 'gif', 'svg'].includes(type)) {
+            return false;
+        }
+
+        try {
+            targetElement.set({ src: fileUrl });
+            return true;
+        } catch {
+            return false;
+        }
+    }, []);
+
+    const processFiles = useCallback((files, dropInfo) => {
         const validFiles = Array.from(files).filter(file => {
             if (!isFileSupported(file)) {
                 console.warn(`Unsupported file type: ${file.type}`);
@@ -62,15 +198,33 @@ export const DragDropHandler = observer(({ store, children, onFileUpload }) => {
                 const isVideo = file.type.startsWith('video/');
                 const isImage = file.type.startsWith('image/');
 
-                // Call the upload callback if provided (for UploadSection integration)
-                if (onFileUpload) {
-                    onFileUpload({ url: fileUrl, type: isVideo ? 'video' : 'image' });
+                // For upload drop zone we only upload into the panel.
+                if (dropInfo?.target === 'upload') {
+                    if (onFileUpload) {
+                        onFileUpload({ url: fileUrl, type: isVideo ? 'video' : 'image' });
+                    }
+                    return;
+                }
+
+                // Canvas drop rules (Storyly-like):
+                // - Drop on existing element => replace media
+                // - Drop on empty canvas => set as background media (images only)
+                if (dropInfo?.target === 'canvas' && isImage) {
+                    const underPointer =
+                        typeof dropInfo.clientX === 'number' && typeof dropInfo.clientY === 'number'
+                            ? findElementModelUnderClientPoint(dropInfo.clientX, dropInfo.clientY)
+                            : null;
+
+                    const replaced = underPointer ? replaceElementMedia(underPointer, fileUrl) : false;
+                    if (!replaced) {
+                        setImageAsBackgroundMedia(fileUrl);
+                    }
+                    return;
                 }
 
                 // Add to canvas
                 if (store.activePage) {
                     const pageWidth = store.width;
-                    const pageHeight = store.height;
 
                     if (isImage) {
                         // Create image element to get natural dimensions
@@ -145,7 +299,13 @@ export const DragDropHandler = observer(({ store, children, onFileUpload }) => {
             };
             reader.readAsDataURL(file);
         });
-    }, [store, onFileUpload]);
+    }, [
+        store,
+        onFileUpload,
+        findElementModelUnderClientPoint,
+        replaceElementMedia,
+        setImageAsBackgroundMedia,
+    ]);
 
     /**
      * Determine drop target based on element
@@ -229,7 +389,11 @@ export const DragDropHandler = observer(({ store, children, onFileUpload }) => {
 
         const files = e.dataTransfer.files;
         if (files && files.length > 0) {
-            processFiles(files, e.target);
+            processFiles(files, {
+                target,
+                clientX: e.clientX,
+                clientY: e.clientY,
+            });
         }
 
         setDropTarget(null);
@@ -271,8 +435,12 @@ export const DragDropHandler = observer(({ store, children, onFileUpload }) => {
                             </svg>
                         </div>
                         <div className="drag-drop-text">
-                            <h3>Drop to upload</h3>
-                            <p>Images (PNG, JPG, GIF) and Videos (MP4)</p>
+                            <h3>{dropTarget === 'canvas' ? 'Drop to set background' : 'Drop to upload'}</h3>
+                            <p>
+                                {dropTarget === 'canvas'
+                                    ? 'Images will become slide background media'
+                                    : 'Images (PNG, JPG, GIF) and Videos (MP4)'}
+                            </p>
                         </div>
                     </div>
                 </div>

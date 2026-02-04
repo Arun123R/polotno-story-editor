@@ -117,6 +117,7 @@ html[data-theme="dark"] .custom-text-section .bp5-tab[aria-selected="true"] svg 
     height: 100%;
     background: var(--sidebar-content-bg, #ffffff);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 0;
 }
 
 /* ============================================
@@ -344,6 +345,14 @@ html[data-theme="dark"] .custom-text-section .bp5-tab[aria-selected="true"] svg 
     background: var(--sidebar-content-bg, #ffffff) !important;
 }
 
+/* Scroll container for custom tab content (since we render content outside BP tab panels) */
+.custom-text-section .text-panel-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
 /* ============================================
    POLOTNO TEXT ITEMS STYLING
    ============================================ */
@@ -551,7 +560,7 @@ html[data-theme="dark"] .custom-text-section .bp5-tab[aria-selected="true"] svg 
    ============================================ */
 
 .text-panel-body {
-    padding: 14px 12px;
+    padding: 14px 12px 100px;
 }
 
 .add-text-title {

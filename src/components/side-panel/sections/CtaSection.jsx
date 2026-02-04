@@ -1245,7 +1245,7 @@ export const CtaSectionPanel = observer(({ store }) => {
         className="hidden"
       />
 
-      <div className="p-4 space-y-6 overflow-y-auto flex-1">
+      <div className="p-4 space-y-6 overflow-y-auto flex-1 pb-20">
         {/* ADD CTA Section */}
         <div>
           <h3 className="text-[12px] font-bold text-(--text-muted) uppercase tracking-wider mb-4 px-1">
