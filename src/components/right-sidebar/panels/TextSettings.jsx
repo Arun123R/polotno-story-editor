@@ -6,6 +6,7 @@ import {
   TrashIcon,
 } from '../shared/CommonControls';
 import { ColorPicker } from '../shared/ColorPicker';
+import Dropdown from '../../shared/Dropdown';
 
 /**
  * Text element settings panel - Storyly-inspired dark theme
@@ -187,15 +188,12 @@ export const TextSettings = observer(({ store, element, elements = [], isMultiSe
                 <span className="control-label">Font</span>
                 <div className="control-value">
                   <div className="select-wrapper" style={{ width: '120px' }}>
-                    <select
-                      className="select-input"
+                    <Dropdown
                       value={element.fontFamily || 'Inter'}
-                      onChange={(e) => applyToAll({ fontFamily: e.target.value })}
-                    >
-                      {fontFamilies.map(font => (
-                        <option key={font} value={font}>{font}</option>
-                      ))}
-                    </select>
+                      onChange={(v) => applyToAll({ fontFamily: v })}
+                      options={fontFamilies.map((font) => ({ value: font, label: font }))}
+                      ariaLabel="Font"
+                    />
                   </div>
                 </div>
               </div>
@@ -205,15 +203,12 @@ export const TextSettings = observer(({ store, element, elements = [], isMultiSe
                 <span className="control-label"></span>
                 <div className="control-value">
                   <div className="select-wrapper" style={{ width: '120px' }}>
-                    <select
-                      className="select-input"
+                    <Dropdown
                       value={element.fontWeight || '400'}
-                      onChange={(e) => applyToAll({ fontWeight: e.target.value })}
-                    >
-                      {fontWeights.map(w => (
-                        <option key={w.value} value={w.value}>{w.label}</option>
-                      ))}
-                    </select>
+                      onChange={(v) => applyToAll({ fontWeight: v })}
+                      options={fontWeights.map((w) => ({ value: w.value, label: w.label }))}
+                      ariaLabel="Font weight"
+                    />
                   </div>
                 </div>
               </div>
@@ -266,11 +261,15 @@ export const TextSettings = observer(({ store, element, elements = [], isMultiSe
                 <span className="control-label">Highlight</span>
                 <div className="control-value">
                   <div className="select-wrapper" style={{ width: '120px' }}>
-                    <select className="select-input" defaultValue="none">
-                      <option value="none">None</option>
-                      <option value="solid">Solid</option>
-                      <option value="gradient">Gradient</option>
-                    </select>
+                    <Dropdown
+                      defaultValue="none"
+                      options={[
+                        { value: 'none', label: 'None' },
+                        { value: 'solid', label: 'Solid' },
+                        { value: 'gradient', label: 'Gradient' },
+                      ]}
+                      ariaLabel="Highlight"
+                    />
                   </div>
                 </div>
               </div>
@@ -279,40 +278,40 @@ export const TextSettings = observer(({ store, element, elements = [], isMultiSe
               <div className="control-row">
                 <span className="control-label">Alignment</span>
                 <div className="control-value">
-                  <div className="alignment-group">
+                  <div className="alignment-group alignment-group--text">
                     <button
                       className={`align-btn ${element.align === 'left' ? 'active' : ''}`}
                       onClick={() => applyToAll({ align: 'left' })}
                       title="Align Left"
                     >
-                      ☰
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                        <line x1="4" y1="7" x2="16" y2="7" />
+                        <line x1="4" y1="12" x2="20" y2="12" />
+                        <line x1="4" y1="17" x2="14" y2="17" />
+                      </svg>
                     </button>
                     <button
                       className={`align-btn ${element.align === 'center' ? 'active' : ''}`}
                       onClick={() => applyToAll({ align: 'center' })}
                       title="Align Center"
                     >
-                      ☰
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                        <line x1="6" y1="7" x2="18" y2="7" />
+                        <line x1="4" y1="12" x2="20" y2="12" />
+                        <line x1="7" y1="17" x2="17" y2="17" />
+                      </svg>
                     </button>
                     <button
                       className={`align-btn ${element.align === 'right' ? 'active' : ''}`}
                       onClick={() => applyToAll({ align: 'right' })}
                       title="Align Right"
                     >
-                      ☰
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                        <line x1="8" y1="7" x2="20" y2="7" />
+                        <line x1="4" y1="12" x2="20" y2="12" />
+                        <line x1="10" y1="17" x2="20" y2="17" />
+                      </svg>
                     </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Vertical Alignment */}
-              <div className="control-row">
-                <span className="control-label"></span>
-                <div className="control-value">
-                  <div className="alignment-group">
-                    <button className="align-btn" title="Top">↑</button>
-                    <button className="align-btn active" title="Middle">↕</button>
-                    <button className="align-btn" title="Bottom">↓</button>
                   </div>
                 </div>
               </div>

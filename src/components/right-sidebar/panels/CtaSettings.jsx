@@ -4,6 +4,7 @@ import { AnimationSection, DurationSection, TrashIcon } from '../shared/CommonCo
 import { ColorPicker } from '../shared/ColorPicker';
 import { generateCtaSVG, CTA_DEFAULTS } from '../../side-panel/sections/CtaSection';
 import { toCanvas, toExport } from '../../../utils/scale';
+import Dropdown from '../../shared/Dropdown';
 
 /**
  * CTA Settings Panel
@@ -1366,23 +1367,19 @@ export const CtaSettings = observer(({ store, element }) => {
                 <div className="control-row">
                   <span className="control-label">Font Weight</span>
                   <div className="control-value">
-                    <select
-                      value={getTitleFontWeight()}
-                      onChange={(e) => setTitleFontWeight(e.target.value)}
-                      style={{
-                        padding: '6px 10px',
-                        background: 'var(--sidebar-input-bg)',
-                        border: '1px solid var(--sidebar-input-border)',
-                        borderRadius: '4px',
-                        color: 'var(--sidebar-text)',
-                        fontSize: '11px',
-                      }}
-                    >
-                      <option value="400">Normal</option>
-                      <option value="500">Medium</option>
-                      <option value="600">Semi-Bold</option>
-                      <option value="700">Bold</option>
-                    </select>
+                    <div className="select-wrapper" style={{ width: 140 }}>
+                      <Dropdown
+                        value={getTitleFontWeight()}
+                        onChange={(v) => setTitleFontWeight(v)}
+                        options={[
+                          { value: '400', label: 'Normal' },
+                          { value: '500', label: 'Medium' },
+                          { value: '600', label: 'Semi-Bold' },
+                          { value: '700', label: 'Bold' },
+                        ]}
+                        ariaLabel="Title font weight"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1421,23 +1418,19 @@ export const CtaSettings = observer(({ store, element }) => {
                 <div className="control-row">
                   <span className="control-label">Font Weight</span>
                   <div className="control-value">
-                    <select
-                      value={getPriceFontWeight()}
-                      onChange={(e) => setPriceFontWeight(e.target.value)}
-                      style={{
-                        padding: '6px 10px',
-                        background: 'var(--sidebar-input-bg)',
-                        border: '1px solid var(--sidebar-input-border)',
-                        borderRadius: '4px',
-                        color: 'var(--sidebar-text)',
-                        fontSize: '11px',
-                      }}
-                    >
-                      <option value="400">Normal</option>
-                      <option value="500">Medium</option>
-                      <option value="600">Semi-Bold</option>
-                      <option value="700">Bold</option>
-                    </select>
+                    <div className="select-wrapper" style={{ width: 140 }}>
+                      <Dropdown
+                        value={getPriceFontWeight()}
+                        onChange={(v) => setPriceFontWeight(v)}
+                        options={[
+                          { value: '400', label: 'Normal' },
+                          { value: '500', label: 'Medium' },
+                          { value: '600', label: 'Semi-Bold' },
+                          { value: '700', label: 'Bold' },
+                        ]}
+                        ariaLabel="Price font weight"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

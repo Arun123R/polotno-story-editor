@@ -18,6 +18,7 @@ import {
   INTERACTIVE_DIMENSIONS,
 } from '../../interactive/schemas';
 import { generateInteractiveSVG } from '../../side-panel/sections/InteractiveSection';
+import Dropdown from '../../shared/Dropdown';
 
 /**
  * Interactive Settings Panel
@@ -315,18 +316,14 @@ export const InteractiveSettings = observer(({ store, element }) => {
     <div className="control-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
       <span className="control-label" style={{ fontWeight: 500, color: '#333', fontSize: '13px' }}>{label}</span>
       <div className="control-value" style={{ width: '140px' }}>
-        <div className="select-wrapper" style={{ position: 'relative' }}>
-          <select
-            className="select-input"
-            value={value ?? ''}
-            onChange={(e) => onChange(e.target.value)}
-            style={{ padding: '8px 32px 8px 12px', borderRadius: 8, width: '100%' }}
-          >
-            {options.map(opt => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-          <div style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', fontSize: 10, color: '#718096' }}>▼</div>
+        <div className="select-wrapper" style={{ width: '100%' }}>
+          <Dropdown
+            value={value}
+            onChange={onChange}
+            options={options}
+            placeholder={label}
+            ariaLabel={label}
+          />
         </div>
       </div>
     </div>

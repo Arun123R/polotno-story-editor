@@ -133,6 +133,74 @@ body {
    SHARED UI PRIMITIVES
    =================================== */
 
+/* ===================================
+   COMMON DROPDOWN (Custom)
+   IMPORTANT: the closed trigger styling must remain unchanged.
+   This block styles ONLY the open panel/menu.
+   =================================== */
+
+.app-dropdown__panel {
+    z-index: 9999;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 14px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    /* Hide scrollbar visuals (keep scrolling). */
+    scrollbar-width: none; /* Firefox */
+}
+
+.app-dropdown__panel::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+/* Right-sidebar uses its own theme tokens. */
+.right-sidebar .app-dropdown__panel {
+    background: var(--sidebar-bg-secondary);
+    border-color: var(--sidebar-border);
+}
+
+.app-dropdown__option {
+    width: 100%;
+    padding: 12px 14px;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    outline: none;
+    color: var(--text-secondary);
+}
+
+.right-sidebar .app-dropdown__option {
+    color: var(--sidebar-text-secondary);
+}
+
+.app-dropdown__option:hover,
+.app-dropdown__option.is-active {
+    background: var(--accent-soft);
+    color: var(--text-primary);
+}
+
+.right-sidebar .app-dropdown__option:hover,
+.right-sidebar .app-dropdown__option.is-active {
+    color: var(--sidebar-text);
+}
+
+.app-dropdown__option.is-selected {
+    background: var(--accent-soft);
+    color: var(--accent-primary);
+}
+
+.right-sidebar .app-dropdown__option.is-selected {
+    color: var(--sidebar-accent);
+}
+
+.app-dropdown__option:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
 /* Matches Text section card hover (orange border + peach bg). */
 .studio-card {
     background: var(--bg-secondary);
@@ -148,15 +216,25 @@ body {
     box-shadow: none;
 }
 
+/* Remove default browser focus outline (mouse click), keep custom :focus-visible for keyboard. */
+.studio-card:focus {
+    outline: none;
+}
+
 .studio-card:focus-visible {
-    border-color: var(--accent-primary);
     background: var(--accent-soft);
+    border-color: transparent;
+    box-shadow: none;
     outline: 2px solid rgba(255, 122, 26, 0.35);
     outline-offset: 2px;
 }
 
 .studio-card:active {
-    background: rgba(255, 122, 26, 0.18);
+    /* Match hover border; avoid stacking outline/ring during mouse-down */
+    border-color: var(--accent-primary);
+    background: var(--accent-soft);
+    box-shadow: none;
+    outline: none;
 }
 
 .studio-card.drag-active {
@@ -169,6 +247,83 @@ body {
     border-color: var(--accent-primary);
     background: var(--accent-soft);
     box-shadow: none;
+}
+
+/* Product cards should be perfectly square and have tighter internal spacing */
+.studio-card.product-square {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem; /* matches p-2 */
+    overflow: hidden; /* prevent content from pushing the height */
+}
+
+/* CTA cards (Add CTA section) should match Figma height and center content */
+.studio-card.cta-card {
+    height: 94px; /* matches Figma measurement */
+    padding-left: 0.5rem; /* reduced side padding for wider content */
+    padding-right: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 10px; /* Figma shows 10px radius */
+}
+
+/* Reusable pill used inside CTA cards (Shop Now, Swipe preview) */
+.cta-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 140px;
+    max-width: 80%;
+    padding: 6px 22px;
+    border-radius: 18px; /* pill look */
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+}
+
+/* Classic CTA specific styling: centered pill */
+.studio-card.cta-card.cta-classic {
+    justify-content: center; /* center vertically inside the card */
+    padding-top: 0;
+}
+.studio-card.cta-card.cta-classic .cta-pill {
+    width: 80%;
+    max-width: 220px;
+    margin: 0 auto; /* center horizontally */
+    min-width: 0;
+    padding: 8px 0;
+    border-radius: 8px;
+    align-self: center;
+}
+
+/* Icon container for Image CTA */
+.cta-icon {
+    width: 48px;
+    height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+}
+
+/* Larger Swipe Up preview */
+.cta-swipe {
+    width: 180px;
+    height: 48px;
+    display: block;
+    margin: 0 auto 6px;
+}
+
+/* Slightly reduce the label spacing under the pill */
+.cta-card .cta-label {
+    margin-top: 6px; /* ~mt-1.5 */
 }
 
 .appstorys-editor {
@@ -573,6 +728,53 @@ html[data-theme="dark"] .bp5-tab[aria-selected="true"] svg {
 .polotno-pages-timeline button,
 .polotno-pages-timeline>div {
     background-color: transparent;
+}
+
+/* Remove the square border/outline around the + (Add page) icon button */
+/* Polotno uses Blueprint v5 buttons inside the pages timeline. */
+.polotno-pages-timeline .bp5-button.bp5-minimal {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.polotno-pages-timeline .bp5-button.bp5-minimal:focus,
+.polotno-pages-timeline .bp5-button.bp5-minimal:focus-visible,
+.polotno-pages-timeline .bp5-button.bp5-minimal:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Defensive: if any border is applied to the icon wrapper itself, remove it. */
+.polotno-pages-timeline .bp5-icon-plus,
+.polotno-pages-timeline .bp6-icon-plus {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+/* Boxed timeline icon: Duplicate only - neutral boxed style */
+.polotno-pages-timeline .bp5-icon-duplicate {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border: 1px solid var(--sidebar-border);
+    border-radius: 6px;
+    color: var(--sidebar-text-secondary);
+    transition: all 0.12s ease;
+    box-sizing: border-box;
+}
+
+.polotno-pages-timeline .bp5-icon-duplicate svg {
+    width: 16px !important;
+    height: 16px !important;
+}
+
+.polotno-pages-timeline button:hover .bp5-icon-duplicate,
+.polotno-pages-timeline .bp5-icon-duplicate:hover {
+    background: var(--sidebar-bg-hover);
+    color: var(--sidebar-text);
 }
 
 /* Page thumbnails */
