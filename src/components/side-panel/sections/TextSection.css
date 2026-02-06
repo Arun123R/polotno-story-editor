@@ -598,15 +598,35 @@ html[data-theme="dark"] .custom-text-section .bp5-tab[aria-selected="true"] svg 
     box-shadow: none;
 }
 
+/* Remove default focus outline on mouse click; keep :focus-visible for keyboard. */
+.add-text-card:focus {
+    outline: none;
+}
+
 .add-text-card:focus-visible {
-    border-color: var(--accent-primary);
     background: var(--accent-soft);
+    border-color: transparent;
+    box-shadow: none;
     outline: 2px solid rgba(255, 122, 26, 0.35);
     outline-offset: 2px;
 }
 
 .add-text-card:active {
-    background: rgba(255, 122, 26, 0.18);
+    /* Match hover border; avoid stacking outline/ring during mouse-down */
+    border-color: var(--accent-primary);
+    background: var(--accent-soft);
+    box-shadow: none;
+    outline: none;
+}
+
+/* Blueprint buttons inside Text section: remove mouse-focus ring to avoid double border on click. */
+.custom-text-section .bp5-button:focus:not(:focus-visible) {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.custom-text-section .bp5-button:active {
+    box-shadow: none !important;
 }
 
 .add-text-plus {
