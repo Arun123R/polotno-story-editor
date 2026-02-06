@@ -131,48 +131,44 @@ export const EditorContextProvider = ({ children }) => {
         return () => disposer();
     }, [currentSlideId]); // Only dependency needed from closure
 
-    // Intercept store.deletePages to handle backend deletion
-    useEffect(() => {
-        const originalDeletePages = store.deletePages;
+    /**
+     * Safe wrapper for deleting pages that handles backend deletion
+     * IMPORTANT: This does NOT mutate store.deletePages (which would violate MobX proxy rules)
+     * Instead, components should call this function directly
+     * 
+     * @param {string[]} pageIds - Array of page IDs to delete
+     */
+    const deletePages = useCallback(async (pageIds) => {
+        if (!pageIds || pageIds.length === 0) return;
 
-        store.deletePages = async (pageIds) => {
-            if (!pageIds || pageIds.length === 0) return;
-
-            // 1. Identify which slides have backend IDs
-            const backendDeletions = [];
-            store.pages.forEach(page => {
-                if (pageIds.includes(page.id) && page.custom?.originalSlideId) {
-                    backendDeletions.push(page.custom.originalSlideId);
-                }
-            });
-
-            // 2. Call backend API for each
-            if (backendDeletions.length > 0) {
-                const confirmDelete = window.confirm(`Are you sure you want to delete ${backendDeletions.length > 1 ? 'these slides' : 'this slide'}? This action cannot be undone.`);
-                if (!confirmDelete) return; // Abort entirely if user cancels
-
-                try {
-                    await Promise.all(backendDeletions.map(id => storyAPI.deleteStorySlide(id)));
-                    console.log('[EditorContext] Deleted slides from backend:', backendDeletions);
-                } catch (error) {
-                    console.error('[EditorContext] Failed to delete slides from backend:', error);
-                    alert('Failed to delete some slides. Please try again.');
-                    return; // Don't remove from UI if backend fails? Or remove anyway? 
-                    // Usually better to fail safe.
-                }
-            } else {
-                // Local-only pages, confirm?
-                // Polotno might confirm? No, usually instant. 
-                // We'll add a check unless it's implicit.
+        // 1. Identify which slides have backend IDs
+        const backendDeletions = [];
+        store.pages.forEach(page => {
+            if (pageIds.includes(page.id) && page.custom?.originalSlideId) {
+                backendDeletions.push(page.custom.originalSlideId);
             }
+        });
 
-            // 3. Proceed with UI removal
-            originalDeletePages.call(store, pageIds);
-        };
+        // 2. Call backend API for each
+        if (backendDeletions.length > 0) {
+            const confirmDelete = window.confirm(
+                `Are you sure you want to delete ${backendDeletions.length > 1 ? 'these slides' : 'this slide'}? This action cannot be undone.`
+            );
+            if (!confirmDelete) return; // Abort entirely if user cancels
 
-        return () => {
-            store.deletePages = originalDeletePages;
-        };
+            try {
+                await Promise.all(backendDeletions.map(id => storyAPI.deleteStorySlide(id)));
+                console.log('[EditorContext] Deleted slides from backend:', backendDeletions);
+            } catch (error) {
+                console.error('[EditorContext] Failed to delete slides from backend:', error);
+                alert('Failed to delete some slides. Please try again.');
+                return; // Don't remove from UI if backend fails
+            }
+        }
+
+        // 3. Proceed with UI removal using official Polotno API
+        // This is the CORRECT way - call the method, don't reassign it
+        store.deletePages(pageIds);
     }, []);
 
     // ============================================
@@ -274,6 +270,7 @@ export const EditorContextProvider = ({ children }) => {
         switchToSlide,
         switchToGroup,
         selectSlide,
+        deletePages,
 
         // Helpers
         findSlide,
@@ -303,6 +300,7 @@ export const EditorContextProvider = ({ children }) => {
         switchToSlide,
         switchToGroup,
         selectSlide,
+        deletePages,
         findSlide,
         findGroup,
         getSlidesForGroup,
