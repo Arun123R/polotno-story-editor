@@ -1,4 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react';
+
+import InfoIcon from '../../InfoIcon';
+import DurationHeaderWithTooltip from './DurationHeaderWithTooltip';
 import { observer } from 'mobx-react-lite';
 import Dropdown from '../../shared/Dropdown';
 
@@ -644,11 +647,10 @@ export const DurationSection = observer(({ store, element }) => {
 
   return (
     <div className="duration-section">
-      <div className="duration-header">
-        <span className="duration-title">
-          Duration <span style={{ fontSize: '10px', color: 'var(--sidebar-text-muted)' }}>ⓘ</span>
-        </span>
-      </div>
+      <DurationHeaderWithTooltip />
+
+
+
 
       <div className="duration-controls">
         <button className="play-btn" onClick={handlePlayPause} aria-label={store.isPlaying ? 'Pause' : 'Play'}>
