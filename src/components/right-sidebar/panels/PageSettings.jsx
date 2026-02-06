@@ -12,11 +12,13 @@ import {
   normalizeSlideBackground,
   applySlideBackgroundToPage,
 } from '../../../utils/slideBackground';
+import { useEditorContext } from '../../../context/EditorContext';
 
 /**
  * Page settings panel (when no element is selected) - Storyly-inspired dark theme
  */
 export const PageSettings = observer(({ store }) => {
+  const { deletePages } = useEditorContext();
   const activePage = store.activePage;
 
   // UI-only preset state (NO store change)
@@ -491,7 +493,7 @@ export const PageSettings = observer(({ store }) => {
         <div className="action-buttons">
           <button
             className="action-btn delete"
-            onClick={() => store.deletePages([activePage.id])}
+            onClick={() => deletePages([activePage.id])}
             disabled={store.pages.length <= 1}
             style={{ opacity: store.pages.length <= 1 ? 0.5 : 1 }}
           >
