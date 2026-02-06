@@ -3,11 +3,38 @@ import { useState } from 'react';
 import './Topbar.css';
 
 import { ThemeToggleButton } from './ThemeToggleButton';
-import { handleSave } from '../utils/canvasSave.js';
+// Note: handleSave from canvasSave.js is deprecated
+// We now use buildSlidePayload from slidePayloadBuilder.js (imported dynamically)
+import { useEditorContext } from '../context/EditorContext';
 
-export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar, groupId: propGroupId, slideId }) => {
+export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar, groupId: propGroupId, slideId: propSlideId }) => {
     const [isSaving, setIsSaving] = useState(false);
-    const [currentGroupId, _setCurrentGroupId] = useState(propGroupId || 'demo-group-id');
+
+    // Get context values (with fallback for when not in provider)
+    let contextValues = {};
+    try {
+        contextValues = useEditorContext();
+    } catch (e) {
+        // Not in provider, use props
+        contextValues = {
+            currentGroupId: propGroupId,
+            currentSlideId: propSlideId,
+            checkIsHydrating: () => false,
+            ctaState: {},
+        };
+    }
+
+    const {
+        currentGroupId: contextGroupId,
+        currentSlideId: contextSlideId,
+        checkIsHydrating,
+        ctaState,
+        groupSlides,
+    } = contextValues;
+
+    // Use context values with prop fallbacks
+    const groupId = contextGroupId || propGroupId || 'demo-group-id';
+    const slideId = contextSlideId || propSlideId;
     const [isCreatingGroup, _setIsCreatingGroup] = useState(false);
 
     // Disabled auto-create group to prevent 401 errors
@@ -62,36 +89,107 @@ export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar,
     };
 
     const handleSaveClick = async () => {
-        if (!currentGroupId) {
+        // CRITICAL: Block save during hydration to prevent overwrite loops
+        if (checkIsHydrating()) {
+            console.warn('⚠️ [TOPBAR] Save blocked - hydration in progress');
+            return;
+        }
+
+        if (!groupId) {
             alert('No group ID available. Please wait for group creation to complete.');
             return;
         }
 
         console.log('🔵 [TOPBAR] Save button clicked!');
-        console.log('🔵 [TOPBAR] Using groupId:', currentGroupId);
+        console.log('🔵 [TOPBAR] Using groupId:', groupId);
+        console.log('🔵 [TOPBAR] Using slideId:', slideId);
+        console.log('🔵 [TOPBAR] Editor State (ctaState):', ctaState);
         setIsSaving(true);
 
         try {
-            const result = await handleSave({
-                store, // Pass store explicitly
-                groupId: currentGroupId,
-                slideId: slideId || null,
-                slideMetadata: {
-                    description: projectName || 'Created from Polotno Editor',
-                    enableCTA: false,
-                    isActive: store?.activePage?.custom?.isActive !== false,
-                },
-                onSuccess: (data) => {
-                    console.log('✅ [TOPBAR] Save successful:', data);
-                    alert('Slide saved successfully!');
-                },
-                onError: (error) => {
-                    console.error('❌ [TOPBAR] Save failed:', error);
-                    alert(`Failed to save: ${error}`);
-                },
+            // Import payload builder (NEVER reads from canvas export)
+            // Import payload builder (NEVER reads from canvas export)
+            const {
+                buildSlidePayload,
+                buildCreateSlideFormData,
+                buildUpdateSlideFormData,
+                calculateNextSlideOrder
+            } = await import('../utils/slidePayloadBuilder.js');
+            const { storyAPI } = await import('../services/api.js');
+
+            // Get current page for element extraction
+            const currentPage = store?.activePage || store?.pages?.[0] || null;
+
+            if (!currentPage) {
+                throw new Error('No active page to save');
+            }
+
+            // TARGETED SAVE STRATEGY
+            // Save only the active/current slide (the one user is editing)
+            // This ensures we don't overwrite other slides unnecessarily
+
+            const pageIndex = store.pages.findIndex(p => p.id === currentPage.id);
+            const order = pageIndex >= 0 ? pageIndex + 1 : 1;
+
+            // Determine if this is an UPDATE or CREATE
+            // page.custom.originalSlideId = backend ID set during hydration
+            // If present, this is an existing slide -> UPDATE
+            // If absent, this is a new slide -> CREATE
+            const backendSlideId = currentPage.custom?.originalSlideId || null;
+            const isUpdate = !!backendSlideId;
+
+            console.log(`[TOPBAR] Save Mode: ${isUpdate ? 'UPDATE' : 'CREATE'}`);
+            console.log(`[TOPBAR] Backend Slide ID: ${backendSlideId}`);
+            console.log(`[TOPBAR] Page ID: ${currentPage.id}`);
+            console.log(`[TOPBAR] Order: ${order}`);
+
+            // Build Payload from editor state
+            const payload = buildSlidePayload({
+                editorState: ctaState || {},
+                page: currentPage,
+                groupId: groupId,
+                slideId: backendSlideId, // Pass backend ID for update, null for create
+                order: order,
             });
 
-            console.log('🔵 [TOPBAR] Save result:', result);
+            console.log('📦 [TOPBAR] Payload:', payload);
+
+            // Prepare Media Args with Dirty Tracking
+            const mediaArgs = {
+                image: (ctaState?.image instanceof File) ? ctaState.image : (ctaState?.imageFile instanceof File ? ctaState.imageFile : null),
+                video: (ctaState?.video instanceof File) ? ctaState.video : (ctaState?.videoFile instanceof File ? ctaState.videoFile : null),
+                imageChanged: !!ctaState?.imageChanged,
+                videoChanged: !!ctaState?.videoChanged,
+            };
+
+            console.log('[TOPBAR] Media Args:', mediaArgs);
+
+            let formData;
+            let result;
+
+            // Execute correct API based on slide type
+            if (isUpdate) {
+                // UPDATE: Strict dirty checking
+                formData = buildUpdateSlideFormData(payload, mediaArgs);
+                console.log('📤 [TOPBAR] Calling UPDATE endpoint for slide:', backendSlideId);
+                result = await storyAPI.updateStorySlide(formData);
+                console.log('✅ [TOPBAR] UPDATE successful:', result?.data);
+            } else {
+                // CREATE: Blind append (if media exists)
+                formData = buildCreateSlideFormData(payload, mediaArgs);
+                console.log('📤 [TOPBAR] Calling CREATE endpoint (new slide)');
+                result = await storyAPI.createStorySlide(formData);
+                console.log('✅ [TOPBAR] CREATE successful:', result?.data);
+
+                // Store the new backend ID in page.custom for future updates
+                if (result?.data?.id) {
+                    currentPage.set({ custom: { ...currentPage.custom, originalSlideId: result.data.id } });
+                    console.log('[TOPBAR] Stored new slide ID:', result.data.id);
+                }
+            }
+
+            alert('Slide saved successfully!');
+
         } catch (error) {
             console.error('❌ [TOPBAR] Save error:', error);
             alert(`Error: ${error.message}`);
@@ -178,8 +276,8 @@ export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar,
                     <button
                         className="topbar-btn topbar-btn-primary"
                         onClick={handleSaveClick}
-                        disabled={isSaving || isCreatingGroup || !currentGroupId}
-                        style={{ opacity: (isSaving || isCreatingGroup || !currentGroupId) ? 0.6 : 1 }}
+                        disabled={isSaving || isCreatingGroup || !groupId}
+                        style={{ opacity: (isSaving || isCreatingGroup || !groupId) ? 0.6 : 1 }}
                     >
                         {isSaving ? 'Saving...' : isCreatingGroup ? 'Preparing...' : 'Save'}
                     </button>

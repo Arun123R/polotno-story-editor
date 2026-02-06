@@ -320,7 +320,12 @@ export const convertCanvasToStorySlide = (canvasPayload, slideMetadata = {}) => 
 
 /**
  * Main Save Handler
- * Sends canvas JSON payload directly to backend API endpoint
+ * 
+ * BACKEND CONTRACT (STRICT):
+ * - Uses multipart/form-data
+ * - Splits data into: content (semantic) vs styling (presentation)
+ * - Does NOT send canvasData to backend
+ * - Matches dashboard behavior exactly
  */
 export const handleSave = async (options = {}) => {
     try {
@@ -331,7 +336,8 @@ export const handleSave = async (options = {}) => {
             store: passedStore,
             groupId,
             slideId,
-            slideMetadata = {},
+            contentData = {},  // Semantic/business data
+            stylingData = {},  // UI/presentation data
             onSuccess,
             onError,
         } = options;
@@ -343,46 +349,46 @@ export const handleSave = async (options = {}) => {
             throw new Error('No store available - cannot build canvas payload');
         }
 
-        // Step 1: Build canvas payload from editor state
-        const canvasPayload = buildCanvasPayload(storeToUse);
-        console.log('📦 Canvas payload built:', canvasPayload);
-
-        // Step 2: Validate payload
-        const validation = validateCanvasPayload(canvasPayload);
-        if (!validation.isValid) {
-            console.error('❌ Validation failed:', validation.errors);
-            throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
-        }
-        console.log('✅ Payload validated');
-
-        // Step 3: Prepare for backend
+        // Step 1: Prepare for backend
         if (!groupId) {
             throw new Error('groupId is required for saving');
         }
 
-        // Step 4: Build FormData with canvas JSON
+        // Step 2: Build FormData following STRICT backend contract
         const formData = new FormData();
 
-        // Add parent group ID
+        // REQUIRED: Core fields
         formData.append("parent", String(groupId));
+        formData.append("order", String(contentData.order || 1));
 
-        // Add slide metadata (matching dashboard format)
-        formData.append("order", String(slideMetadata.order || 1));
-        formData.append("isActive", slideMetadata.isActive !== false ? "true" : "false"); // Changed to "true"/"false"
-        formData.append("link", slideMetadata.link || "");
-        formData.append("button_text", slideMetadata.button_text || "");
-        formData.append("fullWidthCta", slideMetadata.fullWidthCta ? "1" : "0");
+        // CONTENT (semantic/business data) - sent as JSON string
+        // Contains: link, button_text, image (URL), video (URL), ctas (array)
+        const content = {
+            link: contentData.link || "",
+            button_text: contentData.buttonText || contentData.button_text || "",
+            image: null,  // Will be uploaded as binary, not URL
+            video: null,  // Will be uploaded as binary, not URL
+            // NEW: Include CTAs array
+            ctas: contentData.ctas || [],
+        };
+        formData.append("content", JSON.stringify(content));
+        console.log('📝 Content payload:', content);
 
-        // Add styling if provided, otherwise use empty object
-        formData.append("styling", JSON.stringify(slideMetadata.styling || {}));
+        // STYLING (UI/presentation data) - sent as JSON string
+        // Contains: fullWidthCta, rdrType, pc_redirect_type, cta (styling object)
+        const styling = {
+            fullWidthCta: stylingData.fullWidthCta ? 1 : 0,
+            rdrType: stylingData.rdrType || "url",
+            pc_redirect_type: stylingData.pc_redirect_type || "url",
+            cta: stylingData.cta || {},
+        };
+        formData.append("styling", JSON.stringify(styling));
+        console.log('🎨 Styling payload:', styling);
 
-        // Add canvas JSON payload as a custom field
-        formData.append("canvasData", JSON.stringify(canvasPayload));
-
-        // Export canvas as image and add to formData
+        // Step 3: Export canvas as image and add to formData
         console.log('📸 Exporting canvas as image...');
         try {
-            const store = window.store; // Get store from window
+            const store = window.store || storeToUse;
             if (store && store.pages && store.pages.length > 0) {
                 const firstPage = store.pages[0];
                 const dataURL = await store.toDataURL({ pageId: firstPage.id, pixelRatio: 2 });
@@ -394,17 +400,18 @@ export const handleSave = async (options = {}) => {
                 // Create File from Blob
                 const imageFile = new File([blob], 'slide-image.png', { type: 'image/png' });
 
+                // MEDIA: Binary upload (not in content JSON)
                 formData.append("image", imageFile);
-                formData.append("video", ""); // Empty video field
                 console.log('✅ Canvas image exported and added to payload');
             } else {
                 console.warn('⚠️ No store or pages found, sending without image');
-                formData.append("image", "");
-                formData.append("video", "");
             }
         } catch (error) {
             console.error('❌ Error exporting canvas image:', error);
-            formData.append("image", "");
+        }
+
+        // Video field (empty for now, can be populated if video upload is needed)
+        if (!formData.has("video")) {
             formData.append("video", "");
         }
 
@@ -414,13 +421,14 @@ export const handleSave = async (options = {}) => {
         }
 
         console.log('📤 Sending to backend:', {
-            endpoint: slideId ? 'UPDATE /api/v1/campaigns/update-story-slide/' : 'CREATE /api/v1/campaigns/create-story-slide/',
+            endpoint: slideId ? 'UPDATE /api/v1/slides/:id' : 'CREATE /api/v1/slides',
             groupId,
             slideId,
-            hasCanvasData: true,
+            hasContent: true,
+            hasStyling: true,
         });
 
-        // Step 5: Import storyAPI and send to backend
+        // Step 4: Import storyAPI and send to backend
         const { storyAPI } = await import('../services/api.js');
 
         let response;
@@ -434,14 +442,13 @@ export const handleSave = async (options = {}) => {
             response = await storyAPI.createStorySlide(formData);
         }
 
-        // Step 6: Handle response
+        // Step 5: Handle response
         if (response.status === 200 || response.status === 201) {
             console.log('✅ Save successful:', response.data);
             onSuccess?.(response.data);
             return {
                 success: true,
                 data: response.data,
-                payload: canvasPayload,
             };
         } else {
             console.error('❌ Save failed:', response.statusText);
@@ -531,30 +538,30 @@ export const exportCanvasJSON = () => {
 /**
  * Load canvas from JSON payload (restore canvas state)
  */
-export const loadCanvasFromPayload = (payload) => {
+export const loadCanvasFromPayload = (payload, targetStore = store) => {
     if (!payload || !payload.pages) {
         throw new Error('Invalid payload: missing pages');
     }
 
     try {
         // Clear existing pages
-        while (store.pages.length > 0) {
-            store.deletePage(store.pages[0].id);
+        while (targetStore.pages.length > 0) {
+            targetStore.deletePage(targetStore.pages[0].id);
         }
 
         // Set canvas dimensions
         if (payload.width && payload.height) {
-            store.setSize(payload.width, payload.height);
+            targetStore.setSize(payload.width, payload.height);
         }
 
         // Restore custom metadata
         if (payload.custom) {
-            store.set({ custom: payload.custom });
+            targetStore.set({ custom: payload.custom });
         }
 
         // Load each page
         payload.pages.forEach((pageData) => {
-            const page = store.addPage();
+            const page = targetStore.addPage();
 
             // Set page properties
             const incomingBackground = pageData.background || '';
@@ -582,4 +589,157 @@ export const loadCanvasFromPayload = (payload) => {
         console.error('❌ Failed to load canvas:', error);
         throw error;
     }
+};
+
+/**
+ * Converts a backend Slide object (without canvasData) into a Polotno Canvas Payload.
+ * Maps legacy fields (image, buttons, styling) to a reconstructred visual state.
+ */
+/**
+ * Converts a single backend Slide object into a Polotno Page object.
+ */
+const convertSlideToPage = (slide) => {
+    // Default dimensions
+    const width = 360;
+    const height = 640;
+
+    // 1. Resolve Background
+    let background = '#ffffff';
+    if (slide.image && typeof slide.image === 'string') {
+        background = slide.image;
+    } else if (slide.video && typeof slide.video === 'string') {
+        background = slide.videoPreview || '#000000';
+    }
+
+    // 2. Resolve Elements (CTA)
+    const children = [];
+
+    // Video Element
+    if (slide.video && typeof slide.video === 'string') {
+        children.push({
+            id: 'video-' + slide.id,
+            type: 'video',
+            x: 0,
+            y: 0,
+            width: width,
+            height: height,
+            src: slide.video,
+            locked: true,
+        });
+    }
+
+    // CTA Button
+    if (slide.button_text) {
+        let styling = slide.styling || {};
+        if (typeof styling === 'string') {
+            try { styling = JSON.parse(styling); } catch (e) { }
+        }
+
+        // Handle flattened styling structure seen in screenshot (font, size, etc might be at top level or nested)
+        // Adjusting strategy to be defensive
+        const ctaStyle = styling.cta || {}; // Try standard path
+        const containerStyle = ctaStyle.container || {};
+        const textStyle = ctaStyle.text || styling.font || {}; // Fallback to 'font' key if present
+
+        const ctaWidth = parseInt(containerStyle.ctaWidth) || 180;
+        const ctaHeight = parseInt(containerStyle.height) || 40;
+        const ctaX = (width - ctaWidth) / 2;
+        const ctaY = height - ctaHeight - 50;
+
+        children.push({
+            id: 'cta-bg-' + slide.id,
+            type: 'figure',
+            name: 'cta-background',
+            x: ctaX,
+            y: ctaY,
+            width: ctaWidth,
+            height: ctaHeight,
+            fill: containerStyle.backgroundColor || '#F97316',
+            stroke: containerStyle.borderColor || '',
+            strokeWidth: parseInt(containerStyle.borderWidth) || 0,
+            cornerRadius: parseInt(containerStyle.cornerRadius?.topLeft) || 8,
+        });
+
+        children.push({
+            id: 'cta-text-' + slide.id,
+            type: 'text',
+            name: 'cta-text',
+            text: slide.button_text,
+            fontSize: parseInt(textStyle.size || textStyle.fontSize) || 14,
+            fontFamily: textStyle.family || textStyle.fontFamily || 'Arial',
+            fill: textStyle.color || '#FFFFFF',
+            align: 'center',
+            verticalAlign: 'middle',
+            width: ctaWidth,
+            x: ctaX,
+            y: ctaY + (ctaHeight / 2) - ((parseInt(textStyle.size || textStyle.fontSize) || 14) / 2),
+        });
+    }
+
+    return {
+        id: slide.id || Math.random().toString(36).substr(2, 9),
+        width,
+        height,
+        background,
+        duration: slide.duration || 5000,
+        custom: {
+            isActive: slide.isActive !== false,
+            originalSlideId: slide.id,
+            order: slide.order
+        },
+        children
+    };
+};
+
+/**
+ * Converts a backend Slide object (without canvasData) into a Polotno Canvas Payload.
+ * Maps legacy fields to a reconstructed visual state.
+ * [Kept for backward compatibility with single-slide calls]
+ */
+export const convertBackendSlideToCanvasPayload = (slide) => {
+    if (!slide) return null;
+    const page = convertSlideToPage(slide);
+    return {
+        width: 360,
+        height: 640,
+        pages: [page],
+        custom: { reconstructed: true }
+    };
+};
+
+/**
+ * Converts an array of slides (a Story Group) into a full multi-page Polotno Payload.
+ */
+export const convertStoryGroupToCanvasPayload = (slides) => {
+    if (!Array.isArray(slides) || slides.length === 0) return null;
+
+    // Sort by order
+    const sortedSlides = [...slides].sort((a, b) => (a.order || 0) - (b.order || 0));
+
+    const pages = sortedSlides.map(slide => {
+        // If the slide has rich canvasData, use it!
+        if (slide.canvasData) {
+            try {
+                const payload = typeof slide.canvasData === 'string'
+                    ? JSON.parse(slide.canvasData)
+                    : slide.canvasData;
+                // We only need the page object from this payload
+                // Assuming payload.pages[0] is the relevant one
+                if (payload.pages && payload.pages.length > 0) {
+                    const richPage = payload.pages[0];
+                    richPage.id = slide.id; // Ensure ID matches
+                    return richPage;
+                }
+            } catch (e) { /* ignore */ }
+        }
+        // Fallback: Map from legacy fields
+        return convertSlideToPage(slide);
+    });
+
+    return {
+        width: 360,
+        height: 640,
+        pages: pages,
+        custom: { reconstructedGroup: true }
+    };
 };

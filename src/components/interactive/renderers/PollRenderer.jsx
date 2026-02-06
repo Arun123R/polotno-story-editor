@@ -5,10 +5,14 @@ import React from 'react';
  * Renders a poll with question and clickable options
  */
 export const PollRenderer = ({ data, style, width, height }) => {
+  console.log('[PollRenderer] Rendering with:', { data, style, width, height });
+
   const options = data?.options || [];
   const question = data?.question || 'What do you prefer?';
   const showResults = data?.showResults || false;
   const totalVotes = options.reduce((sum, opt) => sum + (opt.votes || 0), 0);
+
+  console.log('[PollRenderer] Processed:', { options, question, showResults, totalVotes });
 
   const containerStyle = {
     width: width || 280,
@@ -26,15 +30,22 @@ export const PollRenderer = ({ data, style, width, height }) => {
 
   const questionStyle = {
     color: style?.questionColor || '#ffffff',
-    fontSize: style?.questionFontSize || 16,
+    fontSize: (style?.questionFontSize || 16) + 'px',
     fontWeight: 600,
     textAlign: 'center',
     margin: 0,
   };
 
+  // Support horizontal/vertical layout (handle both object and string formats)
+  const layoutValue = data?.layout;
+  const layoutType = typeof layoutValue === 'object' ? layoutValue?.type : layoutValue;
+  const layout = layoutType || 'vertical';
+  const isHorizontal = layout === 'horizontal';
+
   const optionsContainerStyle = {
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: isHorizontal ? 'row' : 'column',
+    flexWrap: isHorizontal ? 'wrap' : 'nowrap',
     gap: 8,
     flex: 1,
   };
@@ -51,6 +62,7 @@ export const PollRenderer = ({ data, style, width, height }) => {
     position: 'relative',
     overflow: 'hidden',
     textAlign: 'center',
+    flex: isHorizontal ? '1 1 calc(50% - 4px)' : '0 0 auto', // For horizontal: 2 columns with gap
   };
 
   const resultBarStyle = (percentage) => ({
@@ -70,13 +82,13 @@ export const PollRenderer = ({ data, style, width, height }) => {
       <p style={questionStyle}>{question}</p>
       <div style={optionsContainerStyle}>
         {options.map((option, index) => {
-          const percentage = totalVotes > 0 
-            ? Math.round((option.votes || 0) / totalVotes * 100) 
+          const percentage = totalVotes > 0
+            ? Math.round((option.votes || 0) / totalVotes * 100)
             : 0;
-          
+
           return (
-            <div 
-              key={option.id || index} 
+            <div
+              key={option.id || index}
               style={optionStyle}
             >
               {showResults && <div style={resultBarStyle(percentage)} />}
