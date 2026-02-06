@@ -181,7 +181,15 @@ export const storyAPI = {
     },
 
     deleteStorySlide: (slideId) => {
-        return api.delete(`/api/v1/campaigns/create-story-slide/?id=${slideId}`);
+        const formData = new FormData();
+        formData.append('id', slideId);
+
+        return api.delete(`/api/v1/campaigns/delete-story-slide/?id=${slideId}`, {
+            data: formData,
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
     },
 
     listSlides: (groupId) => {

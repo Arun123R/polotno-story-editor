@@ -5,11 +5,11 @@ import {
 } from "polotno";
 import { Topbar } from "./Topbar";
 
-export const EditorLayout = ({ store, sidePanel, toolbar, canvas, footer, rightSidebar }) => {
+export const EditorLayout = ({ store, sidePanel, toolbar, canvas, footer, rightSidebar, groupId, slideId }) => {
   return (
     <div className="h-screen overflow-hidden flex flex-col appstorys-editor">
       {/* TOP TOOLBAR (fixed height) */}
-      <Topbar store={store} toolbar={toolbar} />
+      <Topbar store={store} toolbar={toolbar} groupId={groupId} slideId={slideId} />
       <PolotnoContainer
         className="w-full overflow-hidden"
         style={{ display: "flex", flex: 1, minHeight: 0 }}

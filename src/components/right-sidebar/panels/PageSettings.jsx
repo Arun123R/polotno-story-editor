@@ -38,6 +38,7 @@ export const PageSettings = observer(({ store }) => {
   );
 
   const [colorPickerMode, setColorPickerMode] = useState(currentBg.color?.type === 'gradient' ? 'gradient' : 'solid');
+
   useEffect(() => {
     setColorPickerMode(currentBg.color?.type === 'gradient' ? 'gradient' : 'solid');
   }, [activePage.id, currentBg.color?.type]);
@@ -220,7 +221,6 @@ export const PageSettings = observer(({ store }) => {
             <span className="control-label">Background</span>
           </div>
 
-          {/* A) Color block (Solid/Gradient inside) */}
           <div className="control-row" style={{ alignItems: 'flex-start' }}>
             <span className="control-label">Color</span>
             <div
@@ -322,7 +322,6 @@ export const PageSettings = observer(({ store }) => {
             </div>
           </div>
 
-          {/* B) Media block (optional layer above color) */}
           <div className="control-row" style={{ alignItems: 'center' }}>
             <span className="control-label">Media</span>
             <div
@@ -378,8 +377,6 @@ export const PageSettings = observer(({ store }) => {
                   </button>
                 ) : null}
               </div>
-
-
             </div>
           </div>
 

@@ -1,5 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { useState, useRef, useCallback } from 'react';
+import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import {
   PositionSection,
   AppearanceSection,
@@ -18,6 +20,18 @@ import {
   INTERACTIVE_DIMENSIONS,
 } from '../../interactive/schemas';
 import { generateInteractiveSVG } from '../../side-panel/sections/InteractiveSection';
+import { PollRenderer } from '../../interactive/renderers/PollRenderer';
+
+// Helper to escape XML special characters
+const escapeXml = (unsafe) => {
+  if (!unsafe) return '';
+  return String(unsafe)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+};
 
 /**
  * Interactive Settings Panel
@@ -44,17 +58,19 @@ export const InteractiveSettings = observer(({ store, element }) => {
     // Calculate dynamic height for polls based on options and layout
     if (interactiveType === 'poll' && newData.options) {
       const optionCount = newData.options.length;
-      const layout = newData.layout || 'horizontal';
+      const layoutValue = newData.layout;
+      const layoutType = typeof layoutValue === 'object' ? layoutValue?.type : layoutValue;
+      const layout = layoutType || 'horizontal';
       const padding = 16;
-      const questionHeight = 24;
-      const buttonHeight = 26;
-      const buttonGap = 6;
+      const questionHeight = 40; // Space for question
+      const optionHeight = 36; // Match SVG generation
+      const optionGap = 8; // Match SVG generation
 
       if (layout === 'horizontal') {
         const rows = Math.ceil(optionCount / 2);
-        height = padding + questionHeight + padding + (rows * buttonHeight) + ((rows - 1) * buttonGap) + padding;
+        height = padding + questionHeight + (rows * optionHeight) + ((rows - 1) * optionGap) + padding;
       } else {
-        height = padding + questionHeight + padding + (optionCount * buttonHeight) + ((optionCount - 1) * buttonGap) + padding;
+        height = padding + questionHeight + (optionCount * optionHeight) + ((optionCount - 1) * optionGap) + padding;
       }
     }
 
@@ -99,8 +115,95 @@ export const InteractiveSettings = observer(({ store, element }) => {
     }
 
     const dimensions = { width, height };
-    const styleDefaults = { ...INTERACTIVE_STYLES[interactiveType], ...newStyle };
-    const newSrc = generateInteractiveSVG(interactiveType, newData, styleDefaults, dimensions);
+    let newSrc;
+
+    // Use pure SVG generation for polls (foreignObject doesn't work reliably in data URLs)
+    if (interactiveType === 'poll') {
+      const bgColor = newStyle.containerBgColor || '#ffffff';
+      const questionColor = newStyle.questionColor || '#000000';
+      const questionSize = newStyle.questionFontSize || 16;
+      const optionBg = newStyle.optionBgColor || '#ffffff';
+      const optionText = newStyle.optionTextColor || '#000000';
+      const optionRadius = newStyle.optionBorderRadius || 8;
+      const resultBarColor = newStyle.resultBarColor || '#F97316';
+
+      const question = newData.question || 'Question?';
+      const options = newData.options || [];
+      const showResults = newData.showResults || false;
+
+      // Determine layout - handle deeply nested structure: layout.type can be {type: 'horizontal'}
+      let layoutValue = newData.layout;
+      if (typeof layoutValue === 'object' && layoutValue?.type) {
+        layoutValue = typeof layoutValue.type === 'object' ? layoutValue.type.type : layoutValue.type;
+      }
+      const layout = layoutValue || 'horizontal';
+      const isHorizontal = layout === 'horizontal';
+
+      // Calculate positions
+      const padding = 16;
+      const questionY = padding + 20;
+      const optionsStartY = questionY + 20;
+      const optionHeight = 36;
+      const optionGap = 8;
+
+      let optionsSvg = '';
+
+      if (isHorizontal) {
+        // Horizontal layout: 2 columns
+        const optionWidth = (width - padding * 2 - optionGap) / 2;
+        options.forEach((opt, idx) => {
+          const col = idx % 2;
+          const row = Math.floor(idx / 2);
+          const x = padding + col * (optionWidth + optionGap);
+          const y = optionsStartY + row * (optionHeight + optionGap);
+          const text = opt.text || opt.label || '';
+
+          // Option background
+          optionsSvg += `<rect x="${x}" y="${y}" width="${optionWidth}" height="${optionHeight}" rx="${optionRadius}" fill="${optionBg}" stroke="#e5e7eb" stroke-width="1"/>`;
+
+          // Option text
+          optionsSvg += `<text x="${x + optionWidth / 2}" y="${y + optionHeight / 2}" text-anchor="middle" dominant-baseline="middle" fill="${optionText}" font-size="14" font-family="Arial">${escapeXml(text)}</text>`;
+
+          // Result bar if showing results
+          if (showResults) {
+            const percentage = 0; // Placeholder
+            optionsSvg += `<text x="${x + optionWidth - 10}" y="${y + optionHeight / 2}" text-anchor="end" dominant-baseline="middle" fill="${optionText}" font-size="12" opacity="0.7">${percentage}%</text>`;
+          }
+        });
+      } else {
+        // Vertical layout: full width
+        const optionWidth = width - padding * 2;
+        options.forEach((opt, idx) => {
+          const x = padding;
+          const y = optionsStartY + idx * (optionHeight + optionGap);
+          const text = opt.text || opt.label || '';
+
+          // Option background
+          optionsSvg += `<rect x="${x}" y="${y}" width="${optionWidth}" height="${optionHeight}" rx="${optionRadius}" fill="${optionBg}" stroke="#e5e7eb" stroke-width="1"/>`;
+
+          // Option text
+          optionsSvg += `<text x="${x + optionWidth / 2}" y="${y + optionHeight / 2}" text-anchor="middle" dominant-baseline="middle" fill="${optionText}" font-size="14" font-family="Arial">${escapeXml(text)}</text>`;
+
+          // Result bar if showing results
+          if (showResults) {
+            const percentage = 0; // Placeholder
+            optionsSvg += `<text x="${x + optionWidth - 10}" y="${y + optionHeight / 2}" text-anchor="end" dominant-baseline="middle" fill="${optionText}" font-size="12" opacity="0.7">${percentage}%</text>`;
+          }
+        });
+      }
+
+      newSrc = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+          <rect width="${width}" height="${height}" rx="12" fill="${bgColor}"/>
+          <text x="${width / 2}" y="${questionY}" text-anchor="middle" dominant-baseline="middle" fill="${questionColor}" font-size="${questionSize}" font-weight="600" font-family="Arial">${escapeXml(question)}</text>
+          ${optionsSvg}
+        </svg>
+      `)}`;
+    } else {
+      const styleDefaults = { ...INTERACTIVE_STYLES[interactiveType], ...newStyle };
+      newSrc = generateInteractiveSVG(interactiveType, newData, styleDefaults, dimensions);
+    }
+
     element.set({ src: newSrc, height, width });
   }, [element, interactiveType]);
 
@@ -145,7 +248,8 @@ export const InteractiveSettings = observer(({ store, element }) => {
     } else if (interactiveType === 'quiz') {
       newOption = { id: newId, text: `Option ${options.length + 1}` };
     } else {
-      newOption = { id: newId, label: `Option ${options.length + 1}`, votes: 0 };
+      const optionText = `Option ${options.length + 1}`;
+      newOption = { id: newId, label: optionText, text: optionText, votes: 0 };
     }
     updateOptions([...options, newOption]);
   };
@@ -360,7 +464,7 @@ export const InteractiveSettings = observer(({ store, element }) => {
             <input
               type="text"
               value={option.label ?? option.text ?? ''}
-              onChange={(e) => updateOption(option.id, { label: e.target.value })}
+              onChange={(e) => updateOption(option.id, { label: e.target.value, text: e.target.value })}
               style={{
                 flex: 1,
                 padding: '8px 10px',
@@ -408,7 +512,7 @@ export const InteractiveSettings = observer(({ store, element }) => {
       </div>
 
       <div className="section" style={{ marginTop: 16 }}>
-        {renderSelect('Layout', data.layout || 'horizontal', (v) => updateData('layout', v), [
+        {renderSelect('Layout', data.layout?.type || data.layout || 'horizontal', (v) => updateData('layout', { type: v, columns: 2 }), [
           { value: 'horizontal', label: 'Horizontal (2 columns)' },
           { value: 'vertical', label: 'Vertical (full width)' },
         ])}
