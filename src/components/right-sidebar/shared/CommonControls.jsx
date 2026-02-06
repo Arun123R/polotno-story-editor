@@ -1,5 +1,9 @@
 import React, { useCallback, useEffect, useRef } from 'react';
+
+import InfoIcon from '../../InfoIcon';
+import DurationHeaderWithTooltip from './DurationHeaderWithTooltip';
 import { observer } from 'mobx-react-lite';
+import Dropdown from '../../shared/Dropdown';
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -643,11 +647,10 @@ export const DurationSection = observer(({ store, element }) => {
 
   return (
     <div className="duration-section">
-      <div className="duration-header">
-        <span className="duration-title">
-          Duration <span style={{ fontSize: '10px', color: 'var(--sidebar-text-muted)' }}>ⓘ</span>
-        </span>
-      </div>
+      <DurationHeaderWithTooltip />
+
+
+
 
       <div className="duration-controls">
         <button className="play-btn" onClick={handlePlayPause} aria-label={store.isPlaying ? 'Pause' : 'Play'}>
@@ -887,17 +890,12 @@ export const AnimationSection = observer(({ store, element }) => {
           <span className="control-label">Effect</span>
           <div className="control-value">
             <div className="select-wrapper" style={{ width: '120px' }}>
-              <select
-                className="select-input"
+              <Dropdown
                 value={getDisplayName(enterAnimation?.name || 'none')}
-                onChange={(e) => setEnterAnimation(e.target.value)}
-              >
-                {animationPresets.map(anim => (
-                  <option key={anim.name} value={anim.name}>
-                    {anim.label}
-                  </option>
-                ))}
-              </select>
+                onChange={(v) => setEnterAnimation(v)}
+                options={animationPresets.map((anim) => ({ value: anim.name, label: anim.label }))}
+                ariaLabel="Entrance effect"
+              />
             </div>
           </div>
         </div>
@@ -908,17 +906,12 @@ export const AnimationSection = observer(({ store, element }) => {
             <span className="control-label">Direction</span>
             <div className="control-value">
               <div className="select-wrapper" style={{ width: '120px' }}>
-                <select
-                  className="select-input"
+                <Dropdown
                   value={getDirection(enterAnimation)}
-                  onChange={(e) => setDirection('enter', e.target.value)}
-                >
-                  {directionOptions.map(dir => (
-                    <option key={dir.value} value={dir.value}>
-                      {dir.label}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(v) => setDirection('enter', v)}
+                  options={directionOptions}
+                  ariaLabel="Entrance direction"
+                />
               </div>
             </div>
           </div>
@@ -982,17 +975,12 @@ export const AnimationSection = observer(({ store, element }) => {
               <span className="control-label">Easing</span>
               <div className="control-value">
                 <div className="select-wrapper" style={{ width: '120px' }}>
-                  <select
-                    className="select-input"
+                  <Dropdown
                     value={enterAnimation.easing || 'easeOut'}
-                    onChange={(e) => updateAnimation('enter', { easing: e.target.value })}
-                  >
-                    {easingOptions.map(opt => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(v) => updateAnimation('enter', { easing: v })}
+                    options={easingOptions}
+                    ariaLabel="Entrance easing"
+                  />
                 </div>
               </div>
             </div>
@@ -1010,17 +998,12 @@ export const AnimationSection = observer(({ store, element }) => {
           <span className="control-label">Effect</span>
           <div className="control-value">
             <div className="select-wrapper" style={{ width: '120px' }}>
-              <select
-                className="select-input"
+              <Dropdown
                 value={getDisplayName(exitAnimation?.name || 'none')}
-                onChange={(e) => setExitAnimation(e.target.value)}
-              >
-                {animationPresets.map(anim => (
-                  <option key={anim.name} value={anim.name}>
-                    {anim.label}
-                  </option>
-                ))}
-              </select>
+                onChange={(v) => setExitAnimation(v)}
+                options={animationPresets.map((anim) => ({ value: anim.name, label: anim.label }))}
+                ariaLabel="Exit effect"
+              />
             </div>
           </div>
         </div>
@@ -1031,17 +1014,12 @@ export const AnimationSection = observer(({ store, element }) => {
             <span className="control-label">Direction</span>
             <div className="control-value">
               <div className="select-wrapper" style={{ width: '120px' }}>
-                <select
-                  className="select-input"
+                <Dropdown
                   value={getDirection(exitAnimation)}
-                  onChange={(e) => setDirection('exit', e.target.value)}
-                >
-                  {directionOptions.map(dir => (
-                    <option key={dir.value} value={dir.value}>
-                      {dir.label}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(v) => setDirection('exit', v)}
+                  options={directionOptions}
+                  ariaLabel="Exit direction"
+                />
               </div>
             </div>
           </div>
@@ -1108,17 +1086,12 @@ export const AnimationSection = observer(({ store, element }) => {
               <span className="control-label">Easing</span>
               <div className="control-value">
                 <div className="select-wrapper" style={{ width: '120px' }}>
-                  <select
-                    className="select-input"
+                  <Dropdown
                     value={exitAnimation.easing || 'easeIn'}
-                    onChange={(e) => updateAnimation('exit', { easing: e.target.value })}
-                  >
-                    {easingOptions.map(opt => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(v) => updateAnimation('exit', { easing: v })}
+                    options={easingOptions}
+                    ariaLabel="Exit easing"
+                  />
                 </div>
               </div>
             </div>
@@ -1136,17 +1109,12 @@ export const AnimationSection = observer(({ store, element }) => {
           <span className="control-label">Effect</span>
           <div className="control-value">
             <div className="select-wrapper" style={{ width: '120px' }}>
-              <select
-                className="select-input"
+              <Dropdown
                 value={getDisplayName(loopAnimation?.name || 'none')}
-                onChange={(e) => setLoopAnimation(e.target.value)}
-              >
-                {animationPresets.map(anim => (
-                  <option key={anim.name} value={anim.name}>
-                    {anim.label}
-                  </option>
-                ))}
-              </select>
+                onChange={(v) => setLoopAnimation(v)}
+                options={animationPresets.map((anim) => ({ value: anim.name, label: anim.label }))}
+                ariaLabel="Loop effect"
+              />
             </div>
           </div>
         </div>
@@ -1157,17 +1125,12 @@ export const AnimationSection = observer(({ store, element }) => {
             <span className="control-label">Direction</span>
             <div className="control-value">
               <div className="select-wrapper" style={{ width: '120px' }}>
-                <select
-                  className="select-input"
+                <Dropdown
                   value={getDirection(loopAnimation)}
-                  onChange={(e) => setDirection('loop', e.target.value)}
-                >
-                  {directionOptions.map(dir => (
-                    <option key={dir.value} value={dir.value}>
-                      {dir.label}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(v) => setDirection('loop', v)}
+                  options={directionOptions}
+                  ariaLabel="Loop direction"
+                />
               </div>
             </div>
           </div>
@@ -1234,17 +1197,12 @@ export const AnimationSection = observer(({ store, element }) => {
               <span className="control-label">Easing</span>
               <div className="control-value">
                 <div className="select-wrapper" style={{ width: '120px' }}>
-                  <select
-                    className="select-input"
+                  <Dropdown
                     value={loopAnimation.easing || 'linear'}
-                    onChange={(e) => updateAnimation('loop', { easing: e.target.value })}
-                  >
-                    {easingOptions.map(opt => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(v) => updateAnimation('loop', { easing: v })}
+                    options={easingOptions}
+                    ariaLabel="Loop easing"
+                  />
                 </div>
               </div>
             </div>

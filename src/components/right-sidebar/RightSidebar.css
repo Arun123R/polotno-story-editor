@@ -257,6 +257,16 @@
   border-color: var(--sidebar-accent);
 }
 
+.position-input:active {
+  outline: none;
+}
+
+.position-input:focus-visible {
+  border-color: transparent;
+  outline: 2px solid rgba(249, 115, 22, 0.35);
+  outline-offset: 2px;
+}
+
 /* Color Picker */
 .color-picker-row {
   display: flex;
@@ -296,6 +306,21 @@
   font-family: inherit;
 }
 
+.color-input-text:focus {
+  outline: none;
+  border-color: var(--sidebar-accent);
+}
+
+.color-input-text:active {
+  outline: none;
+}
+
+.color-input-text:focus-visible {
+  border-color: transparent;
+  outline: 2px solid rgba(249, 115, 22, 0.35);
+  outline-offset: 2px;
+}
+
 /* Segmented Control (Presets) */
 .segment-group {
   display: flex;
@@ -317,6 +342,24 @@
   border-radius: 6px;
   transition: all 0.2s;
   white-space: nowrap;
+}
+
+/* Prevent mouse-down focus outline stacking; keep keyboard focus visible. */
+.segment-btn:focus {
+  outline: none;
+}
+
+.segment-btn:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.segment-btn:active {
+  outline: none;
+}
+
+.segment-btn:focus-visible {
+  outline: 2px solid rgba(249, 115, 22, 0.35);
+  outline-offset: 2px;
 }
 
 .segment-btn:hover {
@@ -363,6 +406,16 @@
 .slider-input:focus {
   outline: none;
   border-color: var(--sidebar-accent);
+}
+
+.slider-input:active {
+  outline: none;
+}
+
+.slider-input:focus-visible {
+  border-color: transparent;
+  outline: 2px solid rgba(249, 115, 22, 0.35);
+  outline-offset: 2px;
 }
 
 .slider-track {
@@ -423,6 +476,21 @@
   appearance: none;
 }
 
+.select-input:focus {
+  outline: none;
+  border-color: var(--sidebar-accent);
+}
+
+.select-input:active {
+  outline: none;
+}
+
+.select-input:focus-visible {
+  border-color: transparent;
+  outline: 2px solid rgba(249, 115, 22, 0.35);
+  outline-offset: 2px;
+}
+
 .select-wrapper::after {
   content: '';
   position: absolute;
@@ -463,6 +531,15 @@
   transition: all 0.2s;
 }
 
+.text-style-btn:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.text-style-btn:focus-visible {
+  outline: 2px solid rgba(249, 115, 22, 0.35);
+  outline-offset: 2px;
+}
+
 .text-style-btn:hover {
   background: var(--sidebar-bg-hover);
   color: var(--sidebar-text);
@@ -484,6 +561,23 @@
   gap: 4px;
 }
 
+/* Text panel alignment: new larger card-style buttons (no vertical alignment row). */
+.alignment-group--text {
+  gap: 8px;
+}
+
+.alignment-group--text .align-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  border-width: 2px;
+  color: var(--sidebar-text);
+}
+
+.alignment-group--text .align-btn svg {
+  display: block;
+}
+
 .align-btn {
   width: 36px;
   height: 32px;
@@ -496,6 +590,17 @@
   color: var(--sidebar-text-secondary);
   cursor: pointer;
   transition: all 0.2s;
+}
+
+.align-btn:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+.align-btn:focus-visible {
+  border-color: transparent;
+  outline: 2px solid rgba(249, 115, 22, 0.35);
+  outline-offset: 2px;
 }
 
 .align-btn:hover {
@@ -729,9 +834,39 @@
   box-shadow: none;
 }
 
+/* Remove default browser focus outline on mouse click; keep :focus-visible intentional. */
+.right-sidebar .bp5-input:focus {
+  outline: none;
+}
+
+/* Blueprint often adds a focus ring on the input-group wrapper via box-shadow. */
+.right-sidebar .bp5-input-group:focus-within,
+.right-sidebar .bp5-numeric-input .bp5-input-group:focus-within {
+  box-shadow: none;
+}
+
 .right-sidebar .bp5-input:focus,
 .right-sidebar .bp5-numeric-input .bp5-input-group .bp5-input:focus {
   border-color: var(--sidebar-accent);
+  box-shadow: none;
+}
+
+/* Keyboard accessibility: show a single focus indicator without stacking. */
+.right-sidebar .bp5-input:focus-visible,
+.right-sidebar .bp5-numeric-input .bp5-input-group .bp5-input:focus-visible {
+  border-color: transparent;
+  box-shadow: none;
+  outline: 2px solid rgba(249, 115, 22, 0.35);
+  outline-offset: 2px;
+}
+
+/* Buttons: avoid mouse-down focus ring stacking with hover/active borders. */
+.right-sidebar .bp5-button:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+.right-sidebar .bp5-button:active {
   box-shadow: none;
 }
 
@@ -782,6 +917,24 @@
   background: var(--sidebar-input-bg);
   border: 1px solid var(--sidebar-input-border);
   color: var(--sidebar-text);
+}
+
+.right-sidebar .bp5-html-select select:focus {
+  outline: none;
+  border-color: var(--sidebar-accent);
+  box-shadow: none;
+}
+
+.right-sidebar .bp5-html-select select:active {
+  outline: none;
+  box-shadow: none;
+}
+
+.right-sidebar .bp5-html-select select:focus-visible {
+  border-color: transparent;
+  box-shadow: none;
+  outline: 2px solid rgba(249, 115, 22, 0.35);
+  outline-offset: 2px;
 }
 
 .right-sidebar .bp5-html-select::after {

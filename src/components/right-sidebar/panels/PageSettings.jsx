@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { DurationSection, TrashIcon } from '../shared/CommonControls';
 import { ColorPicker } from '../shared/ColorPicker';
+import Dropdown from '../../shared/Dropdown';
 
 import { getStorePresetName } from '../../../utils/scale';
 import { setStorePreset } from '../../../store/polotnoStore';
@@ -222,7 +223,7 @@ export const PageSettings = observer(({ store }) => {
           </div>
 
           <div className="control-row" style={{ alignItems: 'flex-start' }}>
-            <span className="control-label">Color</span>
+            <span className="control-label" style={{ paddingTop: 7 }}>Color</span>
             <div
               className="control-value"
               style={{
@@ -285,36 +286,23 @@ export const PageSettings = observer(({ store }) => {
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                     <span style={{ fontSize: 12, color: 'var(--sidebar-text-muted)' }}>Direction</span>
-                    <div className="select-wrapper" style={{ position: 'relative', width: '100%' }}>
-                      <select
-                        className="select-input"
+                    <div className="select-wrapper" style={{ width: '100%' }}>
+                      <Dropdown
                         value={
                           currentBg.color?.type === 'gradient'
                             ? currentBg.color.gradient?.direction || 'top'
                             : 'top'
                         }
-                        onChange={(e) => setColorGradient({ direction: e.target.value })}
-                        style={{ padding: '8px 32px 8px 12px', borderRadius: 8, width: '100%' }}
-                      >
-                        <option value="top">Top</option>
-                        <option value="bottom">Bottom</option>
-                        <option value="left">Left</option>
-                        <option value="right">Right</option>
-                        <option value="radial">Radial</option>
-                      </select>
-                      <div
-                        style={{
-                          position: 'absolute',
-                          right: 12,
-                          top: '50%',
-                          transform: 'translateY(-50%)',
-                          pointerEvents: 'none',
-                          fontSize: 10,
-                          color: '#718096',
-                        }}
-                      >
-                        ▼
-                      </div>
+                        onChange={(v) => setColorGradient({ direction: v })}
+                        options={[
+                          { value: 'top', label: 'Top' },
+                          { value: 'bottom', label: 'Bottom' },
+                          { value: 'left', label: 'Left' },
+                          { value: 'right', label: 'Right' },
+                          { value: 'radial', label: 'Radial' },
+                        ]}
+                        ariaLabel="Gradient direction"
+                      />
                     </div>
                   </div>
                 </>
@@ -408,37 +396,24 @@ export const PageSettings = observer(({ store }) => {
             <div className="control-row">
               <span className="control-label">Position</span>
               <div className="control-value" style={{ width: 180 }}>
-                <div className="select-wrapper" style={{ position: 'relative', width: '100%' }}>
-                  <select
-                    className="select-input"
+                <div className="select-wrapper" style={{ width: '100%' }}>
+                  <Dropdown
                     value={currentBg.media?.position || 'bottom-center'}
-                    onChange={(e) => setMedia({ position: e.target.value })}
-                    style={{ padding: '8px 32px 8px 12px', borderRadius: 8, width: '100%' }}
-                  >
-                    <option value="center">Center</option>
-                    <option value="top">Top</option>
-                    <option value="bottom">Bottom</option>
-                    <option value="left">Left</option>
-                    <option value="right">Right</option>
-                    <option value="top-left">Top Left</option>
-                    <option value="top-right">Top Right</option>
-                    <option value="bottom-left">Bottom Left</option>
-                    <option value="bottom-right">Bottom Right</option>
-                    <option value="bottom-center">Bottom Center</option>
-                  </select>
-                  <div
-                    style={{
-                      position: 'absolute',
-                      right: 12,
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      pointerEvents: 'none',
-                      fontSize: 10,
-                      color: '#718096',
-                    }}
-                  >
-                    ▼
-                  </div>
+                    onChange={(v) => setMedia({ position: v })}
+                    options={[
+                      { value: 'center', label: 'Center' },
+                      { value: 'top', label: 'Top' },
+                      { value: 'bottom', label: 'Bottom' },
+                      { value: 'left', label: 'Left' },
+                      { value: 'right', label: 'Right' },
+                      { value: 'top-left', label: 'Top Left' },
+                      { value: 'top-right', label: 'Top Right' },
+                      { value: 'bottom-left', label: 'Bottom Left' },
+                      { value: 'bottom-right', label: 'Bottom Right' },
+                      { value: 'bottom-center', label: 'Bottom Center' },
+                    ]}
+                    ariaLabel="Media position"
+                  />
                 </div>
               </div>
             </div>

@@ -1245,50 +1245,51 @@ export const CtaSectionPanel = observer(({ store }) => {
         className="hidden"
       />
 
-      <div className="p-4 space-y-6 overflow-y-auto flex-1 pb-20">
+      <div className="px-3 py-3 space-y-6 overflow-y-auto flex-1 pb-20">
         {/* ADD CTA Section */}
         <div>
           <h3 className="text-[12px] font-bold text-(--text-muted) uppercase tracking-wider mb-4 px-1">
             Add CTA
           </h3>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             {/* Classic CTA */}
             <button
               onClick={addClassicCta}
-              className="studio-card w-full flex flex-col items-center justify-center py-4 px-3 group"
+              aria-label="Add Shop Now CTA"
+              className="studio-card cta-card cta-classic w-full flex flex-col items-center justify-center px-3 group"
             >
-              <div className="bg-(--info) text-(--surface-light) px-6 py-2.5 rounded-full text-[14px] font-bold shadow-sm transition-transform group-hover:scale-105">
+              <div className="cta-pill bg-(--info) text-(--surface-light) transition-transform group-hover:scale-105">
                 Shop Now
               </div>
-              <span className="mt-2 text-[12px] text-(--text-muted) font-medium">classic</span>
             </button>
 
             {/* Swipe Up CTA */}
             <button
               onClick={addSwipeUpCta}
-              className="studio-card w-full flex flex-col items-center justify-center py-4 px-3 group"
+              aria-label="Add Swipe Up CTA"
+              className="studio-card cta-card w-full flex flex-col items-center justify-center px-3 group"
             >
               {(() => {
                 // Use an existing swipe_up CTA on the page for preview if available
                 const existing = mainCtas.find((c) => c.custom?.ctaType === 'swipe_up');
                 const previewData = existing ? existing.custom : CTA_DEFAULTS.swipe_up;
-                const previewSvg = generateCtaSVG('swipe_up', previewData, 180, 60);
+                // Generate a larger preview SVG so the pill appears bigger in the panel
+                const previewSvg = generateCtaSVG('swipe_up', previewData, 220, 80);
                 return (
-                  <img src={previewSvg} alt="Swipe Up preview" style={{ width: 140, height: 36, objectFit: 'contain' }} className="mb-1" />
+                  <img src={previewSvg} alt="Swipe Up preview" style={{ width: 180, height: 48, objectFit: 'contain' }} className="mb-1 cta-swipe" />
                 );
               })()}
-              <span className="text-[14px] text-(--text-primary) font-medium">Swipe Up</span>
             </button>
 
             {/* Image CTA */}
             <button
               onClick={openImagePicker}
-              className="studio-card w-full flex flex-col items-center justify-center py-4 px-3 group"
+              className="studio-card cta-card w-full flex flex-col items-center justify-center px-3 group"
             >
-              <div className="bg-(--bg-hover) p-2.5 rounded-xl mb-1 group-hover:bg-(--border-primary) transition-colors">
+              <div className="cta-icon bg-(--bg-hover) mb-1 group-hover:bg-(--border-primary) transition-colors">
                 <ImageCtaIcon className="w-6 h-6 text-(--text-secondary)" />
               </div>
-              <span className="text-[14px] text-(--text-primary) font-medium">Image CTA</span>
+              <span className="cta-label text-[14px] text-(--text-primary) font-medium">Image CTA</span>
             </button>
           </div>
         </div>
@@ -1298,13 +1299,13 @@ export const CtaSectionPanel = observer(({ store }) => {
           <h3 className="text-[12px] font-bold text-(--text-muted) uppercase tracking-wider mb-4 px-1">
             Product Cards
           </h3>
-          <div className="grid grid-cols-3 gap-2 px-1">
+          <div className="grid grid-cols-3 gap-2 px-0 items-start">
             {/* Visit Product */}
             <button
               onClick={addVisitProductCta}
-              className="studio-card aspect-square flex flex-col items-center justify-center p-2 group"
+              className="studio-card product-square flex flex-col items-center justify-center p-2 group"
             >
-              <div className="w-10 h-10 bg-(--text-primary) rounded-lg flex items-center justify-center mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+              <div className="w-10 aspect-square bg-(--text-primary) rounded-xl flex items-center justify-center mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
                 <VisitIcon className="w-5 h-5 text-(--bg-secondary)" />
               </div>
               <span className="text-[12px] text-(--text-secondary) font-medium">Visit</span>
@@ -1313,9 +1314,9 @@ export const CtaSectionPanel = observer(({ store }) => {
             {/* Describe Product */}
             <button
               onClick={addDescribeProductCta}
-              className="studio-card aspect-square flex flex-col items-center justify-center p-2 group"
+              className="studio-card product-square flex flex-col items-center justify-center p-2 group"
             >
-              <div className="w-10 h-10 bg-(--text-primary) rounded-lg flex items-center justify-center mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+              <div className="w-10 aspect-square bg-(--text-primary) rounded-xl flex items-center justify-center mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
                 <DescribeIcon className="w-5 h-5 text-(--bg-secondary)" />
               </div>
               <span className="text-[12px] text-(--text-secondary) font-medium">Describe</span>
@@ -1324,9 +1325,9 @@ export const CtaSectionPanel = observer(({ store }) => {
             {/* Buy Product */}
             <button
               onClick={addBuyProductCta}
-              className="studio-card aspect-square flex flex-col items-center justify-center p-2 group"
+              className="studio-card product-square flex flex-col items-center justify-center p-2 group"
             >
-              <div className="w-10 h-10 bg-(--text-primary) rounded-lg flex items-center justify-center mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+              <div className="w-10 aspect-square bg-(--text-primary) rounded-xl flex items-center justify-center mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
                 <BuyIcon className="w-5 h-5 text-(--bg-secondary)" />
               </div>
               <span className="text-[12px] text-(--text-secondary) font-medium">Buy</span>
