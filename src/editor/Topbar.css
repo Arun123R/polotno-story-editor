@@ -129,8 +129,7 @@
     height: 28px;
     border-radius: 50%;
     overflow: hidden;
-    border: 2px solid #5EEAD4;
-    /* Teal-ish border like in reference */
+    /* border removed, now controlled by inline style in JSX */
     background: white;
     flex-shrink: 0;
 }
