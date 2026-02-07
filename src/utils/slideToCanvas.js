@@ -19,6 +19,9 @@
 // Story preset dimensions (360x640)
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
+import { CountdownRenderer } from '../components/interactive/renderers/CountdownRenderer';
+import { QuestionRenderer } from '../components/interactive/renderers/QuestionRenderer';
+import { ImageQuizRenderer } from '../components/interactive/renderers/ImageQuizRenderer';
 import { PollRenderer } from '../components/interactive/renderers/PollRenderer';
 
 const CANVAS_WIDTH = 360;
@@ -552,6 +555,600 @@ export const buildPageFromSlide = (slide) => {
                 interactiveType: 'poll',
                 data: pollData,
                 style: pollStyle
+            }
+        });
+    }
+
+    // ============================================
+    // STEP 5: Apply Quiz elements
+    // ============================================
+    if (content.quiz) {
+        const quizContent = content.quiz;
+        const quizStyling = styling.quiz || {};
+
+        console.log(`[slideToCanvas] Creating Quiz element`);
+
+        // 1. Map Data to QuizRenderer format
+        const quizData = {
+            question: quizContent.question || '',
+            options: (quizContent.options || []).map(o => ({
+                id: o.id,
+                text: o.text,
+                isCorrect: !!o.isCorrect
+            })),
+            showExplanation: quizContent.showExplanation || false,
+            duration: quizContent.duration || { start: 0, end: 5 }
+        };
+
+        // 2. Map Styling to QuizRenderer format (nested structure)
+        const quizStyle = {
+            // Support both nested and flat structures
+            colors: {
+                background: quizStyling.colors?.background || quizStyling.background || '#FF0000',
+                questionColor: quizStyling.colors?.questionColor || quizStyling.questionColor || '#FFFFFF',
+                optionBackground: quizStyling.colors?.optionBackground || quizStyling.optionBackground || '#F9FAFB',
+                optionTextColor: quizStyling.colors?.optionTextColor || quizStyling.optionTextColor || '#1F2937',
+                correctColor: quizStyling.colors?.correctColor || quizStyling.correctColor || '#10B981',
+                incorrectColor: quizStyling.colors?.incorrectColor || quizStyling.incorrectColor || '#EF4444'
+            },
+            typography: {
+                questionSize: quizStyling.typography?.questionSize || quizStyling.questionSize || 16,
+                optionSize: quizStyling.typography?.optionSize || quizStyling.optionSize || 14
+            },
+            spacing: {
+                padding: quizStyling.spacing?.padding || quizStyling.padding || 20,
+                optionRadius: quizStyling.spacing?.optionRadius || quizStyling.optionRadius || 8
+            },
+            appearance: {
+                opacity: quizStyling.appearance?.opacity ?? quizStyling.opacity ?? 1,
+                radius: quizStyling.appearance?.radius || quizStyling.radius || 16
+            }
+        };
+
+        // 3. Geometry
+        let width = quizStyling.size?.width || 280;
+        let height = quizStyling.size?.height || 214;
+
+        // Calculate minimum height based on options count
+        if (quizContent.options) {
+            const optionCount = quizContent.options.length;
+            const padding = quizStyle.spacing.padding;
+            const questionHeight = 35;
+            const optionHeight = 34;
+            const optionGap = 12;
+            const bottomPadding = 18;
+
+            const minHeight = padding + questionHeight + 15 + (optionCount * optionHeight) + ((optionCount - 1) * optionGap) + bottomPadding;
+
+            if (height < minHeight) {
+                console.log(`[slideToCanvas] ⚠️ Height ${height}px too small for ${optionCount} quiz options, using ${minHeight}px`);
+                height = minHeight;
+            }
+        }
+
+        const x = quizStyling.position?.x || 40;
+        const y = quizStyling.position?.y || 200;
+
+        // 4. Generate SVG for quiz
+        const bgColor = quizStyle.colors.background;
+        const questionColor = quizStyle.colors.questionColor;
+        const questionSize = quizStyle.typography.questionSize;
+        const optionBg = quizStyle.colors.optionBackground;
+        const optionTextColor = quizStyle.colors.optionTextColor;
+        const optionSize = quizStyle.typography.optionSize;
+        const correctColor = quizStyle.colors.correctColor;
+        const borderRadius = quizStyle.appearance.radius;
+        const padding = quizStyle.spacing.padding;
+        const optionRadius = quizStyle.spacing.optionRadius;
+
+        const question = quizData.question || 'What is the answer?';
+        const options = quizData.options || [];
+
+        // Calculate positions
+        const questionY = padding + 18;
+        const optionsStartY = questionY + 30;
+        const optionHeight = 34;
+        const optionGap = 12;
+
+        let optionsSvg = '';
+        options.forEach((opt, idx) => {
+            const optY = optionsStartY + idx * (optionHeight + optionGap);
+            const text = opt.text || '';
+            const letter = String.fromCharCode(65 + idx); // A, B, C...
+
+            // Option pill
+            const pillBg = opt.isCorrect ? correctColor : optionBg;
+            const borderColor = opt.isCorrect ? correctColor : 'transparent';
+
+            optionsSvg += `<rect x="${padding}" y="${optY}" width="${width - padding * 2}" height="${optionHeight}" rx="${optionRadius}" fill="${pillBg}" stroke="${borderColor}" stroke-width="2"/>`;
+
+            // Letter circle
+            optionsSvg += `<circle cx="${padding + 20}" cy="${optY + optionHeight / 2}" r="12" fill="#e5e7eb"/>`;
+            optionsSvg += `<text x="${padding + 20}" y="${optY + optionHeight / 2}" text-anchor="middle" dominant-baseline="middle" fill="#1f2937" font-size="11" font-weight="700">${letter}</text>`;
+
+            // Option text
+            optionsSvg += `<text x="${padding + 44}" y="${optY + optionHeight / 2}" dominant-baseline="middle" fill="${optionTextColor}" font-size="${optionSize}" font-family="Arial">${escapeXml(text)}</text>`;
+
+            // Checkmark for correct answer
+            if (opt.isCorrect) {
+                optionsSvg += `<text x="${width - padding - 10}" y="${optY + optionHeight / 2}" text-anchor="end" dominant-baseline="middle" fill="${correctColor}" font-size="16">✓</text>`;
+            }
+        });
+
+        const svgSrc = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+                <rect width="${width}" height="${height}" rx="${borderRadius}" fill="${bgColor}"/>
+                <text x="${padding + 4}" y="${questionY}" dominant-baseline="middle" fill="${questionColor}" font-size="${questionSize}" font-weight="700" font-family="Arial">${escapeXml(question)}</text>
+                ${optionsSvg}
+            </svg>
+        `)}`;
+
+        // 5. Create element with internal schema structure for editing
+        children.push({
+            id: `quiz-${slideId}`,
+            type: 'svg',
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+            src: svgSrc,
+            custom: {
+                kind: 'interactive',
+                interactiveType: 'quiz',
+                data: quizData,
+                style: quizStyle
+            }
+        });
+
+        console.log(`[slideToCanvas] ✓ Created Quiz element`);
+    }
+
+    // ============================================
+    // STEP 6: Apply Rating elements
+    // ============================================
+    if (content.rating) {
+        const ratingContent = content.rating;
+        const ratingStyling = styling.rating || {};
+
+        console.log(`[slideToCanvas] Creating Rating element`);
+
+        // 1. Map Data
+        const ratingData = {
+            type: 'rating',
+            variant: ratingContent.variant || 'slider',
+            title: ratingContent.title || '',
+            maxRating: ratingContent.maxRating || 5,
+            emoji: ratingContent.emoji || '😺',
+            currentRating: ratingContent.currentRating || 3
+        };
+
+        // 2. Map Styling (nested structure)
+        const ratingStyle = {
+            colors: {
+                background: ratingStyling.colors?.background || ratingStyling.background || '#695454',
+                cardBackground: ratingStyling.colors?.cardBackground || ratingStyling.cardBackground || '#863232',
+                titleColor: ratingStyling.colors?.titleColor || ratingStyling.titleColor || '#000000',
+                sliderTrack: ratingStyling.colors?.sliderTrack || ratingStyling.sliderTrack || '#E6E6E6',
+                sliderFill: ratingStyling.colors?.sliderFill || ratingStyling.sliderFill || '#F97316'
+            },
+            typography: {
+                titleSize: ratingStyling.typography?.titleSize || ratingStyling.titleSize || 14,
+                emojiSize: ratingStyling.typography?.emojiSize || ratingStyling.emojiSize || 32
+            },
+            radius: ratingStyling.radius || 12,
+            padding: ratingStyling.padding || 36
+        };
+
+        // 3. Geometry
+        const width = ratingStyling.size?.width || 237;
+        const height = ratingStyling.size?.height || 90;
+        const x = ratingStyling.position?.x || 62;
+        const y = ratingStyling.position?.y || 261;
+
+        // 4. Generate SVG for rating
+        const bgColor = ratingStyle.colors.background;
+        const cardBg = ratingStyle.colors.cardBackground;
+        const titleColor = ratingStyle.colors.titleColor;
+        const titleSize = ratingStyle.typography.titleSize;
+        const emojiSize = ratingStyle.typography.emojiSize;
+        const sliderTrack = ratingStyle.colors.sliderTrack;
+        const sliderFill = ratingStyle.colors.sliderFill;
+        const borderRadius = ratingStyle.radius;
+        // Use fixed padding for consistent layout
+        const padding = 20;
+
+        const title = ratingData.title || 'Rate this';
+        const variant = ratingData.variant;
+        const emoji = ratingData.emoji;
+        const maxRating = ratingData.maxRating;
+        const currentRating = ratingData.currentRating;
+
+        let contentSvg = '';
+
+        // Title
+        const titleY = padding + titleSize / 2 + 5;
+        contentSvg += `<text x="${width / 2}" y="${titleY}" text-anchor="middle" dominant-baseline="middle" fill="${titleColor}" font-size="${titleSize}" font-weight="600">${escapeXml(title)}</text>`;
+
+        // Rating display based on variant
+        const ratingY = titleY + 25;
+
+        if (variant === 'slider') {
+            // Slider variant with emoji as thumb
+            const sliderWidth = width - padding * 2;
+            const sliderHeight = 8;
+            const sliderX = padding;
+            const fillWidth = (currentRating / maxRating) * sliderWidth;
+            const thumbX = sliderX + fillWidth;
+
+            // Define gradient
+            contentSvg += `
+              <defs>
+                <linearGradient id="sliderGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:#d946ef;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:${sliderFill};stop-opacity:1" />
+                </linearGradient>
+              </defs>
+            `;
+
+            contentSvg += `<rect x="${sliderX}" y="${ratingY}" width="${sliderWidth}" height="${sliderHeight}" rx="4" fill="${sliderTrack}"/>`;
+            contentSvg += `<rect x="${sliderX}" y="${ratingY}" width="${fillWidth}" height="${sliderHeight}" rx="4" fill="url(#sliderGradient)"/>`;
+            // Emoji as slider thumb
+            contentSvg += `<text x="${thumbX}" y="${ratingY + 4}" text-anchor="middle" dominant-baseline="middle" font-size="${emojiSize}" style="pointer-events: none;">${emoji}</text>`;
+        } else if (variant === 'emoji') {
+            // Emoji variant
+            const emojiSpacing = (width - padding * 2) / maxRating;
+            for (let i = 0; i < maxRating; i++) {
+                const emojiX = padding + i * emojiSpacing + emojiSpacing / 2;
+                const opacity = i < currentRating ? 1 : 0.3;
+                contentSvg += `<text x="${emojiX}" y="${ratingY}" text-anchor="middle" dominant-baseline="middle" font-size="${emojiSize}" opacity="${opacity}">${emoji}</text>`;
+            }
+        } else {
+            // Star variant (default)
+            const starSpacing = (width - padding * 2) / maxRating;
+            for (let i = 0; i < maxRating; i++) {
+                const starX = padding + i * starSpacing + starSpacing / 2;
+                const fill = i < currentRating ? sliderFill : sliderTrack;
+                contentSvg += `<text x="${starX}" y="${ratingY}" text-anchor="middle" dominant-baseline="middle" font-size="${emojiSize}" fill="${fill}">★</text>`;
+            }
+        }
+
+        const svgSrc = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+                <rect width="${width}" height="${height}" rx="${borderRadius}" fill="${bgColor}"/>
+                ${contentSvg}
+            </svg>
+        `)}`;
+
+        // 5. Create element
+        children.push({
+            id: `rating-${slideId}`,
+            type: 'svg',
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+            src: svgSrc,
+            custom: {
+                kind: 'interactive',
+                interactiveType: 'rating',
+                data: ratingData,
+                style: ratingStyle
+            }
+        });
+
+        console.log(`[slideToCanvas] ✓ Created Rating element`);
+    }
+
+    // ============================================
+    // STEP 7: Apply Reaction elements
+    // ============================================
+    if (content.reaction) {
+        const reactionContent = content.reaction;
+        const reactionStyling = styling.reaction || {};
+
+        console.log(`[slideToCanvas] Creating Reaction element`);
+
+        // 1. Map Data
+        const reactionData = {
+            type: 'reaction',
+            emojis: reactionContent.emojis || ['👍', '👎'],
+            showCount: reactionContent.showCount || false,
+            duration: reactionContent.duration || { start: 0, end: 5 }
+        };
+
+        // 2. Map Styling
+        const reactionStyle = {
+            background: reactionStyling.background || '#FFFFFF',
+            transparentBackground: reactionStyling.transparentBackground || false,
+            padding: reactionStyling.padding !== undefined ? reactionStyling.padding : 0,
+            emojiSize: reactionStyling.emojiSize || 48,
+            radius: reactionStyling.radius !== undefined ? reactionStyling.radius : 0,
+            countColor: reactionStyling.countColor || '#374151',
+            countSize: reactionStyling.countSize || 14
+        };
+
+        // 3. Geometry
+        const width = reactionStyling.size?.width || 280;
+        let height = reactionStyling.size?.height || 64;
+        if (reactionData.showCount && height < 100) {
+            height = 100;
+        }
+        const x = reactionStyling.position?.x || 40;
+        const y = reactionStyling.position?.y || 276;
+
+        // 4. Generate SVG
+        const bgColor = reactionStyle.background;
+        const transparentBg = reactionStyle.transparentBackground;
+        const emojiSize = reactionStyle.emojiSize;
+        const countColor = reactionStyle.countColor || '#374151';
+        const countSize = reactionStyle.countSize || 14;
+        const radius = reactionStyle.radius;
+        const emojis = reactionData.emojis;
+
+        // Layout logic
+        const gap = 20;
+        const totalContentWidth = emojis.length * emojiSize + (emojis.length - 1) * gap;
+        const startX = (width - totalContentWidth) / 2;
+        const centerY = height / 2;
+
+        const showCount = reactionData.showCount;
+
+        let contentSVG = '';
+        emojis.forEach((emoji, index) => {
+            const ex = startX + index * (emojiSize + gap) + emojiSize / 2;
+
+            if (showCount) {
+                contentSVG += `<text x="${ex}" y="${centerY - 4}" text-anchor="middle" dominant-baseline="middle" font-size="${emojiSize}" style="pointer-events: none;">${emoji}</text>`;
+                contentSVG += `<text x="${ex}" y="${centerY + 24}" text-anchor="middle" dominant-baseline="middle" font-size="${countSize}" font-family="Arial, sans-serif" font-weight="600" fill="${countColor}">0</text>`;
+            } else {
+                contentSVG += `<text x="${ex}" y="${centerY + 2}" text-anchor="middle" dominant-baseline="middle" font-size="${emojiSize}" style="pointer-events: none;">${emoji}</text>`;
+            }
+        });
+
+        const bgRect = transparentBg ? '' : `<rect width="${width}" height="${height}" rx="${radius}" fill="${bgColor}" />`;
+
+        const svgSrc = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+                ${bgRect}
+                ${contentSVG}
+            </svg>
+        `)}`;
+
+        // 5. Create element
+        children.push({
+            id: reactionContent.id || `reaction-${slideId}`,
+            type: 'svg',
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+            src: svgSrc,
+            custom: {
+                kind: 'interactive',
+                interactiveType: 'reaction',
+                data: reactionData,
+                style: reactionStyle
+            }
+        });
+        console.log(`[slideToCanvas] ✓ Created Reaction element`);
+    }
+
+    // STEP 8: Apply Countdown elements
+    // ============================================
+    if (content.countdown) {
+        const countdownContent = content.countdown;
+        const countdownStyling = styling.countdown || {};
+
+        console.log(`[slideToCanvas] Creating Countdown element`);
+
+        const width = countdownStyling.size?.width || 360;
+        const height = countdownStyling.size?.height || 140;
+        const x = countdownStyling.position?.x || 0;
+        const y = countdownStyling.position?.y || 180;
+
+        // Generate unique ID to avoid conflicts (ignoring user payload ID)
+        const elementId = `countdown-${slideId}-${Math.floor(Math.random() * 100000)}`;
+
+        const countdownData = {
+            title: countdownContent.title,
+            endDate: countdownContent.endDate,
+            endTime: countdownContent.endTime,
+            showDays: countdownContent.display?.showDays,
+            showHours: countdownContent.display?.showHours,
+            showMinutes: countdownContent.display?.showMinutes,
+            showSeconds: countdownContent.display?.showSeconds,
+            duration: countdownContent.duration
+        };
+
+        const countdownStyle = {
+            titleColor: countdownStyling.titleColor || '#1f2937',
+            digitColor: countdownStyling.digitColor || '#1f2937',
+            digitSize: countdownStyling.digitSize || 28,
+            digitBackground: countdownStyling.digitBackground || '#000000',
+            labelColor: countdownStyling.labelColor || '#9ca3af',
+            background: countdownStyling.background || '#ffffff',
+            radius: countdownStyling.radius !== undefined ? countdownStyling.radius : 12,
+            padding: countdownStyling.padding !== undefined ? countdownStyling.padding : 16,
+        };
+
+        // Generate SVG using the React Renderer (visual fidelity)
+        const svgString = renderToStaticMarkup(
+            React.createElement(CountdownRenderer, {
+                data: countdownData,
+                style: countdownStyle,
+                width: width,
+                height: height
+            })
+        );
+
+        const svgSrc = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+                <foreignObject width="100%" height="100%">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;">
+                        ${svgString}
+                    </div>
+                </foreignObject>
+            </svg>
+        `)}`;
+
+        children.push({
+            id: elementId,
+            type: 'svg', // Use 'svg' instead of 'interactive' to support Store validation
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+            rotation: countdownStyling.rotation || 0,
+            opacity: countdownStyling.opacity !== undefined ? countdownStyling.opacity : 1,
+            src: svgSrc,
+            custom: {
+                kind: 'interactive',
+                interactiveType: 'countdown',
+                data: countdownData,
+                style: countdownStyle
+            }
+        });
+    }
+
+    // STEP 9: Apply Question elements
+    // ============================================
+    if (content.question) {
+        const qContent = content.question;
+        const qStyling = styling.question || {};
+
+        console.log(`[slideToCanvas] Creating Question element`);
+
+        const width = qStyling.size?.width || 280;
+        const height = qStyling.size?.height || 160;
+        const x = qStyling.position?.x || 40;
+        const y = qStyling.position?.y || 240;
+
+        const elementId = `question-${slideId}-${Math.floor(Math.random() * 100000)}`;
+
+        const qData = {
+            title: qContent.title,
+            placeholder: qContent.placeholder,
+            maxLength: qContent.maxLength,
+            allowAnonymous: qContent.allowAnonymous,
+            duration: qContent.duration
+        };
+
+        const qStyle = {
+            background: qStyling.background || '#FFFFFF',
+            radius: qStyling.radius !== undefined ? qStyling.radius : 16,
+            padding: qStyling.padding !== undefined ? qStyling.padding : 20,
+            questionColor: qStyling.questionColor || '#1F2937',
+            questionSize: qStyling.questionSize || 16,
+            inputBackground: qStyling.inputBackground || '#F3F4F6',
+            inputTextColor: qStyling.inputTextColor || '#9CA3AF',
+            submitBackground: qStyling.submitBackground || '#F97316'
+        };
+
+        const svgString = renderToStaticMarkup(
+            React.createElement(QuestionRenderer, {
+                data: qData,
+                style: qStyle,
+                width: width,
+                height: height
+            })
+        );
+
+        const svgSrc = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+                <foreignObject width="100%" height="100%">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;">
+                        ${svgString}
+                    </div>
+                </foreignObject>
+            </svg>
+        `)}`;
+
+        children.push({
+            id: elementId,
+            type: 'svg', // Use 'svg' to avoid Store validation error
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+            rotation: qStyling.rotation || 0,
+            opacity: qStyling.opacity !== undefined ? qStyling.opacity : 1,
+            src: svgSrc,
+            custom: {
+                kind: 'interactive',
+                interactiveType: 'question',
+                data: qData,
+                style: qStyle
+            }
+        });
+    }
+
+    // STEP 10: Apply Image Quiz elements
+    // ============================================
+    if (content.imageQuiz) {
+        const iqContent = content.imageQuiz;
+        const iqStyling = styling.imageQuiz || {};
+
+        console.log(`[slideToCanvas] Creating Image Quiz element`);
+
+        const width = iqStyling.size?.width || 300;
+        const height = iqStyling.size?.height || 240;
+        const x = iqStyling.position?.x || 0;
+        const y = iqStyling.position?.y || 0;
+
+        const elementId = `image-quiz-${slideId}-${Math.floor(Math.random() * 100000)}`;
+
+        const iqData = {
+            question: iqContent.question,
+            options: iqContent.options,
+            layout: iqContent.layout,
+            columns: 2,
+            duration: iqContent.duration
+        };
+
+        const iqStyle = {
+            background: iqStyling.background || '#FFFFFF',
+            radius: iqStyling.radius !== undefined ? iqStyling.radius : 16,
+            padding: iqStyling.padding !== undefined ? iqStyling.padding : 20,
+            questionColor: iqStyling.questionColor || '#1F2937',
+            imageRadius: iqStyling.imageRadius !== undefined ? iqStyling.imageRadius : 8,
+            borderColor: iqStyling.borderColor || '#E5E7EB',
+            correctBorderColor: iqStyling.correctBorderColor || '#10B981'
+        };
+
+        const svgString = renderToStaticMarkup(
+            React.createElement(ImageQuizRenderer, {
+                data: iqData,
+                style: iqStyle,
+                width: width,
+                height: height
+            })
+        );
+
+        const svgSrc = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+                <foreignObject width="100%" height="100%">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;">
+                        ${svgString}
+                    </div>
+                </foreignObject>
+            </svg>
+        `)}`;
+
+        children.push({
+            id: elementId,
+            type: 'svg',
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+            rotation: iqStyling.rotation || 0,
+            opacity: iqStyling.opacity !== undefined ? iqStyling.opacity : 1,
+            src: svgSrc,
+            custom: {
+                kind: 'interactive',
+                interactiveType: 'imageQuiz',
+                data: iqData,
+                style: iqStyle
             }
         });
     }

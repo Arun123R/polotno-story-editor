@@ -206,6 +206,7 @@ export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar,
             console.log(`[TOPBAR] Page ID: ${currentPage.id}`);
             console.log(`[TOPBAR] Order: ${order}`);
 
+
             // Build Payload from editor state
             const payload = buildSlidePayload({
                 editorState: ctaState || {},

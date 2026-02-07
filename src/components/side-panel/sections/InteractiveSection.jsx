@@ -151,40 +151,50 @@ const generatePollSVG = (data, style, width, height) => {
 
 // Generate Rating SVG
 const generateRatingSVG = (data, style, width, height) => {
-  const padding = 8;
+  const padding = 20;
   const cardW = width - padding * 2;
   const cardH = height - padding * 2;
-  const textY = padding + 18;
-  const sliderY = padding + 38;
-  const sliderW = cardW - 24;
-  const sliderX = padding + 12;
+  const titleFontSize = style?.titleFontSize || style?.typography?.titleSize || 14;
+  // Calculate vertical layout similar to regenerateSVG
+  const titleY = padding + titleFontSize / 2 + 5;
+  const ratingY = titleY + 25;
+
+  const sliderW = cardW;
+  const sliderH = 8;
+  const sliderX = padding;
+
   const title = data?.title || 'Do you like my eyes?';
   const emoji = data?.emoji || '😺';
   const maxRating = data?.maxRating || 5;
   const currentRating = data?.currentRating || 3;
   const fillPercent = Math.min(1, currentRating / maxRating);
   const fillW = sliderW * fillPercent;
-  const cardBg = style?.cardBgColor || '#ffffff';
-  const titleColor = style?.titleColor || '#000000';
-  const titleFontSize = style?.titleFontSize || 12;
-  const emojiSize = style?.emojiSize || 18;
+  const thumbX = sliderX + fillW;
+
+  const cardBg = style?.cardBgColor || style?.colors?.cardBackground || '#FFFFFF';
+  const containerBg = style?.containerBgColor || style?.colors?.background || '#FFFFFF'; // Use this for main background
+  const titleColor = style?.titleColor || style?.colors?.titleColor || '#000000';
+  const emojiSize = style?.emojiSize || style?.typography?.emojiSize || 32;
+  const sliderTrack = style?.inactiveColor || style?.colors?.sliderTrack || '#E6E6E6';
+  const sliderFill = style?.activeColor || style?.colors?.sliderFill || '#F97316';
 
   const gradId = 'grad' + Math.random().toString(36).substr(2, 9);
+
+  // Note: We use containerBg for the main rect to match other renderers
   const svgContent = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <linearGradient id="${gradId}" x1="0" x2="1" y1="0" y2="0">
+      <linearGradient id="${gradId}" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stop-color="#d946ef"/>
-        <stop offset="50%" stop-color="#f43f5e"/>
-        <stop offset="100%" stop-color="#fb923c"/>
+        <stop offset="100%" stop-color="${sliderFill}"/>
       </linearGradient>
     </defs>
-    <rect x="${padding}" y="${padding}" width="${cardW}" height="${cardH}" fill="${cardBg}" rx="12"/>
-    <text x="${width / 2}" y="${textY}" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="${titleFontSize}" font-weight="600" fill="${titleColor}">
-      ${title}
+    <rect width="${width}" height="${height}" fill="${containerBg}" rx="12"/>
+    <text x="${width / 2}" y="${titleY}" text-anchor="middle" dominant-baseline="middle" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="${titleFontSize}" font-weight="600" fill="${titleColor}">
+      ${escapeXml(title)}
     </text>
-    <rect x="${sliderX}" y="${sliderY}" width="${sliderW}" height="8" rx="4" fill="#e5e7eb"/>
-    <rect x="${sliderX}" y="${sliderY}" width="${fillW}" height="8" rx="4" fill="url(#${gradId})"/>
-    <text x="${sliderX + fillW}" y="${sliderY + 14}" text-anchor="middle" font-size="${emojiSize}">${emoji}</text>
+    <rect x="${sliderX}" y="${ratingY}" width="${sliderW}" height="${sliderH}" rx="4" fill="${sliderTrack}"/>
+    <rect x="${sliderX}" y="${ratingY}" width="${fillW}" height="${sliderH}" rx="4" fill="url(#${gradId})"/>
+    <text x="${thumbX}" y="${ratingY + 4}" text-anchor="middle" dominant-baseline="middle" font-size="${emojiSize}">${emoji}</text>
   </svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgContent)}`;
 };
@@ -261,52 +271,46 @@ const generateQuizSVG = (data, style, width, height) => {
 };
 
 // Generate Reaction SVG
+// Generate Reaction SVG matching the specific payload requirements
 const generateReactionSVG = (data, style, width, height) => {
   const emojis = data?.emojis || ['👍', '👎'];
-  const showCount = data?.showCount || false;
-  const transparentBg = style?.transparentBg || data?.transparentBg || false;
-  const bgColor = style?.containerBgColor || '#ffffff';
-  const buttonBg = '#f9fafb';
-  const buttonBorder = '#e5e7eb';
+  const showCount = data?.showCount !== undefined ? data.showCount : false;
 
-  const padding = 12;
-  const buttonCount = emojis.length;
-  const buttonGap = 8;
+  // Styling from payload
+  const bgColor = style?.background || style?.containerBgColor || '#FFFFFF';
+  const transparentBg = style?.transparentBackground || false;
+  const padding = style?.padding !== undefined ? style.padding : 0;
+  const emojiSize = style?.emojiSize || 48;
+  const radius = style?.radius !== undefined ? style.radius : 0;
+  const countColor = style?.countColor || '#374151';
+  const countSize = style?.countSize || 14;
 
-  // Calculate button dimensions - if showing count, buttons are taller (vertical pills)
-  const buttonWidth = Math.min(50, (width - padding * 2 - (buttonCount - 1) * buttonGap) / buttonCount);
-  const buttonHeight = showCount ? Math.min(65, height - padding * 2) : buttonWidth;
-  const buttonY = (height - buttonHeight) / 2;
-  const totalWidth = buttonCount * buttonWidth + (buttonCount - 1) * buttonGap;
-  const startX = (width - totalWidth) / 2;
+  // Layout logic
+  const gap = 20;
+  const totalContentWidth = emojis.length * emojiSize + (emojis.length - 1) * gap;
+  const startX = (width - totalContentWidth) / 2;
+  const centerY = height / 2;
 
-  let buttonsSVG = '';
-  emojis.forEach((emoji, idx) => {
-    const x = startX + idx * (buttonWidth + buttonGap);
+  let contentSVG = '';
+  emojis.forEach((emoji, index) => {
+    const x = startX + index * (emojiSize + gap) + emojiSize / 2;
 
     if (showCount) {
-      // Tall pill shape with emoji and count
-      buttonsSVG += `
-        <rect x="${x}" y="${buttonY}" width="${buttonWidth}" height="${buttonHeight}" rx="${buttonWidth / 2}" fill="${buttonBg}" stroke="${buttonBorder}" stroke-width="1"/>
-        <text x="${x + buttonWidth / 2}" y="${buttonY + buttonHeight * 0.35}" text-anchor="middle" font-size="${buttonWidth * 0.5}" dominant-baseline="middle">${emoji}</text>
-        <text x="${x + buttonWidth / 2}" y="${buttonY + buttonHeight * 0.75}" text-anchor="middle" font-family="Arial, sans-serif" font-size="${buttonWidth * 0.35}" font-weight="600" fill="#000000" dominant-baseline="middle">2k</text>
-      `;
+      // Show emoji shifted up, count below. Adjusted to fit 64px height.
+      contentSVG += `<text x="${x}" y="${centerY - 4}" text-anchor="middle" dominant-baseline="middle" font-size="${emojiSize}" style="pointer-events: none;">${emoji}</text>`;
+      contentSVG += `<text x="${x}" y="${centerY + 24}" text-anchor="middle" dominant-baseline="middle" font-size="${countSize}" font-family="Arial, sans-serif" font-weight="600" fill="${countColor}">0</text>`;
     } else {
-      // Standard circle shape
-      buttonsSVG += `
-        <circle cx="${x + buttonWidth / 2}" cy="${buttonY + buttonWidth / 2}" r="${buttonWidth / 2}" fill="${buttonBg}" stroke="${buttonBorder}" stroke-width="1"/>
-        <text x="${x + buttonWidth / 2}" y="${buttonY + buttonWidth / 2 + buttonWidth * 0.05}" text-anchor="middle" font-size="${buttonWidth * 0.6}" dominant-baseline="middle">${emoji}</text>
-      `;
+      // Visually center emoji
+      contentSVG += `<text x="${x}" y="${centerY + 2}" text-anchor="middle" dominant-baseline="middle" font-size="${emojiSize}" style="pointer-events: none;">${emoji}</text>`;
     }
   });
 
+  const bgRect = transparentBg ? '' : `<rect width="${width}" height="${height}" fill="${bgColor}" rx="${radius}" />`;
+
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-      <!-- Background -->
-      ${transparentBg ? '' : `<rect width="${width}" height="${height}" fill="${bgColor}" rx="12"/>`}
-      
-      <!-- Emoji buttons -->
-      ${buttonsSVG}
+      ${bgRect}
+      ${contentSVG}
     </svg>
   `)}`;
 };
@@ -314,11 +318,11 @@ const generateReactionSVG = (data, style, width, height) => {
 // Generate Countdown SVG with Individual Digit Tiles
 const generateCountdownSVG = (data, style, width, height) => {
   const title = data?.title || "It's almost my b-day!";
-  const containerBg = style?.containerBgColor || '#ffffff';
+  const containerBg = style?.background || style?.containerBgColor || '#ffffff';
   const textColor = style?.titleColor || '#1f2937';
   const labelColor = style?.labelColor || '#1f2937'; // Darker label color from image
   // New tiling styles
-  const digitBoxBg = '#f3f4f6'; // Light gray for digit tiles
+  const digitBoxBg = style?.digitBackground || style?.digitBgColor || '#f3f4f6'; // Light gray for digit tiles
   const digitBoxRadius = 6;
   const digitBoxWidth = 32;
   const digitBoxHeight = 44;

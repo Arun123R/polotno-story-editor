@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite';
 import Konva from 'konva';
 import './DragDropHandler.css';
 import { applySlideBackgroundToPage, normalizeSlideBackground } from '../utils/slideBackground';
+import { storyAPI } from '../services/api';
 
 // Supported file types
 const SUPPORTED_IMAGE_TYPES = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'];
@@ -172,7 +173,7 @@ export const DragDropHandler = observer(({ store, children, onFileUpload }) => {
         }
     }, []);
 
-    const processFiles = useCallback((files, dropInfo) => {
+    const processFiles = useCallback(async (files, dropInfo) => {
         const validFiles = Array.from(files).filter(file => {
             if (!isFileSupported(file)) {
                 console.warn(`Unsupported file type: ${file.type}`);
@@ -191,10 +192,10 @@ export const DragDropHandler = observer(({ store, children, onFileUpload }) => {
         }
 
         // Process each valid file
-        validFiles.forEach(file => {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const fileUrl = event.target.result;
+        for (const file of validFiles) {
+            try {
+                // Upload to CDN and get URL
+                const fileUrl = await storyAPI.uploadGeneralMedia(file);
                 const isVideo = file.type.startsWith('video/');
                 const isImage = file.type.startsWith('image/');
 
@@ -203,7 +204,7 @@ export const DragDropHandler = observer(({ store, children, onFileUpload }) => {
                     if (onFileUpload) {
                         onFileUpload({ url: fileUrl, type: isVideo ? 'video' : 'image' });
                     }
-                    return;
+                    continue;
                 }
 
                 // Canvas drop rules (Storyly-like):
@@ -219,7 +220,7 @@ export const DragDropHandler = observer(({ store, children, onFileUpload }) => {
                     if (!replaced) {
                         setImageAsBackgroundMedia(fileUrl);
                     }
-                    return;
+                    continue;
                 }
 
                 // Add to canvas
@@ -296,9 +297,11 @@ export const DragDropHandler = observer(({ store, children, onFileUpload }) => {
                         video.load();
                     }
                 }
-            };
-            reader.readAsDataURL(file);
-        });
+            } catch (error) {
+                console.error('Failed to upload file:', error);
+                alert(`Failed to upload "${file.name}". Please try again.`);
+            }
+        }
     }, [
         store,
         onFileUpload,
