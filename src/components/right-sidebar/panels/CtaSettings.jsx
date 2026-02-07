@@ -3,6 +3,7 @@ import { useState, useRef, useCallback } from 'react';
 import { AnimationSection, DurationSection, TrashIcon } from '../shared/CommonControls';
 import { ColorPicker } from '../shared/ColorPicker';
 import { generateCtaSVG, CTA_DEFAULTS } from '../../side-panel/sections/CtaSection';
+import InfoTooltipIcon from '../shared/InfoTooltipIcon';
 import { toCanvas, toExport } from '../../../utils/scale';
 import Dropdown from '../../shared/Dropdown';
 
@@ -1018,22 +1019,31 @@ export const CtaSettings = observer(({ store, element }) => {
               {/* Background Color - for classic, swipe_up */}
               {(ctaType === 'classic' || ctaType === 'swipe_up') && (
                 <div className="control-row">
-                  <span className="control-label">Background</span>
+                  <span className="control-label">
+                    {ctaType === 'swipe_up' && getBgTransparent() ? 'Arrow Color' : 'Background'}
+                  </span>
                   <div className="control-value">
                     <ColorPicker
-                      value={getBgColor()}
-                      onChange={setBackgroundColor}
+                      value={ctaType === 'swipe_up' && getBgTransparent() ? getArrowColor() : getBgColor()}
+                      onChange={ctaType === 'swipe_up' && getBgTransparent() ? setArrowColor : setBackgroundColor}
                     />
                   </div>
                 </div>
               )}
               {(ctaType === 'classic' || ctaType === 'swipe_up') && (
                 <div className="control-row">
-                  <span className="control-label">Transparent</span>
+                  <span className="control-label" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    Transparent
+                    <InfoTooltipIcon
+                      ariaLabel="Show info about Transparent"
+                      tooltipTitle="Transparent"
+                      tooltipText="If enabled, the CTA background will be fully transparent."
+                      iconSize={14}
+                    />
+                  </span>
                   <div className="control-value">
                     <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                       <input type="checkbox" checked={getBgTransparent()} onChange={(e) => setBgTransparent(e.target.checked)} style={{ width: 16, height: 16, cursor: 'pointer' }} />
-                      <span style={{ fontSize: 12, color: 'var(--sidebar-text-muted)' }}>Make background transparent</span>
                     </label>
                   </div>
                 </div>
@@ -1042,6 +1052,7 @@ export const CtaSettings = observer(({ store, element }) => {
               {/* Text / Arrow Color - mode-aware */}
               {(ctaType === 'classic' || ctaType === 'swipe_up') && (
                 isArrowOnlyMode ? (
+                  ctaType === 'swipe_up' && getBgTransparent() ? null :
                   <div className="control-row">
                     <span className="control-label">Arrow Color</span>
                     <div className="control-value">
