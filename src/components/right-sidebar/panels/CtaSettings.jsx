@@ -5,6 +5,7 @@ import { ColorPicker } from '../shared/ColorPicker';
 import { generateCtaSVG, CTA_DEFAULTS } from '../../side-panel/sections/CtaSection';
 import { toCanvas, toExport } from '../../../utils/scale';
 import Dropdown from '../../shared/Dropdown';
+import { storyAPI } from '../../../services/api';
 
 /**
  * CTA Settings Panel
@@ -38,7 +39,7 @@ export const CtaSettings = observer(({ store, element }) => {
   const isProductCardVariant = ['product_card', 'visit_product', 'describe_product', 'buy_product'].includes(ctaType);
 
   // Get CTA type label
-  
+
 
   // Regenerate SVG when data changes
   const regenerateSVG = useCallback((newCustomData) => {
@@ -46,9 +47,9 @@ export const CtaSettings = observer(({ store, element }) => {
       const exportWidth = toExport(element.width);
       const exportHeight = toExport(element.height);
       const newSrc = generateCtaSVG(
-        ctaType, 
-        newCustomData, 
-        exportWidth, 
+        ctaType,
+        newCustomData,
+        exportWidth,
         exportHeight
       );
       element.set({ src: newSrc });
@@ -342,16 +343,20 @@ export const CtaSettings = observer(({ store, element }) => {
     updateCustomData('imageUrl', value);
   };
 
-  // Handle product image upload
-  const handleProductImageUpload = (e) => {
+  // Handle product image upload - uploads to CDN via API
+  const handleProductImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file || !file.type.startsWith('image/')) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      setProductImageUrl(event.target.result);
-    };
-    reader.readAsDataURL(file);
+    try {
+      // Upload to CDN and get URL
+      const cdnUrl = await storyAPI.uploadGeneralMedia(file);
+      setProductImageUrl(cdnUrl);
+    } catch (error) {
+      console.error('Failed to upload product image:', error);
+      // Optionally show error to user
+    }
+
     e.target.value = '';
   };
 
@@ -1064,7 +1069,7 @@ export const CtaSettings = observer(({ store, element }) => {
                 )
               )}
 
-              
+
 
               {/* Arrow Animation Toggle - for swipe_up only */}
               {ctaType === 'swipe_up' && (

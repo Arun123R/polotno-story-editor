@@ -15,9 +15,9 @@ export const ImageQuizRenderer = ({ data, style, width, height }) => {
     width: width || 300,
     height: height || 'auto',
     minHeight: 200,
-    background: style?.containerBgColor || '#ffffff',
-    borderRadius: style?.containerBorderRadius || 16,
-    padding: style?.containerPadding || 20,
+    background: style?.background || style?.containerBgColor || '#ffffff',
+    borderRadius: style?.radius !== undefined ? style.radius : (style?.containerBorderRadius || 16),
+    padding: style?.padding !== undefined ? style.padding : (style?.containerPadding || 20),
     display: 'flex',
     flexDirection: 'column',
     gap: 16,
@@ -27,7 +27,7 @@ export const ImageQuizRenderer = ({ data, style, width, height }) => {
 
   const questionStyle = {
     color: style?.questionColor || '#1f2937',
-    fontSize: style?.questionFontSize || 16,
+    fontSize: style?.questionSize || style?.questionFontSize || 16, // Added request support if needed
     fontWeight: 700,
     textAlign: 'center',
     margin: 0,
@@ -52,10 +52,10 @@ export const ImageQuizRenderer = ({ data, style, width, height }) => {
   const getImageStyle = (option) => ({
     width: '100%',
     aspectRatio: '1',
-    borderRadius: style?.imageBorderRadius || 8,
+    borderRadius: style?.imageRadius !== undefined ? style.imageRadius : (style?.imageBorderRadius || 8),
     border: option.id === correctAnswerId
       ? `3px solid ${style?.correctBorderColor || '#10b981'}`
-      : `1px solid ${style?.imageBorderColor || '#e5e7eb'}`,
+      : `1px solid ${style?.borderColor || style?.imageBorderColor || '#e5e7eb'}`,
     background: option.imageUrl ? 'transparent' : '#f3f4f6',
     display: 'flex',
     alignItems: 'center',

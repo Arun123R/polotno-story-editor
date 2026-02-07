@@ -10,6 +10,7 @@ import {
   TrashIcon,
 } from '../shared/CommonControls';
 import { ColorPicker } from '../shared/ColorPicker';
+import { EmojiPickerControl } from '../shared/EmojiPicker';
 import {
   getInteractiveType,
   getInteractiveData,
@@ -21,6 +22,8 @@ import {
 } from '../../interactive/schemas';
 import { generateInteractiveSVG } from '../../side-panel/sections/InteractiveSection';
 import { PollRenderer } from '../../interactive/renderers/PollRenderer';
+import { QuestionRenderer } from '../../interactive/renderers/QuestionRenderer';
+import { ImageQuizRenderer } from '../../interactive/renderers/ImageQuizRenderer';
 
 // Helper to escape XML special characters
 const escapeXml = (unsafe) => {
@@ -33,6 +36,7 @@ const escapeXml = (unsafe) => {
     .replace(/'/g, '&apos;');
 };
 import Dropdown from '../../shared/Dropdown';
+import { storyAPI } from '../../../services/api';
 
 /**
  * Interactive Settings Panel
@@ -94,6 +98,13 @@ export const InteractiveSettings = observer(({ store, element }) => {
       height = INTERACTIVE_DIMENSIONS['imageQuiz'].height;
     }
 
+    // Fixed dimensions for rating to prevent changes during styling edits
+    if (interactiveType === 'rating') {
+      // Keep existing dimensions if element already has them, otherwise use defaults
+      width = element.width || INTERACTIVE_DIMENSIONS['rating']?.width || 237;
+      height = element.height || INTERACTIVE_DIMENSIONS['rating']?.height || 90;
+    }
+
 
     // Calculate dynamic height for quiz based on options
     if (interactiveType === 'quiz' && newData.options) {
@@ -109,10 +120,17 @@ export const InteractiveSettings = observer(({ store, element }) => {
 
     // Dynamic height for reaction
     if (interactiveType === 'reaction') {
-      const padding = 12;
-      const buttonSize = 40;
-      const pillHeight = 65;
-      height = newData.showCount ? (pillHeight + padding * 2) : (buttonSize + padding * 2);
+      const emojiSize = newStyle.emojiSize || 48;
+      const verticalPadding = newData.showCount ? 55 : 16;
+      height = Math.max(64, emojiSize + verticalPadding);
+    }
+
+    // Dynamic height for question
+    if (interactiveType === 'question') {
+      const padding = newStyle.padding ?? 20;
+      const qSize = newStyle.questionSize ?? 20;
+      // Height = PaddingTop + Title (size*1.4) + Margin(12) + Input(45) + PaddingBottom
+      height = padding + (qSize * 1.4) + 12 + 45 + padding;
     }
 
     const dimensions = { width, height };
@@ -193,10 +211,232 @@ export const InteractiveSettings = observer(({ store, element }) => {
         });
       }
 
+
       newSrc = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
         <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
           <rect width="${width}" height="${height}" rx="12" fill="${bgColor}"/>
           <text x="${width / 2}" y="${questionY}" text-anchor="middle" dominant-baseline="middle" fill="${questionColor}" font-size="${questionSize}" font-weight="600" font-family="Arial">${escapeXml(question)}</text>
+          ${optionsSvg}
+        </svg>
+      `)}`;
+    } else if (interactiveType === 'quiz') {
+      // Quiz SVG generation with nested structure support
+      const bgColor = newStyle?.colors?.background || newStyle.containerBgColor || '#FF0000';
+      const questionColor = newStyle?.colors?.questionColor || newStyle.questionColor || '#FFFFFF';
+      const questionSize = newStyle?.typography?.questionSize || newStyle.questionFontSize || 16;
+      const optionBg = newStyle?.colors?.optionBackground || newStyle.optionBgColor || '#F9FAFB';
+      const optionTextColor = newStyle?.colors?.optionTextColor || newStyle.optionTextColor || '#1F2937';
+      const optionSize = newStyle?.typography?.optionSize || newStyle.optionFontSize || 14;
+      const correctColor = newStyle?.colors?.correctColor || newStyle.correctColor || '#10B981';
+      const borderRadius = newStyle?.appearance?.radius || newStyle.containerBorderRadius || 16;
+      const padding = newStyle?.spacing?.padding || newStyle.containerPadding || 20;
+      const optionRadius = newStyle?.spacing?.optionRadius || newStyle.optionBorderRadius || 8;
+
+      const question = newData.question || 'What is the answer?';
+      const options = newData.options || [];
+
+      // Calculate positions
+      const questionY = padding + 18;
+      const optionsStartY = questionY + 30;
+      const optionHeight = 34;
+      const optionGap = 12;
+
+      let optionsSvg = '';
+      options.forEach((opt, idx) => {
+        const optY = optionsStartY + idx * (optionHeight + optionGap);
+        const text = opt.text || '';
+        const letter = String.fromCharCode(65 + idx); // A, B, C...
+
+        // Option pill
+        const pillBg = opt.isCorrect ? correctColor : optionBg;
+        const borderColor = opt.isCorrect ? correctColor : 'transparent';
+
+        optionsSvg += `<rect x="${padding}" y="${optY}" width="${width - padding * 2}" height="${optionHeight}" rx="${optionRadius}" fill="${pillBg}" stroke="${borderColor}" stroke-width="2"/>`;
+
+        // Letter circle
+        optionsSvg += `<circle cx="${padding + 20}" cy="${optY + optionHeight / 2}" r="12" fill="#e5e7eb"/>`;
+        optionsSvg += `<text x="${padding + 20}" y="${optY + optionHeight / 2}" text-anchor="middle" dominant-baseline="middle" fill="#1f2937" font-size="11" font-weight="700">${letter}</text>`;
+
+        // Option text
+        optionsSvg += `<text x="${padding + 44}" y="${optY + optionHeight / 2}" dominant-baseline="middle" fill="${optionTextColor}" font-size="${optionSize}" font-family="Arial">${escapeXml(text)}</text>`;
+
+        // Checkmark for correct answer
+        if (opt.isCorrect) {
+          optionsSvg += `<text x="${width - padding - 10}" y="${optY + optionHeight / 2}" text-anchor="end" dominant-baseline="middle" fill="${correctColor}" font-size="16">✓</text>`;
+        }
+      });
+
+      newSrc = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+          <rect width="${width}" height="${height}" rx="${borderRadius}" fill="${bgColor}"/>
+          <text x="${padding + 4}" y="${questionY}" dominant-baseline="middle" fill="${questionColor}" font-size="${questionSize}" font-weight="700" font-family="Arial">${escapeXml(question)}</text>
+          ${optionsSvg}
+        </svg>
+      `)}`;
+    } else if (interactiveType === 'rating') {
+      // Rating SVG generation with nested structure support
+      const bgColor = newStyle?.colors?.background || newStyle.containerBgColor || '#695454';
+      const titleColor = newStyle?.colors?.titleColor || newStyle.titleColor || '#000000';
+      const titleSize = newStyle?.typography?.titleSize || newStyle.titleFontSize || 14;
+      const emojiSize = newStyle?.typography?.emojiSize || newStyle.emojiSize || 32;
+      const sliderTrack = newStyle?.colors?.sliderTrack || newStyle.inactiveColor || '#E6E6E6';
+      const sliderFill = newStyle?.colors?.sliderFill || newStyle.activeColor || '#F97316';
+      const borderRadius = newStyle.radius || newStyle.containerBorderRadius || 12;
+      // Use fixed padding for consistent layout (don't use style.padding for layout calculations)
+      const padding = 20;
+
+      const title = newData.title || 'Rate this';
+      const variant = newData.variant || newData.type || 'slider';
+      const emoji = newData.emoji || '😺';
+      const maxRating = newData.maxRating || 5;
+      const currentRating = newData.currentRating || 3;
+
+      let contentSvg = '';
+
+      // Title
+      const titleY = padding + titleSize / 2 + 5;
+      contentSvg += `<text x="${width / 2}" y="${titleY}" text-anchor="middle" dominant-baseline="middle" fill="${titleColor}" font-size="${titleSize}" font-weight="600">${escapeXml(title)}</text>`;
+
+      // Rating display based on variant
+      const ratingY = titleY + 25;
+
+      if (variant === 'slider') {
+        // Slider variant with emoji as thumb
+        const sliderWidth = width - padding * 2;
+        const sliderHeight = 8;
+        const sliderX = padding;
+        const fillWidth = (currentRating / maxRating) * sliderWidth;
+        const thumbX = sliderX + fillWidth;
+
+        // Define gradient
+        contentSvg += `
+          <defs>
+            <linearGradient id="sliderGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#d946ef;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:${sliderFill};stop-opacity:1" />
+            </linearGradient>
+          </defs>
+        `;
+
+        contentSvg += `<rect x="${sliderX}" y="${ratingY}" width="${sliderWidth}" height="${sliderHeight}" rx="4" fill="${sliderTrack}"/>`;
+        contentSvg += `<rect x="${sliderX}" y="${ratingY}" width="${fillWidth}" height="${sliderHeight}" rx="4" fill="url(#sliderGradient)"/>`;
+        // Emoji as slider thumb
+        contentSvg += `<text x="${thumbX}" y="${ratingY + 4}" text-anchor="middle" dominant-baseline="middle" font-size="${emojiSize}" style="pointer-events: none;">${emoji}</text>`;
+      } else if (variant === 'emoji') {
+        // Emoji variant
+        const emojiSpacing = (width - padding * 2) / maxRating;
+        for (let i = 0; i < maxRating; i++) {
+          const emojiX = padding + i * emojiSpacing + emojiSpacing / 2;
+          const opacity = i < currentRating ? 1 : 0.3;
+          contentSvg += `<text x="${emojiX}" y="${ratingY}" text-anchor="middle" dominant-baseline="middle" font-size="${emojiSize}" opacity="${opacity}">${emoji}</text>`;
+        }
+      } else {
+        // Star variant (default)
+        const starSpacing = (width - padding * 2) / maxRating;
+        for (let i = 0; i < maxRating; i++) {
+          const starX = padding + i * starSpacing + starSpacing / 2;
+          const fill = i < currentRating ? sliderFill : sliderTrack;
+          contentSvg += `<text x="${starX}" y="${ratingY}" text-anchor="middle" dominant-baseline="middle" font-size="${emojiSize}" fill="${fill}">★</text>`;
+        }
+      }
+
+      newSrc = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+          <rect width="${width}" height="${height}" rx="${borderRadius}" fill="${bgColor}"/>
+          ${contentSvg}
+        </svg>
+      `)}`;
+    } else if (interactiveType === 'question') {
+      // Use QuestionRenderer for preview (guarantees match)
+      const svgString = renderToStaticMarkup(
+        <QuestionRenderer
+          data={newData}
+          style={newStyle}
+          width={width}
+          height={height}
+        />
+      );
+
+      newSrc = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+          <foreignObject width="100%" height="100%">
+            <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;">
+                ${svgString}
+            </div>
+          </foreignObject>
+        </svg>
+      `)}`;
+    } else if (interactiveType === 'imageQuiz') {
+      // Generate pure SVG for Image Quiz (foreignObject doesn't work with external images)
+      const question = newData?.question || 'Which one is correct?';
+      const options = newData?.options || [];
+      const columns = newData?.columns || 2;
+      const correctAnswerId = newData?.correctAnswerId;
+
+      const bgColor = newStyle?.containerBgColor || '#ffffff';
+      const questionColor = newStyle?.questionColor || '#1f2937';
+      const questionSize = newStyle?.questionFontSize || 16;
+      const labelColor = newStyle?.labelColor || '#4b5563';
+      const labelSize = newStyle?.labelFontSize || 12;
+      const borderRadius = newStyle?.containerBorderRadius || 16;
+      const imageBorderRadius = newStyle?.imageBorderRadius || 8;
+      const correctBorderColor = newStyle?.correctBorderColor || '#10b981';
+      const borderColor = newStyle?.imageBorderColor || '#e5e7eb';
+      const padding = newStyle?.containerPadding || 20;
+
+      // Calculate layout
+      const questionHeight = 30;
+      const gap = 12;
+      const gridStartY = padding + questionHeight + gap;
+      const availableWidth = width - (padding * 2);
+      const optionWidth = (availableWidth - (gap * (columns - 1))) / columns;
+      const imageSize = optionWidth;
+      const labelHeight = 20;
+      const optionHeight = imageSize + gap + labelHeight;
+
+      // Calculate rows
+      const rows = Math.ceil(options.length / columns);
+      const totalHeight = padding + questionHeight + gap + (rows * optionHeight) + ((rows - 1) * gap) + padding;
+
+      // Build SVG
+      let optionsSvg = '';
+      options.forEach((option, index) => {
+        const row = Math.floor(index / columns);
+        const col = index % columns;
+        const x = padding + (col * (optionWidth + gap));
+        const y = gridStartY + (row * (optionHeight + gap));
+
+        // Image container with border
+        const isCorrect = option.id === correctAnswerId;
+        const strokeColor = isCorrect ? correctBorderColor : borderColor;
+        const strokeWidth = isCorrect ? 3 : 1;
+
+        // Background rect
+        optionsSvg += `<rect x="${x}" y="${y}" width="${imageSize}" height="${imageSize}" rx="${imageBorderRadius}" fill="#f3f4f6" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>`;
+
+        // Image if available
+        if (option.imageUrl) {
+          optionsSvg += `<image x="${x + strokeWidth}" y="${y + strokeWidth}" width="${imageSize - strokeWidth * 2}" height="${imageSize - strokeWidth * 2}" href="${option.imageUrl}" preserveAspectRatio="xMidYMid slice" clip-path="url(#clip-${index})"/>`;
+          // Clip path for rounded corners
+          optionsSvg += `<defs><clipPath id="clip-${index}"><rect x="${x + strokeWidth}" y="${y + strokeWidth}" width="${imageSize - strokeWidth * 2}" height="${imageSize - strokeWidth * 2}" rx="${imageBorderRadius - strokeWidth}"/></clipPath></defs>`;
+        } else {
+          // Camera icon placeholder
+          optionsSvg += `<text x="${x + imageSize / 2}" y="${y + imageSize / 2}" text-anchor="middle" dominant-baseline="middle" font-size="32">📷</text>`;
+        }
+
+        // Label
+        const labelY = y + imageSize + gap + labelHeight / 2;
+        optionsSvg += `<text x="${x + imageSize / 2}" y="${labelY}" text-anchor="middle" dominant-baseline="middle" fill="${labelColor}" font-size="${labelSize}" font-weight="500">${option.label || ''}`;
+        if (isCorrect) {
+          optionsSvg += ` <tspan fill="${correctBorderColor}">✓</tspan>`;
+        }
+        optionsSvg += `</text>`;
+      });
+
+      newSrc = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${totalHeight}" viewBox="0 0 ${width} ${totalHeight}">
+          <rect width="${width}" height="${totalHeight}" rx="${borderRadius}" fill="${bgColor}"/>
+          <text x="${width / 2}" y="${padding + questionHeight / 2}" text-anchor="middle" dominant-baseline="middle" fill="${questionColor}" font-size="${questionSize}" font-weight="700">${question}</text>
           ${optionsSvg}
         </svg>
       `)}`;
@@ -224,6 +464,25 @@ export const InteractiveSettings = observer(({ store, element }) => {
 
   const updateStyle = (key, value) => {
     const newStyle = { ...style, [key]: value };
+    element.set({
+      custom: {
+        ...element.custom,
+        style: newStyle,
+      },
+    });
+    // Regenerate SVG after style update
+    regenerateSVG(data, newStyle);
+  };
+
+  // Update nested style properties (for quiz: colors.background, typography.questionSize, etc.)
+  const updateNestedStyle = (category, key, value) => {
+    const newStyle = {
+      ...style,
+      [category]: {
+        ...(style[category] || {}),
+        [key]: value
+      }
+    };
     element.set({
       custom: {
         ...element.custom,
@@ -269,18 +528,29 @@ export const InteractiveSettings = observer(({ store, element }) => {
     ));
   };
 
-  // Handle image upload for Image Quiz - converts to base64 for SVG compatibility
-  const handleImageUpload = (e) => {
+
+  // Handle image upload for Image Quiz - uploads to CDN via API
+  const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file || !file.type.startsWith('image/') || !uploadingOptionId) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const base64Url = event.target.result;
-      updateOption(uploadingOptionId, { imageUrl: base64Url });
+    try {
+      // Upload to CDN and get URL
+      const cdnUrl = await storyAPI.uploadGeneralMedia(file);
+
+      // Update the option with the new image URL
+      const updatedOptions = (data.options || []).map(opt =>
+        opt.id === uploadingOptionId ? { ...opt, imageUrl: cdnUrl } : opt
+      );
+
+      // Update the element's custom data (this will automatically regenerate SVG)
+      updateOptions(updatedOptions);
       setUploadingOptionId(null);
-    };
-    reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('Failed to upload image:', error);
+      // Optionally show error to user
+    }
+
     e.target.value = '';
   };
 
@@ -622,18 +892,16 @@ export const InteractiveSettings = observer(({ store, element }) => {
       <div className="section">
         {renderTextInput('Title', data.title, (v) => updateData('title', v), 'Do you like my eyes?', 'Tagfic')}
 
-        {renderSelect('Type', data.type, (v) => updateData('type', v), [
-          { value: 'star', label: 'Stars' },
-          { value: 'emoji', label: 'Emoji' },
-          { value: 'slider', label: 'Slider' },
-        ])}
-
         {renderNumberInput('Max Rating', data.maxRating, (v) => updateData('maxRating', v), 1, 10)}
 
-        {(data.type === 'emoji' || data.type === 'slider') && renderTextInput('Emoji', data.emoji, (v) => updateData('emoji', v), '😺')}
+        <EmojiPickerControl
+          label="Emoji"
+          value={data.emoji || '😺'}
+          onChange={(v) => updateData('emoji', v)}
+        />
       </div>
 
-      {data.type === 'slider' && (
+      {data.variant === 'slider' && (
         <div className="section" style={{ marginTop: 16 }}>
           <div className="control-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }}>
             <span className="control-label" style={{ fontWeight: 500, color: '#333', fontSize: '13px', marginBottom: 4 }}>Current Rating</span>
@@ -979,24 +1247,33 @@ export const InteractiveSettings = observer(({ store, element }) => {
 
     return (
       <>
+
         <PositionSection element={element} />
-        <AppearanceSection element={element} />
+        {interactiveType !== 'quiz' && interactiveType !== 'rating' && interactiveType !== 'question' && <AppearanceSection element={element} />}
+
 
         <div className="section">
           {renderSectionTitle('Colors & Styling')}
 
-          {renderColorPicker('Background', style.containerBgColor, (v) => updateStyle('containerBgColor', v), defaults.containerBgColor)}
-          {renderNumberInput('Padding', style.containerPadding, (v) => updateStyle('containerPadding', v), 0, 50)}
+          {/* ... Quiz/Rating blocks ... */}
 
-          {/* Type-specific colors */}
-          {(interactiveType === 'poll' || interactiveType === 'quiz' || interactiveType === 'question') && (
+          {/* Generic Background/Padding for types not handling it themselves */}
+          {(interactiveType !== 'quiz' && interactiveType !== 'rating' && interactiveType !== 'question') && (
             <>
-              {renderColorPicker('Question Color', style.questionColor || style.titleColor, (v) => updateStyle(interactiveType === 'question' ? 'titleColor' : 'questionColor', v), defaults.questionColor || defaults.titleColor)}
-              {renderNumberInput('Question Size', style.questionFontSize || style.titleFontSize, (v) => updateStyle(interactiveType === 'question' ? 'titleFontSize' : 'questionFontSize', v), 10, 48)}
+              {renderColorPicker('Background', style.background || style.containerBgColor, (v) => updateStyle('containerBgColor', v), defaults.containerBgColor)}
+              {renderNumberInput('Padding', style.padding !== undefined ? style.padding : style.containerPadding, (v) => updateStyle('padding', v), 0, 50)}
             </>
           )}
 
-          {(interactiveType === 'poll' || interactiveType === 'quiz') && (
+          {/* Type-specific colors for non-quiz types */}
+          {(interactiveType === 'poll') && (
+            <>
+              {renderColorPicker('Question Color', style.questionColor || style.titleColor, (v) => updateStyle('questionColor', v), defaults.questionColor || defaults.titleColor)}
+              {renderNumberInput('Question Size', style.questionFontSize || style.titleFontSize, (v) => updateStyle('questionFontSize', v), 10, 48)}
+            </>
+          )}
+
+          {interactiveType === 'poll' && (
             <>
               {renderColorPicker('Option BG', style.optionBgColor, (v) => updateStyle('optionBgColor', v), defaults.optionBgColor)}
               {renderColorPicker('Option Text', style.optionTextColor, (v) => updateStyle('optionTextColor', v), defaults.optionTextColor)}
@@ -1006,19 +1283,20 @@ export const InteractiveSettings = observer(({ store, element }) => {
 
           {interactiveType === 'poll' && renderColorPicker('Result Bar', style.resultBarColor, (v) => updateStyle('resultBarColor', v), defaults.resultBarColor)}
 
-          {interactiveType === 'quiz' && (
-            <>
-              {renderColorPicker('Correct Color', style.correctColor, (v) => updateStyle('correctColor', v), defaults.correctColor)}
-              {renderColorPicker('Incorrect Color', style.incorrectColor, (v) => updateStyle('incorrectColor', v), defaults.incorrectColor)}
-            </>
-          )}
-
 
           {interactiveType === 'reaction' && (
             <>
-              {renderToggle('Transparent Background', style.transparentBg, (v) => updateStyle('transparentBg', v))}
-              {!style.transparentBg && renderColorPicker('Background', style.containerBgColor, (v) => updateStyle('containerBgColor', v), defaults.containerBgColor)}
-              {renderNumberInput('Emoji Size', style.emojiSize, (v) => updateStyle('emojiSize', v), 24, 80)}
+              {renderToggle('Transparent Background', style.transparentBackground, (v) => updateStyle('transparentBackground', v))}
+              {!style.transparentBackground && renderColorPicker('Background', style.background || style.containerBgColor, (v) => updateStyle('background', v), '#FFFFFF')}
+              {renderNumberInput('Emoji Size', style.emojiSize, (v) => updateStyle('emojiSize', v), 24, 120)}
+              {data.showCount && (
+                <>
+                  {renderColorPicker('Count Color', style.countColor || '#374151', (v) => updateStyle('countColor', v), '#374151')}
+                  {renderNumberInput('Count Size', style.countSize || 14, (v) => updateStyle('countSize', v), 10, 48)}
+                </>
+              )}
+              {renderNumberInput('Padding', style.padding !== undefined ? style.padding : 0, (v) => updateStyle('padding', v), 0, 100)}
+              {renderNumberInput('Border Radius', style.radius !== undefined ? style.radius : 0, (v) => updateStyle('radius', v), 0, 50)}
             </>
           )}
 
@@ -1026,9 +1304,12 @@ export const InteractiveSettings = observer(({ store, element }) => {
             <>
               {renderColorPicker('Title Color', style.titleColor, (v) => updateStyle('titleColor', v), defaults.titleColor)}
               {renderColorPicker('Digit Color', style.digitColor, (v) => updateStyle('digitColor', v), defaults.digitColor)}
-              {renderNumberInput('Digit Size', style.digitFontSize, (v) => updateStyle('digitFontSize', v), 16, 72)}
-              {renderColorPicker('Digit BG', style.digitBgColor, (v) => updateStyle('digitBgColor', v), defaults.digitBgColor)}
+              {renderNumberInput('Digit Size', style.digitSize || style.digitFontSize, (v) => updateStyle('digitSize', v), 16, 72)}
+              {renderColorPicker('Digit BG', style.digitBackground || style.digitBgColor, (v) => updateStyle('digitBackground', v), defaults.digitBackground)}
               {renderColorPicker('Label Color', style.labelColor, (v) => updateStyle('labelColor', v), defaults.labelColor)}
+              {renderColorPicker('Background', style.background || style.containerBgColor, (v) => updateStyle('background', v), defaults.background)}
+              {renderNumberInput('Radius', style.radius !== undefined ? style.radius : style.containerBorderRadius, (v) => updateStyle('radius', v), 0, 50)}
+              {renderNumberInput('Padding', style.padding !== undefined ? style.padding : style.containerPadding, (v) => updateStyle('padding', v), 0, 100)}
             </>
           )}
 
@@ -1045,9 +1326,19 @@ export const InteractiveSettings = observer(({ store, element }) => {
 
           {interactiveType === 'question' && (
             <>
-              {renderColorPicker('Input BG', style.inputBgColor, (v) => updateStyle('inputBgColor', v), defaults.inputBgColor)}
-              {renderColorPicker('Input Text', style.inputTextColor, (v) => updateStyle('inputTextColor', v), defaults.inputTextColor)}
-              {renderColorPicker('Submit BG', style.submitBgColor, (v) => updateStyle('submitBgColor', v), defaults.submitBgColor)}
+              {renderColorPicker('Background', style.background, (v) => updateStyle('background', v), '#FFFFFF')}
+              {renderNumberInput('Padding', style.padding ?? 20, (v) => updateStyle('padding', v), 0, 50)}
+              {renderNumberInput('Radius', style.radius ?? 16, (v) => updateStyle('radius', v), 0, 50)}
+              {renderNumberInput('Opacity (%)', Math.round((style.opacity ?? element.opacity ?? 1) * 100), (v) => {
+                updateStyle('opacity', v / 100);
+              }, 0, 100)}
+
+              {renderColorPicker('Question Color', style.questionColor, (v) => updateStyle('questionColor', v), '#1F2937')}
+              {renderNumberInput('Question Size', style.questionSize ?? 20, (v) => updateStyle('questionSize', v), 10, 48)}
+
+              {renderColorPicker('Input BG', style.inputBackground, (v) => updateStyle('inputBackground', v), '#F3F4F6')}
+              {renderColorPicker('Input Text', style.inputTextColor, (v) => updateStyle('inputTextColor', v), '#9CA3AF')}
+              {renderColorPicker('Submit BG', style.submitBackground, (v) => updateStyle('submitBackground', v), '#F97316')}
             </>
           )}
 
@@ -1060,17 +1351,6 @@ export const InteractiveSettings = observer(({ store, element }) => {
             </>
           )}
         </div>
-
-        {/* Additional Appearance for Rating */}
-        {interactiveType === 'rating' && (
-          <div className="section">
-            {renderSectionTitle('Additional Appearance')}
-            {renderColorPicker('Card Background', style.cardBgColor, (v) => updateStyle('cardBgColor', v), '#ffffff')}
-            {renderColorPicker('Title Color', style.titleColor, (v) => updateStyle('titleColor', v), '#000000')}
-            {renderNumberInput('Title Size', style.titleFontSize, (v) => updateStyle('titleFontSize', v), 8, 24)}
-            {renderNumberInput('Emoji Size', style.emojiSize, (v) => updateStyle('emojiSize', v), 16, 64)}
-          </div>
-        )}
 
         {/* Reset Default Styles Button */}
         <button

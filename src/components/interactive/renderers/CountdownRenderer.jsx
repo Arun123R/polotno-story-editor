@@ -13,31 +13,30 @@ export const CountdownRenderer = ({ data, style, width, height }) => {
   const showMinutes = data?.showMinutes !== false;
   const showSeconds = data?.showSeconds !== false;
 
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const calculateTimeLeft = () => {
+    if (!endDate) {
+      return { days: 0, hours: 12, minutes: 34, seconds: 56 };
+    }
+
+    const endDateTime = new Date(`${endDate}T${endTime}:00`);
+    const now = new Date();
+    const diff = endDateTime - now;
+
+    if (diff <= 0) {
+      return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+    }
+
+    return {
+      days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+      minutes: Math.floor((diff / (1000 * 60)) % 60),
+      seconds: Math.floor((diff / 1000) % 60),
+    };
+  };
+
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
   useEffect(() => {
-    const calculateTimeLeft = () => {
-      if (!endDate) {
-        return { days: 0, hours: 12, minutes: 34, seconds: 56 };
-      }
-
-      const endDateTime = new Date(`${endDate}T${endTime}:00`);
-      const now = new Date();
-      const diff = endDateTime - now;
-
-      if (diff <= 0) {
-        return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-      }
-
-      return {
-        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((diff / (1000 * 60)) % 60),
-        seconds: Math.floor((diff / 1000) % 60),
-      };
-    };
-
-    setTimeLeft(calculateTimeLeft());
     const timer = setInterval(() => {
       setTimeLeft(calculateTimeLeft());
     }, 1000);
@@ -50,9 +49,9 @@ export const CountdownRenderer = ({ data, style, width, height }) => {
   const containerStyle = {
     width: width || 300,
     height: height || 'auto',
-    background: style?.containerBgColor || '#ffffff',
-    borderRadius: style?.containerBorderRadius || 16,
-    padding: style?.containerPadding || 20,
+    background: style?.background || style?.containerBgColor || '#ffffff',
+    borderRadius: style?.radius !== undefined ? style.radius : (style?.containerBorderRadius || 16),
+    padding: style?.padding !== undefined ? style.padding : (style?.containerPadding || 20),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -74,34 +73,37 @@ export const CountdownRenderer = ({ data, style, width, height }) => {
   const timerContainerStyle = {
     display: 'flex',
     alignItems: 'flex-start',
-    gap: 16, // Gap between units
+    justifyContent: 'center',
+    gap: 4, // Compact gap between units
+    flexWrap: 'nowrap', // Force one row
   };
 
   const digitGroupStyle = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: 6,
+    gap: 2,
   };
 
   const digitsRowStyle = {
     display: 'flex',
-    gap: 4, // Gap between digits in same unit
+    gap: 1, // Compact gap between digits
   };
 
   const digitBoxStyle = {
-    width: 32,
-    height: 44,
-    background: '#f3f4f6', // Light gray tile
+    minWidth: 24, // Compact flexible width
+    height: 40,
+    background: style?.digitBackground || style?.digitBgColor || '#f3f4f6',
     borderRadius: 6,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    padding: '0 2px',
   };
 
   const digitTextStyle = {
     color: style?.digitColor || '#1f2937',
-    fontSize: style?.digitFontSize || 24, // Smaller font for tiles
+    fontSize: style?.digitSize || style?.digitFontSize || 24, // Smaller font for tiles
     fontWeight: 700,
     lineHeight: 1,
   };

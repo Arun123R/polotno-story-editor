@@ -13,6 +13,7 @@ import {
   applySlideBackgroundToPage,
 } from '../../../utils/slideBackground';
 import { useEditorContext } from '../../../context/EditorContext';
+import { storyAPI } from '../../../services/api';
 
 /**
  * Page settings panel (when no element is selected) - Storyly-inspired dark theme
@@ -148,24 +149,27 @@ export const PageSettings = observer(({ store }) => {
     });
   };
 
-  const handlePickMediaFile = (file) => {
+  const handlePickMediaFile = async (file) => {
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = typeof reader.result === 'string' ? reader.result : '';
+
+    try {
+      // Upload to CDN and get URL
+      const cdnUrl = await storyAPI.uploadGeneralMedia(file);
       const currentSolid =
         currentBg.color?.type === 'solid' ? (currentBg.color.solid || '#FFFFFF').toUpperCase() : null;
       const shouldAutoColor = currentSolid === '#FFFFFF';
 
-      setMedia({ mediaUrl: dataUrl });
+      setMedia({ mediaUrl: cdnUrl });
 
       if (shouldAutoColor) {
-        extractDominantColor(dataUrl).then((hex) => {
+        extractDominantColor(cdnUrl).then((hex) => {
           if (hex) setColorSolid(hex);
         });
       }
-    };
-    reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('Failed to upload background media:', error);
+      // Optionally show error to user
+    }
   };
 
   return (
