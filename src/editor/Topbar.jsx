@@ -11,6 +11,18 @@ import Dropdown from '../components/shared/Dropdown';
 export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar, groupId: propGroupId, slideId: propSlideId }) => {
     const [isSaving, setIsSaving] = useState(false);
 
+    // Campaign name from context (real data)
+    let campaignName = projectName;
+    try {
+        const context = useEditorContext();
+        if (context && context.campaign && context.campaign.name) {
+            campaignName = context.campaign.name;
+        }
+    // eslint-disable-next-line no-unused-vars
+    } catch (e) {
+        // fallback to prop
+    }
+
     // Get context values (with fallback for when not in provider)
     let contextValues = {};
     try {
@@ -49,6 +61,7 @@ export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar,
             .map((g) => ({
                 id: String(g.id),
                 name: g.name || g.title || `Group ${g.id}`,
+                order: g.order,
                 image:
                     g.thumbnail ||
                     g.image ||
@@ -56,6 +69,8 @@ export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar,
                     g.cover ||
                     g.preview ||
                     null,
+                ringColor: g.ringColor || '#ccc',
+                nameColor: g.nameColor || '#fff',
                 isDummy: false,
             }));
 
@@ -81,6 +96,8 @@ export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar,
                 currentGroup.cover ||
                 currentGroup.preview ||
                 null,
+            ringColor: currentGroup.ringColor || '#ccc',
+            nameColor: currentGroup.nameColor || '#fff',
         } : null;
 
         if (fromContext) return fromContext;
@@ -97,7 +114,10 @@ export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar,
     const dropdownOptions = useMemo(() => {
         return groupOptions.map((g) => ({
             value: g.id,
-            label: g.name,
+            label: g.order !== undefined && g.order !== null ? `(${g.order}) ${g.name}` : g.name,
+            image: g.image,
+            ringColor: g.ringColor,
+            nameColor: g.nameColor,
             disabled: !!g.isDummy || typeof switchToGroup !== 'function',
         }));
     }, [groupOptions, switchToGroup]);
@@ -291,12 +311,28 @@ export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar,
                                 className="breadcrumb-group-selector"
                                 title="Switch Group"
                                 type="button"
+                                style={{
+                                    border: '2px solid #E0E0E0', // static neutral border
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 8,
+                                    background: 'transparent',
+                                }}
                             >
-                                <div className="group-avatar-preview">
-                                    <img
-                                        src={currentGroupDisplay?.image || "https://db62cod6cnasq.cloudfront.net/user-media/15044/sg268209/3429895945.png"}
-                                        alt="Group"
-                                    />
+                                <div className="group-avatar-preview" style={{ width: 32, height: 32, borderRadius: '50%', overflow: 'hidden', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    {currentGroupDisplay?.image ? (
+                                        <span style={{ width: '100%', height: '100%', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `2px solid ${currentGroupDisplay?.ringColor || '#ccc'}` }}>
+                                            <img
+                                                src={currentGroupDisplay?.image}
+                                                alt="Group"
+                                                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                                            />
+                                        </span>
+                                    ) : (
+                                        <span style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: currentGroupDisplay?.ringColor || '#ccc', color: currentGroupDisplay?.nameColor || '#fff', fontWeight: 600, fontSize: 16, border: `2px solid ${currentGroupDisplay?.ringColor || '#ccc'}`, borderRadius: '50%' }}>
+                                            {currentGroupDisplay?.name ? currentGroupDisplay.name.charAt(0).toUpperCase() : '?'}
+                                        </span>
+                                    )}
                                 </div>
                                 <svg
                                     width="14"
@@ -318,7 +354,7 @@ export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar,
 
                     <span className="breadcrumb-separator">›</span>
                     <span className="breadcrumb-item breadcrumb-current">
-                        {projectName}
+                        {campaignName}
                     </span>
                 </div>
             </div>
