@@ -102,8 +102,14 @@ export const EditorContextProvider = ({ children }) => {
     const switchToGroup = useCallback((groupId) => {
         if (groupId === currentGroupId) return;
         console.log(`[EditorContext] Switching to group: ${groupId}`);
+
+        // Pick a valid slide in the next group so hydration/selectSlide works.
+        const nextSlides = getSlidesForGroup?.(groupId) || [];
+        const nextFirstSlideId = nextSlides[0]?.id ? String(nextSlides[0].id) : null;
+
         setCurrentGroupId(groupId);
-    }, [currentGroupId]);
+        setCurrentSlideId(nextFirstSlideId);
+    }, [currentGroupId, getSlidesForGroup]);
 
     // Sync Polotno active page to Context currentSlideId
     useEffect(() => {

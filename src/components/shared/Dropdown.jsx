@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import React, { cloneElement, isValidElement, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 const DEFAULT_MAX_PANEL_HEIGHT = 260;
@@ -23,10 +23,15 @@ export function Dropdown({
   panelMaxHeight = DEFAULT_MAX_PANEL_HEIGHT,
   panelMinWidth = DEFAULT_MIN_PANEL_WIDTH,
   ariaLabel,
+  renderTrigger,
 }) {
   const dropdownId = useId();
   const triggerRef = useRef(null);
   const panelRef = useRef(null);
+
+  const setTriggerNode = useCallback((node) => {
+    triggerRef.current = node;
+  }, []);
 
   const normalizedOptions = useMemo(() => (options || []).map(toOption), [options]);
 
@@ -188,23 +193,64 @@ export function Dropdown({
 
   const rootClass = `app-dropdown ${className}`.trim();
 
+  const triggerAria = {
+    'aria-label': ariaLabel,
+    'aria-haspopup': 'listbox',
+    'aria-expanded': open,
+    'aria-controls': `${dropdownId}-panel`,
+  };
+
+  const composeHandlers = (userHandler, ourHandler) => {
+    return (e) => {
+      userHandler?.(e);
+      if (e?.defaultPrevented) return;
+      ourHandler?.(e);
+    };
+  };
+
+  const customTriggerEl = useMemo(() => {
+    if (typeof renderTrigger !== 'function') return null;
+    const el = renderTrigger({
+      open,
+      disabled,
+      selected,
+      placeholder,
+    });
+    if (!isValidElement(el)) return null;
+
+    const injectedProps = {
+      ref: setTriggerNode,
+      disabled,
+      onClick: composeHandlers(el.props?.onClick, handleToggle),
+      onKeyDown: composeHandlers(el.props?.onKeyDown, handleTriggerKeyDown),
+      ...triggerAria,
+    };
+
+    return cloneElement(el, injectedProps);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [renderTrigger, open, disabled, selected, placeholder, setTriggerNode, handleToggle, handleTriggerKeyDown, dropdownId]);
+
   return (
     <div className={rootClass} style={style}>
-      <button
-        ref={triggerRef}
-        type="button"
-        className="select-input"
-        onClick={handleToggle}
-        onKeyDown={handleTriggerKeyDown}
-        disabled={disabled}
-        aria-label={ariaLabel}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-controls={`${dropdownId}-panel`}
-        style={{ textAlign: 'left' }}
-      >
-        {selected?.label ?? placeholder}
-      </button>
+      {customTriggerEl ? (
+        customTriggerEl
+      ) : (
+        <button
+          ref={setTriggerNode}
+          type="button"
+          className="select-input"
+          onClick={handleToggle}
+          onKeyDown={handleTriggerKeyDown}
+          disabled={disabled}
+          aria-label={ariaLabel}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          aria-controls={`${dropdownId}-panel`}
+          style={{ textAlign: 'left' }}
+        >
+          {selected?.label ?? placeholder}
+        </button>
+      )}
 
       {open
         ? createPortal(

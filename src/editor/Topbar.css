@@ -145,6 +145,56 @@
     color: var(--text-primary);
 }
 
+/* ==================== GROUP DROPDOWN ==================== */
+
+.topbar-group-menu {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.topbar-group-menu-item {
+    width: 100%;
+    text-align: left;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: 13px;
+}
+
+.topbar-group-menu-item:hover {
+    background: var(--bg-hover);
+}
+
+.topbar-group-menu-item.is-active {
+    background: var(--accent-soft);
+}
+
+.topbar-group-menu-item.is-disabled {
+    cursor: default;
+    opacity: 0.7;
+}
+
+.topbar-group-menu-item.is-disabled:hover {
+    background: transparent;
+}
+
+.topbar-group-menu-item__name {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.topbar-group-menu-empty {
+    padding: 10px 12px;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
 .breadcrumb-item {
     color: var(--text-secondary);
     cursor: pointer;

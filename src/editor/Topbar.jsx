@@ -1,11 +1,12 @@
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import './Topbar.css';
 
 import { ThemeToggleButton } from './ThemeToggleButton';
 // Note: handleSave from canvasSave.js is deprecated
 // We now use buildSlidePayload from slidePayloadBuilder.js (imported dynamically)
 import { useEditorContext } from '../context/EditorContext';
+import Dropdown from '../components/shared/Dropdown';
 
 export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar, groupId: propGroupId, slideId: propSlideId }) => {
     const [isSaving, setIsSaving] = useState(false);
@@ -14,6 +15,7 @@ export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar,
     let contextValues = {};
     try {
         contextValues = useEditorContext();
+    // eslint-disable-next-line no-unused-vars
     } catch (e) {
         // Not in provider, use props
         contextValues = {
@@ -29,13 +31,76 @@ export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar,
         currentSlideId: contextSlideId,
         checkIsHydrating,
         ctaState,
-        groupSlides,
+        storyGroups,
+        currentGroup,
+        switchToGroup,
     } = contextValues;
 
     // Use context values with prop fallbacks
     const groupId = contextGroupId || propGroupId || 'demo-group-id';
     const slideId = contextSlideId || propSlideId;
     const [isCreatingGroup, _setIsCreatingGroup] = useState(false);
+
+    const groupOptions = useMemo(() => {
+        const groups = Array.isArray(storyGroups) ? storyGroups : [];
+
+        const normalized = groups
+            .filter((g) => g && g.id != null)
+            .map((g) => ({
+                id: String(g.id),
+                name: g.name || g.title || `Group ${g.id}`,
+                image:
+                    g.thumbnail ||
+                    g.image ||
+                    g.icon ||
+                    g.cover ||
+                    g.preview ||
+                    null,
+                isDummy: false,
+            }));
+
+        if (normalized.length > 0) return normalized;
+
+        // Backend not connected yet -> show placeholders
+        return [1, 2, 3, 4].map((i) => ({
+            id: `dummy-group-${i}`,
+            name: `Dummy Group ${i}`,
+            image: null,
+            isDummy: true,
+        }));
+    }, [storyGroups]);
+
+    const currentGroupDisplay = useMemo(() => {
+        const fromContext = currentGroup && currentGroup.id != null ? {
+            id: String(currentGroup.id),
+            name: currentGroup.name || currentGroup.title || `Group ${currentGroup.id}`,
+            image:
+                currentGroup.thumbnail ||
+                currentGroup.image ||
+                currentGroup.icon ||
+                currentGroup.cover ||
+                currentGroup.preview ||
+                null,
+        } : null;
+
+        if (fromContext) return fromContext;
+
+        const fallbackId = (contextGroupId || propGroupId) ? String(contextGroupId || propGroupId) : null;
+        if (fallbackId) {
+            const found = groupOptions.find((g) => g.id === fallbackId);
+            if (found) return found;
+        }
+
+        return null;
+    }, [currentGroup, contextGroupId, propGroupId, groupOptions]);
+
+    const dropdownOptions = useMemo(() => {
+        return groupOptions.map((g) => ({
+            value: g.id,
+            label: g.name,
+            disabled: !!g.isDummy || typeof switchToGroup !== 'function',
+        }));
+    }, [groupOptions, switchToGroup]);
 
     // Disabled auto-create group to prevent 401 errors
     // Uncomment this when you have auth tokens set
@@ -112,9 +177,7 @@ export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar,
             const {
                 buildSlidePayload,
                 buildCreateSlideFormData,
-                buildUpdateSlideFormData,
-                calculateNextSlideOrder
-            } = await import('../utils/slidePayloadBuilder.js');
+                buildUpdateSlideFormData            } = await import('../utils/slidePayloadBuilder.js');
             const { storyAPI } = await import('../services/api.js');
 
             // Get current page for element extraction
@@ -213,27 +276,43 @@ export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar,
 
                 {/* Breadcrumb Navigation */}
                 <div className="topbar-breadcrumb">
-                    <button className="breadcrumb-group-selector" title="Switch Group">
-                        <div className="group-avatar-preview">
-                            <img
-                                src="https://db62cod6cnasq.cloudfront.net/user-media/15044/sg268209/3429895945.png"
-                                alt="Group"
-                            />
-                        </div>
-                        <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="3"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="group-chevron-static"
-                        >
-                            <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
-                    </button>
+                    <Dropdown
+                        options={dropdownOptions}
+                        value={currentGroupDisplay?.id}
+                        placeholder="Select group"
+                        ariaLabel="Switch Group"
+                        panelMinWidth={240}
+                        onChange={(nextGroupId) => {
+                            switchToGroup?.(nextGroupId);
+                        }}
+                        renderTrigger={() => (
+                            <button
+                                className="breadcrumb-group-selector"
+                                title="Switch Group"
+                                type="button"
+                            >
+                                <div className="group-avatar-preview">
+                                    <img
+                                        src={currentGroupDisplay?.image || "https://db62cod6cnasq.cloudfront.net/user-media/15044/sg268209/3429895945.png"}
+                                        alt="Group"
+                                    />
+                                </div>
+                                <svg
+                                    width="14"
+                                    height="14"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="3"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className="group-chevron-static"
+                                >
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </button>
+                        )}
+                    />
 
 
                     <span className="breadcrumb-separator">›</span>
