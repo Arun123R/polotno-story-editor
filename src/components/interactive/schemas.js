@@ -26,26 +26,34 @@ export const INTERACTIVE_DEFAULTS = {
     quiz: {
         question: 'What is the capital of France?',
         options: [
-            { id: 'q1', text: 'London' },
-            { id: 'q2', text: 'Paris' },
-            { id: 'q3', text: 'Berlin' },
+            { id: 'A', text: 'London', isCorrect: false },
+            { id: 'B', text: 'Paris', isCorrect: true },
+            { id: 'C', text: 'Berlin', isCorrect: false },
         ],
-        correctAnswerId: 'q2',
         showExplanation: false,
-        explanation: '',
+        duration: {
+            start: 0,
+            end: 5
+        }
     },
 
     rating: {
+        type: 'rating',
+        variant: 'slider', // 'star' | 'emoji' | 'slider'
         title: 'Do you like my eyes?',
-        type: 'slider', // 'star' | 'emoji' | 'slider'
         maxRating: 5,
         emoji: '😺',
         currentRating: 3,
     },
 
     reaction: {
+        type: 'reaction',
         emojis: ['👍', '👎'],
-        showCount: true,
+        showCount: false,
+        duration: {
+            start: 0,
+            end: 5
+        }
     },
 
     countdown: {
@@ -104,49 +112,89 @@ export const INTERACTIVE_STYLES = {
     },
 
     quiz: {
-        questionColor: '#1f2937',
-        questionFontSize: 16,
-        optionBgColor: '#f9fafb',
-        optionTextColor: '#1f2937',
-        optionFontSize: 14,
-        optionBorderRadius: 8,
-        correctColor: '#10b981',
-        incorrectColor: '#ef4444',
-        containerBgColor: '#ffffff',
-        containerBorderRadius: 16,
-        containerPadding: 20,
+        position: {
+            x: 28,
+            y: 131
+        },
+        size: {
+            width: 280,
+            height: 214
+        },
+        rotation: 0,
+        appearance: {
+            opacity: 1,
+            radius: 16
+        },
+        colors: {
+            background: '#FF0000',
+            questionColor: '#FFFFFF',
+            optionBackground: '#F9FAFB',
+            optionTextColor: '#1F2937',
+            correctColor: '#10B981',
+            incorrectColor: '#EF4444'
+        },
+        typography: {
+            questionSize: 16,
+            optionSize: 14
+        },
+        spacing: {
+            padding: 20,
+            optionRadius: 8
+        }
     },
 
     rating: {
+        position: { x: 62, y: 261 },
+        size: { width: 237, height: 90 },
+        rotation: 0,
+        opacity: 1,
+        radius: 12,
+        padding: 20,
+        colors: {
+            background: '#FFFFFF',
+            cardBackground: '#FFFFFF',
+            titleColor: '#000000',
+            sliderTrack: '#E6E6E6',
+            sliderFill: '#F97316',
+        },
+        typography: {
+            titleSize: 14,
+            emojiSize: 32,
+        },
+        // Legacy flat properties for backward compatibility
         titleColor: '#000000',
         titleFontSize: 14,
-        activeColor: '#fbbf24',
-        inactiveColor: 'rgba(255,255,255,0.3)',
+        activeColor: '#F97316',
+        inactiveColor: '#E6E6E6',
         emojiSize: 32,
-        containerBgColor: 'rgba(0,0,0,0.5)',
+        containerBgColor: '#FFFFFF',
         containerBorderRadius: 12,
-        containerPadding: 16,
+        containerPadding: 20,
     },
 
     reaction: {
-        containerBgColor: '#ffffff',
-        hoverScale: 1.2,
+        position: { x: 40, y: 276 },
+        size: { width: 280, height: 64 },
+        rotation: 0,
+        opacity: 1,
+        radius: 0,
+        padding: 0,
+        background: '#FFFFFF',
+        transparentBackground: false,
         emojiSize: 48,
-        transparentBg: false,
+        countColor: '#374151',
+        countSize: 14,
     },
 
     countdown: {
         titleColor: '#1f2937',
-        titleFontSize: 14,
         digitColor: '#1f2937',
-        digitFontSize: 28,
-        digitBgColor: 'transparent',
+        digitSize: 28,
+        digitBackground: '#000000',
         labelColor: '#9ca3af',
-        labelFontSize: 9,
-        separatorColor: '#d1d5db',
-        containerBgColor: '#ffffff',
-        containerBorderRadius: 12,
-        containerPadding: 16,
+        background: '#ffffff',
+        radius: 12,
+        padding: 16,
     },
 
     promo: {

@@ -40,40 +40,50 @@ const CountdownPreview = ({ data, style, width, height }) => {
 
   const formatNum = (n) => String(n).padStart(2, '0');
 
+  // Ensure data and style are objects
+  const d = data || {};
+  const s = style || {};
+
+  // Safe defaults and conversions
+  const radius = s.radius !== undefined ? Number(s.radius) : (s.containerBorderRadius || 12);
+  const padding = s.padding !== undefined ? Number(s.padding) : (s.containerPadding || 16);
+  // Safely format numbers
+  const safeFormat = (v) => formatNum(v !== undefined && v !== null ? v : 0);
+
   return (
     <div style={{
       width: '100%',
       height: '100%',
-      background: style?.containerBgColor || 'rgba(0,0,0,0.7)',
-      borderRadius: style?.containerBorderRadius || 12,
+      background: s.background || s.containerBgColor || 'rgba(0,0,0,0.7)',
+      borderRadius: radius,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
       gap: 12,
-      padding: 16,
+      padding: padding,
       boxSizing: 'border-box',
     }}>
       <div style={{
-        color: style?.titleColor || '#fff',
-        fontSize: style?.titleFontSize || 14,
+        color: s.titleColor || '#fff',
+        fontSize: s.titleFontSize || 14,
         fontWeight: 600,
         textTransform: 'uppercase',
         letterSpacing: 2,
       }}>
-        {data?.title || 'Ends In'}
+        {d.title || 'Ends In'}
       </div>
       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
         {[
-          { val: timeLeft.days, label: 'Days' },
-          { val: timeLeft.hours, label: 'Hrs' },
-          { val: timeLeft.minutes, label: 'Min' },
-          { val: timeLeft.seconds, label: 'Sec' },
-        ].map((item, i) => (
+          { val: timeLeft.days, label: 'Days', show: d.showDays !== false },
+          { val: timeLeft.hours, label: 'Hrs', show: d.showHours !== false },
+          { val: timeLeft.minutes, label: 'Min', show: d.showMinutes !== false },
+          { val: timeLeft.seconds, label: 'Sec', show: d.showSeconds !== false },
+        ].filter(item => item.show).map((item, i, arr) => (
           <React.Fragment key={item.label}>
-            {i > 0 && <span style={{ color: style?.separatorColor || '#fff', fontSize: 24, opacity: 0.5 }}>:</span>}
+            {i > 0 && <span style={{ color: s.separatorColor || '#fff', fontSize: 24, opacity: 0.5 }}>:</span>}
             <div style={{
-              background: style?.digitBgColor || 'rgba(255,255,255,0.15)',
+              background: s.digitBackground || s.digitBgColor || 'rgba(255,255,255,0.15)',
               borderRadius: 8,
               padding: '8px 12px',
               display: 'flex',
@@ -82,16 +92,16 @@ const CountdownPreview = ({ data, style, width, height }) => {
               gap: 2,
             }}>
               <span style={{
-                color: style?.digitColor || '#fff',
-                fontSize: style?.digitFontSize || 28,
+                color: s.digitColor || '#fff',
+                fontSize: s.digitSize || s.digitFontSize || 28,
                 fontWeight: 700,
                 fontFamily: 'monospace',
                 lineHeight: 1,
               }}>
-                {formatNum(item.val)}
+                {safeFormat(item.val)}
               </span>
               <span style={{
-                color: style?.labelColor || 'rgba(255,255,255,0.7)',
+                color: s.labelColor || 'rgba(255,255,255,0.7)',
                 fontSize: 9,
                 textTransform: 'uppercase',
               }}>

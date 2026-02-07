@@ -3,6 +3,7 @@ import React, { useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { SectionTab } from 'polotno/side-panel';
 import { Button, Tooltip, Position } from '@blueprintjs/core';
+import { storyAPI } from '../../../services/api';
 
 // Icons
 const UploadIcon = () => (
@@ -109,8 +110,8 @@ export const UploadSectionPanel = observer(({ store }) => {
         }
     };
 
-    // Handle file upload (images and videos)
-    const handleFileUpload = (e, fileType = 'any') => {
+    // Handle file upload (images and videos) - uploads to CDN
+    const handleFileUpload = async (e, fileType = 'any') => {
         const file = e.target.files?.[0];
         if (!file) return;
 
@@ -133,19 +134,20 @@ export const UploadSectionPanel = observer(({ store }) => {
             return;
         }
 
-        // Read file as data URL
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const fileUrl = event.target.result;
+        try {
+            // Upload to CDN and get URL
+            const cdnUrl = await storyAPI.uploadGeneralMedia(file);
             const type = isVideo ? 'video' : 'image';
 
             // Add to uploaded files at the beginning
-            setUploadedImages(prev => [{ url: fileUrl, type }, ...prev]);
+            setUploadedImages(prev => [{ url: cdnUrl, type }, ...prev]);
 
             // Add to canvas immediately
-            addElementToCanvas(fileUrl, type);
-        };
-        reader.readAsDataURL(file);
+            addElementToCanvas(cdnUrl, type);
+        } catch (error) {
+            console.error('Failed to upload media:', error);
+            alert('Failed to upload file. Please try again.');
+        }
     };
 
 

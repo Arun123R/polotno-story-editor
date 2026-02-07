@@ -12,9 +12,9 @@ export const QuestionRenderer = ({ data, style, width, height }) => {
   const containerStyle = {
     width: width || 280,
     height: height || 160,
-    background: style?.containerBgColor || '#ffffff',
-    borderRadius: style?.containerBorderRadius || 16,
-    padding: style?.containerPadding || 20,
+    background: style?.background || style?.containerBgColor || '#ffffff',
+    borderRadius: style?.radius !== undefined ? style.radius : (style?.containerBorderRadius || 16),
+    padding: style?.padding !== undefined ? style.padding : (style?.containerPadding || 20),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -22,11 +22,12 @@ export const QuestionRenderer = ({ data, style, width, height }) => {
     gap: 16,
     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
     boxSizing: 'border-box',
+    fontFamily: 'Inter, Arial, sans-serif',
   };
 
   const titleStyle = {
-    color: style?.titleColor || '#1f2937',
-    fontSize: style?.titleFontSize || 20,
+    color: style?.questionColor || style?.titleColor || '#1f2937',
+    fontSize: style?.questionSize || style?.titleFontSize || 20,
     fontWeight: 700,
     textAlign: 'center',
     margin: 0,
@@ -35,7 +36,7 @@ export const QuestionRenderer = ({ data, style, width, height }) => {
 
   const inputContainerStyle = {
     width: '100%',
-    background: style?.inputBgColor || '#f3f4f6',
+    background: style?.inputBackground || style?.inputBgColor || '#f3f4f6',
     borderRadius: style?.inputBorderRadius || 12,
     padding: '12px 16px',
     boxSizing: 'border-box',
@@ -78,12 +79,7 @@ export const QuestionRenderer = ({ data, style, width, height }) => {
         />
       </div>
 
-      {allowAnonymous && (
-        <div style={anonymousStyle}>
-          <span style={{ fontSize: 10 }}>🔒</span>
-          <span>Anonymous responses</span>
-        </div>
-      )}
+      {/* Anonymous response indicator removed as per request */}
     </div>
   );
 };

@@ -207,6 +207,24 @@ export const storyAPI = {
         });
     },
 
+    /**
+     * Upload general media (image/video) to get CDN URL via image-link endpoint.
+     * @param {File | Blob} file - The file to upload
+     * @returns {Promise<string>} - Returns the CDN URL
+     */
+    uploadGeneralMedia: async (file) => {
+        const formData = new FormData();
+        formData.append("image", file);
+
+        const response = await api.post('/api/v1/campaigns/image-link/', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
+        return response.data.url;
+    },
+
     // Analytics
     getCampaignAnalytics: (campaignId, startDate = null, endDate = null) => {
         let url = `${ANALYTICS_BASE_URL}/campaigns/${campaignId}`;
