@@ -105,7 +105,7 @@ const resolveCampaignId = (): string | null => {
     if (fromUrl) return fromUrl;
 
     if (isDev) {
-        const fromEnv = import.meta.env.VITE_CAMPAIGN_ID;
+        const fromEnv = "bf3ac74d-d010-4611-ad53-5452ae6b44ad";
         if (fromEnv) {
             warnInDev('Using fallback CAMPAIGN_ID from .env');
             return fromEnv;
