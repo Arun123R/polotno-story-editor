@@ -97,14 +97,17 @@ export const useCampaignData = (campaignId, storyGroupId = null) => {
         let targetCampaignId = campaignId;
 
         // If no campaignId, try to resolve from storyGroupId
-        if (!targetCampaignId && storyGroupId) {
-            console.log(`[useCampaignData] No campaignId, resolving from group: ${storyGroupId}`);
+        const validGroupId = storyGroupId && storyGroupId !== 'null' ? storyGroupId : null;
+        if (!targetCampaignId && validGroupId) {
+            console.log(`[useCampaignData] No campaignId, resolving from group: ${validGroupId}`);
             try {
-                const groupResponse = await storyAPI.getStoryGroup(storyGroupId);
+                const groupResponse = await storyAPI.getStoryGroup(validGroupId);
                 if (groupResponse?.data) {
                     // Handle if campaign is ID or object
-                    const camp = groupResponse.data.campaign;
-                    targetCampaignId = (typeof camp === 'object' && camp?.id) ? camp.id : camp;
+                    const camp = groupResponse.data?.campaign;
+                    const campId = groupResponse.data?.campaign_id;
+                    const campName = groupResponse.data?.campaign_name;
+                    targetCampaignId = campId || ((typeof camp === 'object' && camp?.id) ? camp.id : camp);
 
                     if (targetCampaignId) {
                         console.log(`[useCampaignData] Resolved campaignId: ${targetCampaignId}`);

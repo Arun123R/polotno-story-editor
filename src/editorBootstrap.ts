@@ -39,6 +39,9 @@ const warnInDev = (message: string) => {
  */
 const resolveStoryGroupId = (): string | null => {
     const fromUrl = getQueryParam('storyGroupId') || getQueryParam('parentId'); // Support both for backward comapt if needed, but prefer storyGroupId
+
+    // Safety check for weird "null" string values
+    if (fromUrl === 'null') return null;
     if (fromUrl) return fromUrl;
 
     if (isDev) {
