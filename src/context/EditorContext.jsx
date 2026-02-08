@@ -49,7 +49,7 @@ export const EditorContextProvider = ({ children }) => {
         findSlide,
         findGroup,
         getSlidesForGroup,
-    } = useCampaignData(bootstrapCampaignId);
+    } = useCampaignData(bootstrapCampaignId, bootstrapGroupId);
 
     // Get current slide data from cached campaign
     const currentSlide = useMemo(() => {

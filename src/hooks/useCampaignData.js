@@ -83,7 +83,7 @@ const findSlideById = (groups, slideId) => {
  * @param {string} campaignId - The campaign ID to fetch
  * @returns {Object} - { campaign, storyGroups, isLoading, error, findSlide, findGroup }
  */
-export const useCampaignData = (campaignId) => {
+export const useCampaignData = (campaignId, storyGroupId = null) => {
     const [campaign, setCampaign] = useState(null);
     const [storyGroups, setStoryGroups] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -94,12 +94,35 @@ export const useCampaignData = (campaignId) => {
     const fetchedCampaignIdRef = useRef(null);
 
     const fetchCampaign = useCallback(async (force = false) => {
-        if (!campaignId) {
-            console.log('[useCampaignData] No campaignId provided, skipping fetch.');
+        let targetCampaignId = campaignId;
+
+        // If no campaignId, try to resolve from storyGroupId
+        if (!targetCampaignId && storyGroupId) {
+            console.log(`[useCampaignData] No campaignId, resolving from group: ${storyGroupId}`);
+            try {
+                const groupResponse = await storyAPI.getStoryGroup(storyGroupId);
+                if (groupResponse?.data) {
+                    // Handle if campaign is ID or object
+                    const camp = groupResponse.data.campaign;
+                    targetCampaignId = (typeof camp === 'object' && camp?.id) ? camp.id : camp;
+
+                    if (targetCampaignId) {
+                        console.log(`[useCampaignData] Resolved campaignId: ${targetCampaignId}`);
+                    }
+                }
+            } catch (err) {
+                console.error('[useCampaignData] Failed to resolve campaign from group:', err);
+                // Don't error out yet, maybe we can't load campaign but can load something else? 
+                // But this hook is specifically for campaign data.
+            }
+        }
+
+        if (!targetCampaignId) {
+            console.log('[useCampaignData] No campaignId provided (and resolution failed), skipping fetch.');
             return;
         }
 
-        if (!force && hasFetchedRef.current && fetchedCampaignIdRef.current === campaignId) {
+        if (!force && hasFetchedRef.current && fetchedCampaignIdRef.current === targetCampaignId) {
             console.log('[useCampaignData] Campaign already fetched, skipping.');
             return;
         }
@@ -108,8 +131,8 @@ export const useCampaignData = (campaignId) => {
         setError(null);
 
         try {
-            console.log(`[useCampaignData] Fetching campaign: ${campaignId}`);
-            const response = await storyAPI.getCampaignDetails(campaignId);
+            console.log(`[useCampaignData] Fetching campaign: ${targetCampaignId}`);
+            const response = await storyAPI.getCampaignDetails(targetCampaignId);
 
             if (response?.data) {
                 console.log('[useCampaignData] Campaign loaded:', response.data);
@@ -122,7 +145,7 @@ export const useCampaignData = (campaignId) => {
 
                 // Mark as fetched
                 hasFetchedRef.current = true;
-                fetchedCampaignIdRef.current = campaignId;
+                fetchedCampaignIdRef.current = targetCampaignId;
             }
         } catch (err) {
             console.error('[useCampaignData] Failed to fetch campaign:', err);
@@ -130,7 +153,7 @@ export const useCampaignData = (campaignId) => {
         } finally {
             setIsLoading(false);
         }
-    }, [campaignId]);
+    }, [campaignId, storyGroupId]);
 
     useEffect(() => {
         fetchCampaign();
