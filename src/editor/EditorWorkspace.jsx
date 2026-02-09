@@ -4,6 +4,7 @@ import { Workspace } from "polotno/canvas/workspace";
 import { FitZoomButtons } from './FitZoomButtons';
 import { DragDropHandler } from './DragDropHandler';
 import { useKonvaShapeFlips } from '../hooks/useKonvaShapeFlips';
+import { createNewSlideAndRecreateAddSlidePage } from '../store/polotnoStore';
 
 /**
  * useKonvaPageClipping - Hook that directly accesses the Konva stage
@@ -152,6 +153,123 @@ export const EditorWorkspace = observer(({ store }) => {
       store.setScale(0.81);
     });
     return () => cancelAnimationFrame(id);
+  }, [store]);
+
+  // Hide controls (Delete, Duplicate, etc.) for the Add Slide page (always the last page)
+  useEffect(() => {
+    const updateControlsVisibility = () => {
+      if (!containerRef.current || !store.pages.length) return;
+
+      // Find the Add Slide page details
+      const addSlidePage = store.pages.find(p => p.custom?.isAddSlidePage);
+      if (!addSlidePage) return;
+
+      let pageContainer = null;
+
+      // Method 1: Try to find by ID (most precise)
+      // Polotno often uses data-id on the page wrapper
+      pageContainer = containerRef.current.querySelector(`[data-id="${addSlidePage.id}"]`);
+
+      // Method 2: Fallback to last canvas traversal
+      if (!pageContainer) {
+        const canvases = containerRef.current.querySelectorAll('canvas');
+        if (canvases.length > 0) {
+          const lastCanvas = canvases[canvases.length - 1];
+          let current = lastCanvas;
+
+          // Traverse up to find the isolated page container
+          for (let i = 0; i < 5; i++) {
+            if (!current.parentElement) break;
+            const parent = current.parentElement;
+
+            // CRITICAL SAFETY: If the parent contains multiple canvases, we've gone too far up
+            // and hit the workspace wrapper. Stop immediately to avoid hiding neighbor controls.
+            if (parent.querySelectorAll('canvas').length > 1) {
+              break;
+            }
+
+            // If this container has buttons (controls) and is single-page, it's our target
+            if (parent.querySelector('button')) {
+              pageContainer = parent;
+              break;
+            }
+            current = parent;
+          }
+        }
+      }
+
+      if (pageContainer) {
+        // Find the controls container (usually contains buttons)
+        const children = Array.from(pageContainer.children);
+        children.forEach(child => {
+          // If it has buttons and is NOT the canvas wrapper
+          if (child.querySelector('button') && !child.querySelector('canvas')) {
+            child.style.opacity = '0';
+            child.style.pointerEvents = 'none';
+            // Also hide the borders/shadows if any
+            child.style.display = 'none'; // Safer to fully remove from flow if pos absolute
+          }
+        });
+      }
+    };
+
+    // Run periodically to handle DOM updates (new pages, re-renders)
+    const intervalId = setInterval(updateControlsVisibility, 100);
+
+    // Also run immediately
+    updateControlsVisibility();
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  // Handle Clicks for Add Slide Page (Bypassing selection to avoid blue border)
+  useEffect(() => {
+    const handleStageClick = (e) => {
+      const shape = e.target;
+
+      // Robust attribute retrieval (supporting both property access and getAttr)
+      let custom = shape.attrs?.custom;
+      if (!custom && typeof shape.getAttr === 'function') {
+        custom = shape.getAttr('custom');
+      }
+
+      // Also check parent attributes (in case of grouping)
+      if (!custom) {
+        const parent = shape.getParent();
+        if (parent) {
+          custom = parent.attrs?.custom;
+          if (!custom && typeof parent.getAttr === 'function') {
+            custom = parent.getAttr('custom');
+          }
+        }
+      }
+
+      // Check if the clicked element (or parent) has our custom 'add-slide' action
+      if (custom?.action === 'add-slide') {
+        // Find the Add Slide Page
+        const addSlidePage = store.pages.find(p => p.custom?.isAddSlidePage);
+        if (addSlidePage) {
+          createNewSlideAndRecreateAddSlidePage(addSlidePage.id);
+        }
+      }
+    };
+
+    // Attach listener to Konva stage
+    const attachInterval = setInterval(() => {
+      if (window.Konva && window.Konva.stages.length > 0) {
+        // Remove any potential old listeners first
+        window.Konva.stages[0].off('click tap', handleStageClick);
+        window.Konva.stages[0].on('click tap', handleStageClick);
+        clearInterval(attachInterval);
+      }
+    }, 500);
+
+    return () => {
+      clearInterval(attachInterval);
+      if (window.Konva && window.Konva.stages.length > 0) {
+        window.Konva.stages[0].off('click tap', handleStageClick);
+      }
+    };
   }, [store]);
 
   return (

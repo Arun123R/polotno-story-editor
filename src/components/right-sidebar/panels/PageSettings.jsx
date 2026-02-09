@@ -6,7 +6,7 @@ import { ColorPicker } from '../shared/ColorPicker';
 import Dropdown from '../../shared/Dropdown';
 
 import { getStorePresetName } from '../../../utils/scale';
-import { setStorePreset } from '../../../store/polotnoStore';
+import { setStorePreset, isAddSlidePage, getRealPages } from '../../../store/polotnoStore';
 import {
   DEFAULT_SLIDE_BACKGROUND,
   normalizeSlideBackground,
@@ -25,27 +25,40 @@ export const PageSettings = observer(({ store }) => {
   // UI-only preset state (NO store change)
   const [activePreset, setActivePreset] = useState(getStorePresetName(store));
 
+  // Compute currentBg safely even when activePage is null
+  const currentBg = activePage
+    ? normalizeSlideBackground(activePage.custom?.background || DEFAULT_SLIDE_BACKGROUND)
+    : normalizeSlideBackground(DEFAULT_SLIDE_BACKGROUND);
+
+  // ALL HOOKS MUST BE CALLED BEFORE ANY EARLY RETURN
+  const [colorPickerMode, setColorPickerMode] = useState(
+    currentBg.color?.type === 'gradient' ? 'gradient' : 'solid'
+  );
+
   // Keep UI in sync with store preset.
   useEffect(() => {
     setActivePreset(getStorePresetName(store));
   }, [store]);
 
+  // Update color picker mode when page or background type changes
+  useEffect(() => {
+    if (activePage) {
+      setColorPickerMode(currentBg.color?.type === 'gradient' ? 'gradient' : 'solid');
+    }
+  }, [activePage?.id, currentBg.color?.type]);
+
+  // Early return AFTER all hooks
   if (!activePage) return null;
+  if (isAddSlidePage(activePage)) return null;
+
+  // Get real pages (excluding the Add Slide page)
+  const realPages = getRealPages(store);
+  const realPageIndex = realPages.findIndex(p => p.id === activePage.id);
 
   const isSlideActive = activePage.custom?.isActive !== false;
-  const allSlidesInactive = Array.isArray(store.pages) && store.pages.length > 0
-    ? store.pages.every((p) => p?.custom?.isActive === false)
+  const allSlidesInactive = realPages.length > 0
+    ? realPages.every((p) => p?.custom?.isActive === false)
     : false;
-
-  const currentBg = normalizeSlideBackground(
-    activePage.custom?.background || DEFAULT_SLIDE_BACKGROUND
-  );
-
-  const [colorPickerMode, setColorPickerMode] = useState(currentBg.color?.type === 'gradient' ? 'gradient' : 'solid');
-
-  useEffect(() => {
-    setColorPickerMode(currentBg.color?.type === 'gradient' ? 'gradient' : 'solid');
-  }, [activePage.id, currentBg.color?.type]);
 
   const setBackgroundPatch = (nextBg) => {
     const custom = activePage.custom || {};
@@ -489,7 +502,7 @@ export const PageSettings = observer(({ store }) => {
             color: 'var(--sidebar-text-muted)',
           }}
         >
-          Page {store.pages.indexOf(activePage) + 1} of {store.pages.length}
+          Page {realPageIndex + 1} of {realPages.length}
         </div>
       </div>
 
@@ -498,8 +511,12 @@ export const PageSettings = observer(({ store }) => {
           <button
             className="action-btn delete"
             onClick={() => deletePages([activePage.id])}
-            disabled={store.pages.length <= 1}
-            style={{ opacity: store.pages.length <= 1 ? 0.5 : 1 }}
+            disabled={realPages.length <= 1}
+            style={{
+              opacity: realPages.length <= 1 ? 0.5 : 1,
+              justifyContent: 'center',
+              width: '100%'
+            }}
           >
             <span><TrashIcon /></span> Delete
           </button>
