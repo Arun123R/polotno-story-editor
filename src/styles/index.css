@@ -147,7 +147,8 @@ body {
     box-shadow: var(--shadow-lg);
     overflow: hidden;
     /* Hide scrollbar visuals (keep scrolling). */
-    scrollbar-width: none; /* Firefox */
+    scrollbar-width: none;
+    /* Firefox */
 }
 
 .app-dropdown__panel::-webkit-scrollbar {
@@ -256,21 +257,26 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 0.5rem; /* matches p-2 */
-    overflow: hidden; /* prevent content from pushing the height */
+    padding: 0.5rem;
+    /* matches p-2 */
+    overflow: hidden;
+    /* prevent content from pushing the height */
 }
 
 /* CTA cards (Add CTA section) should match Figma height and center content */
 .studio-card.cta-card {
-    height: 94px; /* matches Figma measurement */
-    padding-left: 0.5rem; /* reduced side padding for wider content */
+    height: 94px;
+    /* matches Figma measurement */
+    padding-left: 0.5rem;
+    /* reduced side padding for wider content */
     padding-right: 0.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    border-radius: 10px; /* Figma shows 10px radius */
+    border-radius: 10px;
+    /* Figma shows 10px radius */
 }
 
 /* Reusable pill used inside CTA cards (Shop Now, Swipe preview) */
@@ -281,22 +287,26 @@ body {
     min-width: 140px;
     max-width: 80%;
     padding: 6px 22px;
-    border-radius: 18px; /* pill look */
+    border-radius: 18px;
+    /* pill look */
     font-weight: 700;
     font-size: 14px;
     line-height: 1;
-    box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
 }
 
 /* Classic CTA specific styling: centered pill */
 .studio-card.cta-card.cta-classic {
-    justify-content: center; /* center vertically inside the card */
+    justify-content: center;
+    /* center vertically inside the card */
     padding-top: 0;
 }
+
 .studio-card.cta-card.cta-classic .cta-pill {
     width: 80%;
     max-width: 220px;
-    margin: 0 auto; /* center horizontally */
+    margin: 0 auto;
+    /* center horizontally */
     min-width: 0;
     padding: 8px 0;
     border-radius: 8px;
@@ -323,7 +333,8 @@ body {
 
 /* Slightly reduce the label spacing under the pill */
 .cta-card .cta-label {
-    margin-top: 6px; /* ~mt-1.5 */
+    margin-top: 6px;
+    /* ~mt-1.5 */
 }
 
 .appstorys-editor {
@@ -1913,4 +1924,23 @@ div[class*="go"][style*="overflow-y"] {
 [class*="polotno-panel-container"]::-webkit-scrollbar,
 div[class*="go"][style*="overflow-y"]::-webkit-scrollbar {
     display: none !important;
+}
+
+/* ===================================
+   PREVIEW BUTTON STYLING
+   =================================== */
+
+.polotno-preview-button {
+    color: var(--text-secondary) !important;
+    font-weight: 500 !important;
+}
+
+.polotno-preview-button:hover {
+    background-color: var(--bg-hover) !important;
+    color: var(--text-primary) !important;
+}
+
+.polotno-preview-button .bp5-icon,
+.polotno-preview-button .bp6-icon {
+    color: var(--accent-primary) !important;
 }

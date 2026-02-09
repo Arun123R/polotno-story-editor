@@ -30,7 +30,6 @@ const EditorInner = () => {
   const {
     currentGroupId,
     currentSlideId,
-    isHydrating,
     isCampaignLoading,
     campaignError,
     refetchCampaign,
@@ -48,10 +47,10 @@ const EditorInner = () => {
   // Show loading state while campaign is being fetched
   if (isCampaignLoading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-[var(--bg-primary)]">
+      <div className="h-screen flex items-center justify-center bg-(--bg-primary)">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-[var(--border-primary)] border-t-[var(--accent-primary)] rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-[var(--text-secondary)]">Loading campaign...</p>
+          <div className="w-8 h-8 border-2 border-(--border-primary) border-t-(--accent-primary) rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-(--text-secondary)">Loading campaign...</p>
         </div>
       </div>
     );
@@ -60,13 +59,13 @@ const EditorInner = () => {
   // Show error state
   if (campaignError) {
     return (
-      <div className="h-screen flex items-center justify-center bg-[var(--bg-primary)]">
-        <div className="text-center text-[var(--text-danger)]">
+      <div className="h-screen flex items-center justify-center bg-(--bg-primary)">
+        <div className="text-center text-(--text-danger)">
           <p className="font-semibold mb-2">Failed to load campaign</p>
           <p className="text-sm opacity-70 mb-4">{campaignError}</p>
           <button
             onClick={() => refetchCampaign()}
-            className="px-4 py-2 bg-[var(--accent-primary)] text-white rounded hover:opacity-90 transition-opacity"
+            className="px-4 py-2 bg-(--accent-primary) text-white rounded hover:opacity-90 transition-opacity"
           >
             Retry Connection
           </button>

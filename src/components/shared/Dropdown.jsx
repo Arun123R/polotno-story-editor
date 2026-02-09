@@ -24,6 +24,8 @@ export function Dropdown({
   panelMinWidth = DEFAULT_MIN_PANEL_WIDTH,
   ariaLabel,
   renderTrigger,
+  showOptionAvatar = false,
+  showOptionOrder = false,
 }) {
   const dropdownId = useId();
   const triggerRef = useRef(null);
@@ -272,18 +274,30 @@ export function Dropdown({
               {normalizedOptions.map((opt, idx) => {
                 const isSelected = opt.value === currentValue;
                 const isActive = idx === activeIndex;
-                // Avatar logic: opt.image, opt.ringColor, opt.nameColor, opt.order
-                const avatarUrl = opt.image;
-                const avatarColor = opt.ringColor || '#ccc';
-                const avatarTextColor = opt.nameColor || '#fff';
-                const fallbackText = typeof opt.label === 'string' ? opt.label.charAt(0).toUpperCase() : '?';
-                // Order logic: extract from label or opt.order
+                // Avatar logic (opt-in): opt.image, opt.ringColor, opt.nameColor
+                const avatarUrl = showOptionAvatar ? opt.image : null;
+                const avatarColor = showOptionAvatar ? (opt.ringColor || '#ccc') : null;
+                const avatarTextColor = showOptionAvatar ? (opt.nameColor || '#fff') : null;
+                const fallbackText =
+                  showOptionAvatar && typeof opt.label === 'string'
+                    ? opt.label.replace(/^\(\d+\)\s*/, '').charAt(0).toUpperCase()
+                    : null;
+
+                // Order logic (opt-in): extract from label or opt.order
                 let order = '';
-                if (typeof opt.label === 'string' && opt.label.match(/^\(\d+\)/)) {
-                  order = opt.label.match(/^\((\d+)\)/)[1];
-                } else if (opt.order !== undefined && opt.order !== null) {
-                  order = String(opt.order);
+                if (showOptionOrder) {
+                  if (typeof opt.label === 'string' && opt.label.match(/^\(\d+\)/)) {
+                    order = opt.label.match(/^\((\d+)\)/)[1];
+                  } else if (opt.order !== undefined && opt.order !== null) {
+                    order = String(opt.order);
+                  }
                 }
+
+                const optionLabel =
+                  typeof opt.label === 'string'
+                    ? (showOptionOrder ? opt.label.replace(/^\(\d+\)\s*/, '') : opt.label)
+                    : opt.label;
+
                 return (
                   <button
                     key={String(opt.value)}
@@ -300,41 +314,43 @@ export function Dropdown({
                       triggerRef.current?.focus();
                     }}
                     disabled={opt.disabled}
-                    style={{ display: 'flex', alignItems: 'center', gap: 12 }}
+                    style={{ display: 'flex', alignItems: 'center', gap: showOptionAvatar || showOptionOrder ? 12 : 8 }}
                   >
                     {order && (
                       <span style={{ fontWeight: 600, fontSize: 16, marginRight: 6, color: '#888', minWidth: 24, textAlign: 'right' }}>
                         ({order})
                       </span>
                     )}
-                    <span
-                      style={{
-                        width: 30,
-                        height: 30,
-                        minWidth: 30,
-                        minHeight: 30,
-                        borderRadius: '50%',
-                        background: avatarUrl ? 'transparent' : avatarColor,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        overflow: 'hidden',
-                        marginRight: 8,
-                        border: avatarUrl ? `2px solid ${avatarColor}` : 'none',
-                        boxSizing: 'border-box',
-                      }}
-                    >
-                      {avatarUrl ? (
-                        <img
-                          src={avatarUrl}
-                          alt="avatar"
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
-                        />
-                      ) : (
-                        <span style={{ color: avatarTextColor, fontWeight: 600, fontSize: 16 }}>{fallbackText}</span>
-                      )}
-                    </span>
-                    {typeof opt.label === 'string' ? opt.label.replace(/^\(\d+\)\s*/, '') : opt.label}
+                    {showOptionAvatar ? (
+                      <span
+                        style={{
+                          width: 30,
+                          height: 30,
+                          minWidth: 30,
+                          minHeight: 30,
+                          borderRadius: '50%',
+                          background: avatarUrl ? 'transparent' : avatarColor,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          overflow: 'hidden',
+                          marginRight: 8,
+                          border: avatarUrl ? `2px solid ${avatarColor}` : 'none',
+                          boxSizing: 'border-box',
+                        }}
+                      >
+                        {avatarUrl ? (
+                          <img
+                            src={avatarUrl}
+                            alt="avatar"
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                          />
+                        ) : (
+                          <span style={{ color: avatarTextColor, fontWeight: 600, fontSize: 16 }}>{fallbackText || '?'}</span>
+                        )}
+                      </span>
+                    ) : null}
+                    {optionLabel}
                   </button>
                 );
               })}

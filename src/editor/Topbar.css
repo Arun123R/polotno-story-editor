@@ -316,6 +316,34 @@
     transform: translateY(0);
 }
 
+/* Preview Button (Custom SVG) */
+.topbar-btn-preview {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+}
+
+.topbar-btn-preview:hover {
+    opacity: 0.8;
+    transform: translateY(-1px);
+}
+
+.topbar-btn-preview:active {
+    transform: translateY(0);
+}
+
+.topbar-btn-preview svg {
+    height: 36px;
+    width: auto;
+}
+
+
 /* ==================== RESPONSIVE ==================== */
 
 @media (max-width: 1024px) {

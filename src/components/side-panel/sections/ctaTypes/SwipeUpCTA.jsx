@@ -13,6 +13,7 @@ export const SWIPE_UP_CTA_DEFAULTS = {
   textColor: '#000000',
   bgColor: '#9CA3AF',
   fontSize: 45,
+  arrowAnimation: true,
 };
 
 export const getSwipeUpHeight = (data) => {
@@ -59,27 +60,33 @@ export function generateSwipeUpCtaSVG(data, width, height) {
 
     const textCY = pillY + pillH / 2;
 
+    const arrowAnimation = data?.arrowAnimation !== false;
+
     return svgToDataUri(`
       <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${LOGICAL_WIDTH} ${logicalHeight}">
         <style>
-          @keyframes bounce {
+          @keyframes arrow-bounce {
             0%, 100% {
               transform: translateY(0);
               opacity: 1;
             }
             50% {
-              transform: translateY(-6px);
-              opacity: 0.85;
+              transform: translateY(-8px);
+              opacity: 0.6;
             }
           }
-          .swipe-button {
-            animation: bounce 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+          .swipe-arrow {
+            ${arrowAnimation ? 'animation: arrow-bounce 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;' : ''}
             transform-origin: center center;
+          }
+          .static-pill {
+            pointer-events: none;
           }
         </style>
 
-        <g class="swipe-button">
+        <g class="cta-wrapper">
           <rect
+            class="static-pill"
             x="${pillX}"
             y="${pillY}"
             width="${pillW}"
@@ -89,6 +96,7 @@ export function generateSwipeUpCtaSVG(data, width, height) {
           />
 
           <path
+            class="swipe-arrow"
             d="M ${arrowCX - chevronSize} ${arrowCY + chevronSize / 3}
                L ${arrowCX} ${arrowCY - chevronSize / 3}
                L ${arrowCX + chevronSize} ${arrowCY + chevronSize / 3}"
@@ -129,26 +137,28 @@ export function generateSwipeUpCtaSVG(data, width, height) {
   const arrowCenterX = LOGICAL_WIDTH / 2;
   const arrowCenterY = pillY + pillH / 2;
 
+  const arrowAnimation = data?.arrowAnimation !== false;
+
   return svgToDataUri(`
     <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${LOGICAL_WIDTH} ${logicalHeight}">
       <style>
-        @keyframes bounce {
+        @keyframes arrow-bounce {
           0%, 100% {
             transform: translateY(0);
             opacity: 1;
           }
           50% {
-            transform: translateY(-6px);
-            opacity: 0.85;
+            transform: translateY(-8px);
+            opacity: 0.6;
           }
         }
-        .swipe-button {
-          animation: bounce 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        .swipe-arrow {
+          ${arrowAnimation ? 'animation: arrow-bounce 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;' : ''}
           transform-origin: center center;
         }
       </style>
 
-      <g class="swipe-button">
+      <g class="cta-wrapper">
         <rect
           x="${pillX}"
           y="${pillY}"
@@ -159,6 +169,7 @@ export function generateSwipeUpCtaSVG(data, width, height) {
         />
 
         <path
+          class="swipe-arrow"
           d="M ${arrowCenterX - chevronSize} ${arrowCenterY + chevronSize / 3}
              L ${arrowCenterX} ${arrowCenterY - chevronSize / 3}
              L ${arrowCenterX + chevronSize} ${arrowCenterY + chevronSize / 3}"
