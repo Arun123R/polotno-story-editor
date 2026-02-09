@@ -23,6 +23,23 @@ import { extractCtasPayload, generateCtaId } from './ctaSchema';
 // import { storyAPI } from '../services/api';
 
 // ============================================
+// ADD SLIDE PAGE DETECTION
+// The special "Add Slide" page (custom.isAddSlidePage = true) is NEVER saved to backend
+// ============================================
+const isAddSlidePage = (page) => {
+    return page?.custom?.isAddSlidePage === true;
+};
+
+/**
+ * Filter out the Add Slide page from an array of pages
+ * Use this before processing pages for save/export
+ */
+export const filterRealPages = (pages) => {
+    if (!Array.isArray(pages)) return [];
+    return pages.filter((p) => !isAddSlidePage(p));
+};
+
+// ============================================
 // MEDIA URL PROCESSING HELPER (UNUSED - Kept for reference)
 // ============================================
 // NOTE: Media upload now happens when media is added to the slide,
@@ -600,7 +617,7 @@ const buildContentPayload = (editorState, page) => {
 
     // 1. Legacy flat fields (optional/fallback)
     if (editorState.link) content.link = editorState.link;
-    if (editorState.buttonText) content.button_text = editorState.buttonText;
+    // if (editorState.buttonText) content.button_text = editorState.buttonText;
 
     // 2. Text elements
     const textElements = extractTextFromPage(page);
@@ -750,7 +767,7 @@ const buildStylingPayload = (editorState, page) => {
 
                 // Opacity
                 if (custom.opacity !== undefined) mergedStyling.opacity = custom.opacity;
-                else if (element.opacity !== undefined) mergedStyled.opacity = element.opacity;
+                else if (element.opacity !== undefined) mergedStyling.opacity = element.opacity;
 
                 // Arrow specific
                 if (custom.arrowSize) mergedStyling.arrowSize = custom.arrowSize;
@@ -1017,7 +1034,7 @@ export const hydrateEditorStateFromSlide = (slideData) => {
     return {
         // Legacy flat fields
         link: content.link || slideData.link || '',
-        buttonText: content.button_text || slideData.button_text || '',
+        // buttonText: content.button_text || slideData.button_text || '',
 
         // CTAs array
         ctas: ctas,
