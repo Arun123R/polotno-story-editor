@@ -102,18 +102,23 @@ const resolveTokens = () => {
 /**
  * Campaign ID is OPTIONAL (but helpful for full context).
  * Used to fetch campaign-level details if needed.
+ * 
+ * TODO: In real production, campaignId should come from URL params.
+ * The hardcoded fallback below is for TESTING only.
  */
 const resolveCampaignId = (): string | null => {
+    // 1. First priority: URL parameter
     const fromUrl = getQueryParam('campaignId');
     if (fromUrl) return fromUrl;
 
-    if (isDev) {
-        const fromEnv = "bf3ac74d-d010-4611-ad53-5452ae6b44ad";
-        if (fromEnv) {
-            warnInDev('Using fallback CAMPAIGN_ID from .env');
-            return fromEnv;
-        }
+    // 2. Fallback: Hardcoded value for testing (works in BOTH dev and prod)
+    // REMOVE THIS IN REAL PRODUCTION - campaignId should always come from URL
+    const fallbackCampaignId = "bf3ac74d-d010-4611-ad53-5452ae6b44ad";
+    if (fallbackCampaignId) {
+        console.log('[Editor Bootstrap] Using fallback CAMPAIGN_ID:', fallbackCampaignId);
+        return fallbackCampaignId;
     }
+
     return null;
 };
 
