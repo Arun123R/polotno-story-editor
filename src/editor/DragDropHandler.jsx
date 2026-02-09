@@ -118,12 +118,15 @@ export const DragDropHandler = observer(({ store, children, onFileUpload }) => {
 
         const custom = page.custom || {};
         const currentBg = normalizeSlideBackground(custom.background);
+        
+        // Prepare next background object
         const prevMedia = currentBg.media || {
             mediaUrl: '',
             sizing: 'fit',
             position: 'bottom-center',
         };
-        const nextBg = {
+        
+        let nextBg = {
             ...currentBg,
             media: {
                 ...prevMedia,
@@ -131,29 +134,15 @@ export const DragDropHandler = observer(({ store, children, onFileUpload }) => {
             },
         };
 
-        // Apply media immediately.
+        // Always attempt to sync color when a new image is set as background
+        const dominant = await extractDominantColorFromUrl(fileUrl);
+        if (dominant) {
+            nextBg.color = { type: 'solid', solid: dominant };
+        }
+
+        // Apply atomic update
         page.set({ custom: { ...custom, background: nextBg } });
         applySlideBackgroundToPage(page);
-
-        // Optional premium touch: if still default white solid, set dominant color.
-        const isDefaultSolid =
-            nextBg?.color?.type === 'solid' &&
-            typeof nextBg?.color?.solid === 'string' &&
-            nextBg.color.solid.trim().toUpperCase() === '#FFFFFF';
-
-        if (isDefaultSolid) {
-            const dominant = await extractDominantColorFromUrl(fileUrl);
-            if (dominant) {
-                const custom2 = page.custom || {};
-                const normalized2 = normalizeSlideBackground(custom2.background);
-                const patched = {
-                    ...normalized2,
-                    color: { type: 'solid', solid: dominant },
-                };
-                page.set({ custom: { ...custom2, background: patched } });
-                applySlideBackgroundToPage(page);
-            }
-        }
     }, [extractDominantColorFromUrl, store]);
 
     const replaceElementMedia = useCallback((targetElement, fileUrl) => {

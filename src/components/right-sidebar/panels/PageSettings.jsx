@@ -153,22 +153,45 @@ export const PageSettings = observer(({ store }) => {
     if (!file) return;
 
     try {
-      // Upload to CDN and get URL
+      // 1. Upload to CDN
       const cdnUrl = await storyAPI.uploadGeneralMedia(file);
-      const currentSolid =
-        currentBg.color?.type === 'solid' ? (currentBg.color.solid || '#FFFFFF').toUpperCase() : null;
-      const shouldAutoColor = currentSolid === '#FFFFFF';
 
-      setMedia({ mediaUrl: cdnUrl });
+      // 2. Determine if we should sync the background color
+      const currentSolid = currentBg.color?.type === 'solid' ? (currentBg.color.solid || '#FFFFFF').toUpperCase() : null;
+      // We sync if it's white, OR if no media was present (fresh start), OR if it's already a solid color.
+      // Most users expect the background to adapt to the new image.
+      const shouldAutoColor = true; 
 
+      // 3. Prepare next background state
+      const prevMedia = currentBg.media || {
+        mediaUrl: '',
+        sizing: 'fit',
+        position: 'bottom-center',
+      };
+      
+      let nextBg = {
+        ...currentBg,
+        media: {
+          ...prevMedia,
+          mediaUrl: cdnUrl,
+        },
+      };
+
+      // 4. Extract color if needed
       if (shouldAutoColor) {
-        extractDominantColor(cdnUrl).then((hex) => {
-          if (hex) setColorSolid(hex);
-        });
+        const hex = await extractDominantColor(cdnUrl);
+        if (hex) {
+          nextBg.color = {
+            type: 'solid',
+            solid: hex,
+          };
+        }
       }
+
+      // 5. Apply full update once
+      setBackgroundPatch(nextBg);
     } catch (error) {
       console.error('Failed to upload background media:', error);
-      // Optionally show error to user
     }
   };
 

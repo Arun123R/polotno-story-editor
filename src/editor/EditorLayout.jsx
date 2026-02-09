@@ -4,8 +4,22 @@ import {
   WorkspaceWrap,
 } from "polotno";
 import { Topbar } from "./Topbar";
+import { useState, useEffect } from "react";
+import { MobilePreviewModal } from "../components/preview/MobilePreviewModal";
 
 export const EditorLayout = ({ store, sidePanel, toolbar, canvas, footer, rightSidebar, groupId, slideId }) => {
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  // Listen for preview open event from Topbar
+  useEffect(() => {
+    const handleOpenPreview = () => {
+      setIsPreviewOpen(true);
+    };
+
+    window.addEventListener('openPreview', handleOpenPreview);
+    return () => window.removeEventListener('openPreview', handleOpenPreview);
+  }, []);
+
   return (
     <div className="h-screen overflow-hidden flex flex-col appstorys-editor">
       {/* TOP TOOLBAR (fixed height) */}
@@ -64,6 +78,13 @@ export const EditorLayout = ({ store, sidePanel, toolbar, canvas, footer, rightS
           </div>
         </WorkspaceWrap>
       </PolotnoContainer>
+
+      {/* Mobile Preview Modal */}
+      <MobilePreviewModal
+        store={store}
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+      />
     </div>
   );
 };

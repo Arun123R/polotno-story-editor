@@ -218,6 +218,38 @@ const toolbarComponents = {
       </Popover>
     );
   }),
+
+  // Preview Button - Opens mobile preview modal
+  PreviewButton: observer(({ store }) => {
+    const [isPreviewOpen, setIsPreviewOpen] = React.useState(false);
+
+    return (
+      <>
+        <Button
+          icon="eye-open"
+          text="Preview"
+          minimal
+          onClick={() => setIsPreviewOpen(true)}
+          className="polotno-preview-button"
+        />
+        {/* Lazy load the modal */}
+        {isPreviewOpen && (
+          <React.Suspense fallback={null}>
+            {(() => {
+              const { MobilePreviewModal } = require('../components/preview/MobilePreviewModal');
+              return (
+                <MobilePreviewModal
+                  store={store}
+                  isOpen={isPreviewOpen}
+                  onClose={() => setIsPreviewOpen(false)}
+                />
+              );
+            })()}
+          </React.Suspense>
+        )}
+      </>
+    );
+  }),
 };
 
 export const EditorToolbar = ({ store }) => {
