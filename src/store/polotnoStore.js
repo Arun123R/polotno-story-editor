@@ -6,9 +6,8 @@ import { reaction } from 'mobx';
 import {
   DEFAULT_PRESET,
   getPreset,
-  getPresetScale,
   getStorePresetName,
-  getStoreWorkingSize,
+  getStoreCanvasSize,
 } from '../utils/scale';
 import { detectPresetFromDimensions, getStoreExportScale } from '../utils/scale';
 import {
@@ -16,6 +15,7 @@ import {
   inferSlideBackgroundFromPage,
   normalizeSlideBackground,
 } from '../utils/slideBackground';
+import { enableRuntimeValidation } from '../utils/canvasValidation';
 
 export const store = createStore({
   key: 'TXsh4gxnlODn4eJrqeDi',
@@ -182,33 +182,32 @@ export const setStorePreset = (targetStore, presetName, options = {}) => {
 
   const currentPreset = getStorePresetName(targetStore);
 
-  // Important: after loading an export-sized template, the actual store canvas can be in export units
-  // even if preset metadata is still the same. Base rescaling on the real canvas size, not just metadata.
+  // Check if canvas dimensions need to be updated
   const currentCanvasW = Number(targetStore?.width);
   const currentCanvasH = Number(targetStore?.height);
   const needsCanvasResize =
     Number.isFinite(currentCanvasW) &&
     Number.isFinite(currentCanvasH) &&
-    (currentCanvasW !== preset.working.width || currentCanvasH !== preset.working.height);
+    (currentCanvasW !== preset.dimensions.width || currentCanvasH !== preset.dimensions.height);
 
-  const currentWorking = getStoreWorkingSize(targetStore);
-  const needsPresetResize = currentWorking.width !== preset.working.width || currentWorking.height !== preset.working.height;
+  const currentCanvas = getStoreCanvasSize(targetStore);
+  const needsPresetResize = currentCanvas.width !== preset.dimensions.width || currentCanvas.height !== preset.dimensions.height;
 
   if (rescaleExisting && (needsCanvasResize || needsPresetResize)) {
-    // Rescale existing elements to fit+center into the new working canvas.
-    rescaleAllPagesToNewCanvas(preset.working.width, preset.working.height);
+    // Rescale existing elements to fit+center into the new canvas dimensions.
+    rescaleAllPagesToNewCanvas(preset.dimensions.width, preset.dimensions.height);
   }
 
-  // Resize canvas
-  targetStore.setSize(preset.working.width, preset.working.height);
+  // Resize canvas to 1080px-based dimensions
+  targetStore.setSize(preset.dimensions.width, preset.dimensions.height);
 
-  // Persist preset metadata for dynamic export scaling.
+  // Persist preset metadata. Export dimensions = canvas dimensions now.
   const nextCustom = {
     ...(targetStore.custom || {}),
     preset: name,
-    exportWidth: preset.export.width,
-    exportHeight: preset.export.height,
-    exportScale: getPresetScale(preset),
+    exportWidth: preset.dimensions.width,
+    exportHeight: preset.dimensions.height,
+    exportScale: 1, // Canvas = export dimensions
   };
   if (typeof targetStore.set === 'function') {
     targetStore.set({ custom: nextCustom });
@@ -229,10 +228,10 @@ export const setStorePreset = (targetStore, presetName, options = {}) => {
   return currentPreset !== name;
 };
 
-// Initialize default preset.
+// Initialize default preset with 1080×1920 canvas.
 setStorePreset(store, DEFAULT_PRESET, { rescaleExisting: false });
 
-store.setSize(360, 640);
+// Canvas is now set by setStorePreset to 1080×1920 (or appropriate preset dimensions)
 
 // ============================================
 // SPECIAL "ADD SLIDE" PAGE - ALWAYS AT THE END (RIGHT SIDE)
@@ -301,10 +300,10 @@ const createAddSlidePage = () => {
   addSlidePage.addElement({
     type: 'text',
     text: '+',
-    x: 140,
-    y: 157,
-    width: 80,
-    fontSize: 74,
+    x: 420,
+    y: 471,
+    width: 240,
+    fontSize: 222,
     fontFamily: 'Inter',
     fill: '#6B7280',
     align: 'center',
@@ -320,10 +319,10 @@ const createAddSlidePage = () => {
   addSlidePage.addElement({
     type: 'text',
     text: 'Start Creating',
-    x: 30,
-    y: 280,
-    width: 300,
-    fontSize: 30,
+    x: 90,
+    y: 840,
+    width: 900,
+    fontSize: 90,
     lineHeight: 1.2,
     fontFamily: 'Inter',
     fontWeight: 'bold',
@@ -341,10 +340,10 @@ const createAddSlidePage = () => {
   addSlidePage.addElement({
     type: 'text',
     text: 'Select a template, add CTAs,\nor interactive elements to\nbegin',
-    x: 40,
-    y: 330,
-    width: 280,
-    fontSize: 14,
+    x: 120,
+    y: 990,
+    width: 840,
+    fontSize: 42,
     lineHeight: 1.6,
     fontFamily: 'Inter',
     fill: '#6B7280',
@@ -362,7 +361,7 @@ const createAddSlidePage = () => {
 };
 
 // Initial creation
-const addSlidePageRef = createAddSlidePage();
+
 
 // Select the Add Slide page initially and clear any element selection
 if (store.pages.length > 0) {
@@ -604,8 +603,14 @@ const DEFAULT_PAGE_DURATION = 5000;
 
 // 0) Ensure each page has custom.isActive (default true) for slide status.
 // Skip the special "Add Slide" page at index 0.
+// 🐛 FIX: Track BOTH page IDs AND page.background to catch loadJSON updates
 reaction(
-  () => (Array.isArray(store.pages) ? store.pages.map((p) => p?.id).join('|') : 'no-pages'),
+  () => {
+    if (!Array.isArray(store.pages)) return 'no-pages';
+    return store.pages
+      .map((p) => `${p?.id}:${p?.background || ''}`)
+      .join('|');
+  },
   () => {
     try {
       (store.pages || []).forEach((p) => {
@@ -901,3 +906,11 @@ reaction(
   },
   { fireImmediately: false }
 );
+
+// ============================================
+// CANVAS RESOLUTION VALIDATION (Development Only)
+// ============================================
+// Enable runtime warnings for legacy viewport-based values
+if (import.meta.env.DEV) {
+  enableRuntimeValidation(store);
+}

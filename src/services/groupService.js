@@ -27,6 +27,9 @@ export const createStoryGroup = async (groupData = {}) => {
         if (groupData.campaignId) {
             formData.append('campaign', String(groupData.campaignId));
         }
+        if (groupData.aspectRatio) {
+            formData.append('aspect_ratio', groupData.aspectRatio);
+        }
         if (groupData.themes) {
             formData.append('themes', groupData.themes);
         }
@@ -140,6 +143,7 @@ export const updateStoryGroup = async (groupId, groupData) => {
         if (groupData.isActive !== undefined) {
             formData.append('isActive', groupData.isActive ? '1' : '0');
         }
+        if (groupData.aspectRatio) formData.append('aspect_ratio', groupData.aspectRatio);
         if (groupData.themes) formData.append('themes', groupData.themes);
         if (groupData.tags) formData.append('tags', groupData.tags);
 

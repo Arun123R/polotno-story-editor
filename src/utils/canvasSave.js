@@ -201,11 +201,11 @@ const serializePage = (page) => {
 export const buildCanvasPayload = (targetStore = store) => {
     // Canvas/Store level properties
     const canvasPayload = {
-        // Canvas dimensions (working size)
-        width: targetStore.width || 360,
-        height: targetStore.height || 640,
+        // Canvas dimensions (1080px-based resolution)
+        width: targetStore.width || 1080,
+        height: targetStore.height || 1920,
 
-        // Preset information for export scaling
+        // Preset information (exportScale is now always 1)
         preset: getStorePresetName(targetStore),
         exportScale: getStoreExportScale(targetStore),
 
@@ -599,9 +599,9 @@ export const loadCanvasFromPayload = (payload, targetStore = store) => {
  * Converts a single backend Slide object into a Polotno Page object.
  */
 const convertSlideToPage = (slide) => {
-    // Default dimensions
-    const width = 360;
-    const height = 640;
+    // Default canvas dimensions (1080px-based)
+    const width = 1080;
+    const height = 1920;
 
     // 1. Resolve Background
     let background = '#ffffff';
@@ -700,8 +700,8 @@ export const convertBackendSlideToCanvasPayload = (slide) => {
     if (!slide) return null;
     const page = convertSlideToPage(slide);
     return {
-        width: 360,
-        height: 640,
+        width: 1080,
+        height: 1920,
         pages: [page],
         custom: { reconstructed: true }
     };
@@ -737,8 +737,8 @@ export const convertStoryGroupToCanvasPayload = (slides) => {
     });
 
     return {
-        width: 360,
-        height: 640,
+        width: 1080,
+        height: 1920,
         pages: pages,
         custom: { reconstructedGroup: true }
     };

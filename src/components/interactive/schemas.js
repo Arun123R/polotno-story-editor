@@ -99,31 +99,31 @@ export const INTERACTIVE_DEFAULTS = {
 export const INTERACTIVE_STYLES = {
     poll: {
         questionColor: '#1f2937',
-        questionFontSize: 11,
+        questionFontSize: 33,
         optionBgColor: '#ffffff',
         optionBgHoverColor: '#f3f4f6',
         optionTextColor: '#1f2937',
-        optionFontSize: 13,
-        optionBorderRadius: 8,
+        optionFontSize: 39,
+        optionBorderRadius: 24,
         resultBarColor: '#F97316',
         containerBgColor: '#ffffff', // White card background
-        containerBorderRadius: 12,
-        containerPadding: 16,
+        containerBorderRadius: 36,
+        containerPadding: 48,
     },
 
     quiz: {
         position: {
-            x: 28,
-            y: 131
+            x: 84,
+            y: 393
         },
         size: {
-            width: 280,
-            height: 214
+            width: 840,
+            height: 642
         },
         rotation: 0,
         appearance: {
             opacity: 1,
-            radius: 16
+            radius: 48
         },
         colors: {
             background: '#FF0000',
@@ -134,22 +134,22 @@ export const INTERACTIVE_STYLES = {
             incorrectColor: '#EF4444'
         },
         typography: {
-            questionSize: 16,
-            optionSize: 14
+            questionSize: 48,
+            optionSize: 42
         },
         spacing: {
-            padding: 20,
-            optionRadius: 8
+            padding: 60,
+            optionRadius: 24
         }
     },
 
     rating: {
-        position: { x: 62, y: 261 },
-        size: { width: 237, height: 90 },
+        position: { x: 186, y: 783 },
+        size: { width: 711, height: 270 },
         rotation: 0,
         opacity: 1,
-        radius: 12,
-        padding: 20,
+        radius: 36,
+        padding: 60,
         colors: {
             background: '#FFFFFF',
             cardBackground: '#FFFFFF',
@@ -158,103 +158,103 @@ export const INTERACTIVE_STYLES = {
             sliderFill: '#F97316',
         },
         typography: {
-            titleSize: 14,
-            emojiSize: 32,
+            titleSize: 42,
+            emojiSize: 96,
         },
         // Legacy flat properties for backward compatibility
         titleColor: '#000000',
-        titleFontSize: 14,
+        titleFontSize: 42,
         activeColor: '#F97316',
         inactiveColor: '#E6E6E6',
-        emojiSize: 32,
+        emojiSize: 96,
         containerBgColor: '#FFFFFF',
-        containerBorderRadius: 12,
-        containerPadding: 20,
+        containerBorderRadius: 36,
+        containerPadding: 60,
     },
 
     reaction: {
-        position: { x: 40, y: 276 },
-        size: { width: 280, height: 64 },
+        position: { x: 120, y: 828 },
+        size: { width: 840, height: 192 },
         rotation: 0,
         opacity: 1,
         radius: 0,
         padding: 0,
         background: '#FFFFFF',
         transparentBackground: false,
-        emojiSize: 48,
+        emojiSize: 144,
         countColor: '#374151',
-        countSize: 14,
+        countSize: 42,
     },
 
     countdown: {
         titleColor: '#1f2937',
         digitColor: '#1f2937',
-        digitSize: 28,
+        digitSize: 84,
         digitBackground: '#000000',
         labelColor: '#9ca3af',
         background: '#ffffff',
-        radius: 12,
-        padding: 16,
+        radius: 36,
+        padding: 48,
     },
 
     promo: {
         titleColor: '#1f2937',
-        titleFontSize: 14,
+        titleFontSize: 42,
         codeColor: '#f97316',
-        codeFontSize: 24,
+        codeFontSize: 72,
         codeBgColor: '#fff7ed',
         descriptionColor: '#4b5563',
-        descriptionFontSize: 12,
+        descriptionFontSize: 36,
         buttonBgColor: '#F97316',
         buttonTextColor: '#ffffff',
         borderColor: '#fdba74',
         containerBgColor: '#ffffff',
-        containerBorderRadius: 16,
-        containerPadding: 20,
+        containerBorderRadius: 48,
+        containerPadding: 60,
     },
 
     question: {
         titleColor: '#1f2937',
-        titleFontSize: 16,
+        titleFontSize: 48,
         inputBgColor: '#f3f4f6',
         inputTextColor: '#9ca3af',
-        inputFontSize: 14,
-        inputBorderRadius: 8,
+        inputFontSize: 42,
+        inputBorderRadius: 24,
         placeholderColor: '#9ca3af',
         submitBgColor: '#F97316',
         submitTextColor: '#ffffff',
         containerBgColor: '#ffffff',
-        containerBorderRadius: 16,
-        containerPadding: 20,
+        containerBorderRadius: 48,
+        containerPadding: 60,
     },
 
     imageQuiz: {
         questionColor: '#1f2937',
-        questionFontSize: 16,
-        imageBorderRadius: 8,
+        questionFontSize: 48,
+        imageBorderRadius: 24,
         imageBorderColor: '#e5e7eb',
         selectedBorderColor: '#F97316',
         correctBorderColor: '#10b981',
         incorrectBorderColor: '#ef4444',
         labelColor: '#4b5563',
-        labelFontSize: 12,
+        labelFontSize: 36,
         containerBgColor: '#ffffff',
-        containerBorderRadius: 16,
-        containerPadding: 20,
+        containerBorderRadius: 48,
+        containerPadding: 60,
     },
 };
 
 // ==================== ELEMENT DIMENSIONS ====================
 
 export const INTERACTIVE_DIMENSIONS = {
-    poll: { width: 280, height: 110 },
-    quiz: { width: 280, height: 200 },
-    rating: { width: 237, height: 90 },
-    reaction: { width: 280, height: 80 },
-    countdown: { width: 360, height: 140 },
-    promo: { width: 320, height: 100 },
-    question: { width: 280, height: 160 },
-    imageQuiz: { width: 300, height: 240 },
+    poll: { width: 840, height: 330 },          // 280 * 3
+    quiz: { width: 840, height: 600 },          // 280 * 3, 200 * 3
+    rating: { width: 711, height: 270 },        // 237 * 3, 90 * 3
+    reaction: { width: 840, height: 240 },      // 280 * 3, 80 * 3
+    countdown: { width: 1080, height: 420 },    // 360 * 3, 140 * 3
+    promo: { width: 960, height: 300 },         // 320 * 3, 100 * 3
+    question: { width: 840, height: 480 },      // 280 * 3, 160 * 3
+    imageQuiz: { width: 900, height: 720 },     // 300 * 3, 240 * 3
 };
 
 // ==================== HELPER FUNCTIONS ====================

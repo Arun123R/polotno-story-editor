@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * Slide Payload Builder
  * 
@@ -274,17 +275,17 @@ const extractPollStyling = (page) => {
         size: { width: el.width || 0, height: el.height || 0 },
         rotation: el.rotation || 0,
         opacity: el.opacity !== undefined ? el.opacity : 1,
-        radius: style.containerBorderRadius || 12,
-        padding: style.containerPadding || 16,
+        radius: style.containerBorderRadius || 36,
+        padding: style.containerPadding || 48,
         background: style.containerBgColor || '#FFFFFF',
         question: {
             color: style.questionColor || '#000000',
-            fontSize: style.questionFontSize || 16
+            fontSize: style.questionFontSize || 48
         },
         options: {
             background: style.optionBgColor || '#FFFFFF',
             textColor: style.optionTextColor || '#000000',
-            radius: style.optionBorderRadius || 8
+            radius: style.optionBorderRadius || 24
         },
         resultBarColor: style.resultBarColor || '#F97316'
     };
@@ -351,7 +352,7 @@ const extractQuizStyling = (page) => {
             optionSize: style.typography?.optionSize || style.optionFontSize || 14
         },
         spacing: {
-            padding: style.spacing?.padding || style.containerPadding || 20,
+            padding: style.spacing?.padding || style.containerPadding || 60,
             optionRadius: style.spacing?.optionRadius || style.optionBorderRadius || 8
         }
     };
@@ -398,7 +399,7 @@ const extractRatingStyling = (page) => {
         rotation: el.rotation || 0,
         opacity: el.opacity !== undefined ? el.opacity : 1,
         radius: style.radius || style.containerBorderRadius || 12,
-        padding: style.padding || style.containerPadding || 36,
+        padding: style.padding || style.containerPadding || 108,
         colors: {
             background: style.colors?.background || style.containerBgColor || '#695454',
             cardBackground: style.colors?.cardBackground || style.cardBgColor || '#863232',
@@ -407,8 +408,8 @@ const extractRatingStyling = (page) => {
             sliderFill: style.colors?.sliderFill || style.activeColor || '#F97316'
         },
         typography: {
-            titleSize: style.typography?.titleSize || style.titleFontSize || 14,
-            emojiSize: style.typography?.emojiSize || style.emojiSize || 32
+            titleSize: style.typography?.titleSize || style.titleFontSize || 42,
+            emojiSize: style.typography?.emojiSize || style.emojiSize || 96
         }
     };
 };
@@ -460,9 +461,9 @@ const extractReactionStyling = (page) => {
         background: style.background || '#FFFFFF',
         padding: style.padding !== undefined ? style.padding : 0,
         transparentBackground: !!style.transparentBackground,
-        emojiSize: style.emojiSize || 48,
+        emojiSize: style.emojiSize || 144,
         countColor: style.countColor || '#374151',
-        countSize: style.countSize || 14
+        countSize: style.countSize || 42
     };
 };
 
@@ -509,7 +510,7 @@ const extractCountdownStyling = (page) => {
         opacity: el.opacity !== undefined ? el.opacity : 1,
         radius: style.radius !== undefined ? style.radius : 12,
         background: style.background || '#FFFFFF',
-        padding: style.padding !== undefined ? style.padding : 16,
+        padding: style.padding !== undefined ? style.padding : 48,
         titleColor: style.titleColor || '#1F2937',
         digitColor: style.digitColor || '#1F2937',
         digitSize: style.digitSize || 28,
@@ -553,11 +554,11 @@ const extractQuestionStyling = (page) => {
         },
         rotation: el.rotation || 0,
         opacity: el.opacity !== undefined ? el.opacity : 1,
-        radius: style.radius !== undefined ? style.radius : 16,
+        radius: style.radius !== undefined ? style.radius : 48,
         background: style.background || '#FFFFFF',
-        padding: style.padding !== undefined ? style.padding : 20,
+        padding: style.padding !== undefined ? style.padding : 60,
         questionColor: style.questionColor || '#1F2937',
-        questionSize: style.questionSize || 16,
+        questionSize: style.questionSize || 48,
         inputBackground: style.inputBackground || '#F3F4F6',
         inputTextColor: style.inputTextColor || '#9CA3AF',
         submitBackground: style.submitBackground || '#F97316'
@@ -595,11 +596,11 @@ const extractImageQuizStyling = (page) => {
         size: { width: el.width || 0, height: el.height || 0 },
         rotation: el.rotation || 0,
         opacity: el.opacity !== undefined ? el.opacity : 1,
-        radius: style.radius !== undefined ? style.radius : 16,
+        radius: style.radius !== undefined ? style.radius : 48,
         background: style.background || '#FFFFFF',
-        padding: style.padding !== undefined ? style.padding : 20,
+        padding: style.padding !== undefined ? style.padding : 60,
         questionColor: style.questionColor || '#1F2937',
-        imageRadius: style.imageRadius !== undefined ? style.imageRadius : 8,
+        imageRadius: style.imageRadius !== undefined ? style.imageRadius : 24,
         borderColor: style.borderColor || '#E5E7EB',
         correctBorderColor: style.correctBorderColor || '#10B981'
     };
@@ -672,7 +673,6 @@ const buildContentPayload = (editorState, page) => {
     }
 
     // 5. Quiz section
-    const quiz = extractQuizContent(page);
     const pollContent = extractPollContent(page);
     const quizContent = extractQuizContent(page);
     const ratingContent = extractRatingContent(page);

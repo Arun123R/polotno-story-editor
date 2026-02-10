@@ -5,8 +5,7 @@ import { DurationSection, TrashIcon } from '../shared/CommonControls';
 import { ColorPicker } from '../shared/ColorPicker';
 import Dropdown from '../../shared/Dropdown';
 
-import { getStorePresetName } from '../../../utils/scale';
-import { setStorePreset, isAddSlidePage, getRealPages } from '../../../store/polotnoStore';
+import { isAddSlidePage, getRealPages } from '../../../store/polotnoStore';
 import {
   DEFAULT_SLIDE_BACKGROUND,
   normalizeSlideBackground,
@@ -22,9 +21,6 @@ export const PageSettings = observer(({ store }) => {
   const { deletePages } = useEditorContext();
   const activePage = store.activePage;
 
-  // UI-only preset state (NO store change)
-  const [activePreset, setActivePreset] = useState(getStorePresetName(store));
-
   // Compute currentBg safely even when activePage is null
   const currentBg = activePage
     ? normalizeSlideBackground(activePage.custom?.background || DEFAULT_SLIDE_BACKGROUND)
@@ -34,11 +30,6 @@ export const PageSettings = observer(({ store }) => {
   const [colorPickerMode, setColorPickerMode] = useState(
     currentBg.color?.type === 'gradient' ? 'gradient' : 'solid'
   );
-
-  // Keep UI in sync with store preset.
-  useEffect(() => {
-    setActivePreset(getStorePresetName(store));
-  }, [store]);
 
   // Update color picker mode when page or background type changes
   useEffect(() => {
@@ -473,43 +464,6 @@ export const PageSettings = observer(({ store }) => {
                   <input type="number" className="position-input" value={store.height} disabled />
                   <label>H</label>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="control-row">
-            <span className="control-label">Presets</span>
-            <div className="control-value">
-              <div className="segment-group">
-                <button
-                  className={`segment-btn ${activePreset === 'story' ? 'active' : ''}`}
-                  onClick={() => {
-                    setActivePreset('story');
-                    setStorePreset(store, 'story', { rescaleExisting: true });
-                  }}
-                >
-                  Story
-                </button>
-
-                <button
-                  className={`segment-btn ${activePreset === 'square' ? 'active' : ''}`}
-                  onClick={() => {
-                    setActivePreset('square');
-                    setStorePreset(store, 'square', { rescaleExisting: true });
-                  }}
-                >
-                  Square
-                </button>
-
-                <button
-                  className={`segment-btn ${activePreset === 'wide' ? 'active' : ''}`}
-                  onClick={() => {
-                    setActivePreset('wide');
-                    setStorePreset(store, 'wide', { rescaleExisting: true });
-                  }}
-                >
-                  Wide
-                </button>
               </div>
             </div>
           </div>
