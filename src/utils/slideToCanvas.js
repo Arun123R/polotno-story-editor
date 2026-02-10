@@ -16,7 +16,7 @@
  * NO silent fallbacks. NO partial hydration.
  */
 
-// Story preset dimensions (360x640)
+// Canvas dimensions - 1080px-based resolution (NOT viewport size)
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { CountdownRenderer } from '../components/interactive/renderers/CountdownRenderer';
@@ -24,8 +24,8 @@ import { QuestionRenderer } from '../components/interactive/renderers/QuestionRe
 import { ImageQuizRenderer } from '../components/interactive/renderers/ImageQuizRenderer';
 import { PollRenderer } from '../components/interactive/renderers/PollRenderer';
 
-const CANVAS_WIDTH = 360;
-const CANVAS_HEIGHT = 640;
+const CANVAS_WIDTH = 1080;
+const CANVAS_HEIGHT = 1920;
 
 /**
  * Generate a unique ID for canvas elements
@@ -332,7 +332,7 @@ export const buildPageFromSlide = (slide) => {
         children.push(createTextElement({
             value: content.button_text,
             position: { x: 20, y: CANVAS_HEIGHT - 80 },
-            font: { fontSize: 16 },
+            font: { fontSize: 48 },
             color: '#000000',
         }, slideId, 100));
         console.log(`[slideToCanvas] ✓ Created legacy BUTTON_TEXT element`);
@@ -392,7 +392,7 @@ export const buildPageFromSlide = (slide) => {
                 size: { width: 160, height: 48 },
                 background: styling.cta.container?.backgroundColor || '#F97316',
                 textColor: styling.cta.text?.color || '#FFFFFF',
-                fontSize: styling.cta.text?.fontSize || 16,
+                fontSize: styling.cta.text?.fontSize || 48,
                 borderRadius: styling.cta.cornerRadius?.topLeft || 8,
             },
         };
@@ -428,20 +428,20 @@ export const buildPageFromSlide = (slide) => {
         // 2. Map Styling to PollRenderer format
         const pollStyle = {
             containerBgColor: pollStyling.background || '#ffffff',
-            containerBorderRadius: pollStyling.radius || 12,
-            containerPadding: pollStyling.padding || 16,
+            containerBorderRadius: pollStyling.radius || 36,
+            containerPadding: pollStyling.padding || 48,
             questionColor: pollStyling.question?.color || '#000000',
-            questionFontSize: pollStyling.question?.fontSize || 16,
+            questionFontSize: pollStyling.question?.fontSize || 48,
             optionBgColor: pollStyling.options?.background || '#ffffff',
             optionTextColor: pollStyling.options?.textColor || '#000000',
-            optionBorderRadius: pollStyling.options?.radius || 8,
-            optionFontSize: 14,
+            optionBorderRadius: pollStyling.options?.radius || 24,
+            optionFontSize: 42,
             resultBarColor: pollStyling.resultBarColor || '#F97316'
         };
 
         // 3. Geometry - ensure minimum height for polls
-        let width = pollStyling.size?.width || 280;
-        let height = pollStyling.size?.height || 110;
+        let width = pollStyling.size?.width || 840;
+        let height = pollStyling.size?.height || 330;
 
         // Calculate minimum height based on options count and layout
         if (pollContent.options) {
@@ -485,7 +485,7 @@ export const buildPageFromSlide = (slide) => {
 
         const question = pollData.question || 'Question?';
         const options = pollData.options || [];
-        const showResults = pollData.showResults || false;
+
 
         // Handle deeply nested layout structure: layout.type can be an object {type: 'horizontal'}
         let layoutValue = pollData.layout;
@@ -596,7 +596,7 @@ export const buildPageFromSlide = (slide) => {
                 optionSize: quizStyling.typography?.optionSize || quizStyling.optionSize || 14
             },
             spacing: {
-                padding: quizStyling.spacing?.padding || quizStyling.padding || 20,
+                padding: quizStyling.spacing?.padding || quizStyling.padding || 60,
                 optionRadius: quizStyling.spacing?.optionRadius || quizStyling.optionRadius || 8
             },
             appearance: {
@@ -736,7 +736,7 @@ export const buildPageFromSlide = (slide) => {
                 emojiSize: ratingStyling.typography?.emojiSize || ratingStyling.emojiSize || 32
             },
             radius: ratingStyling.radius || 12,
-            padding: ratingStyling.padding || 36
+            padding: ratingStyling.padding || 108
         };
 
         // 3. Geometry
@@ -747,7 +747,6 @@ export const buildPageFromSlide = (slide) => {
 
         // 4. Generate SVG for rating
         const bgColor = ratingStyle.colors.background;
-        const cardBg = ratingStyle.colors.cardBackground;
         const titleColor = ratingStyle.colors.titleColor;
         const titleSize = ratingStyle.typography.titleSize;
         const emojiSize = ratingStyle.typography.emojiSize;
@@ -941,10 +940,10 @@ export const buildPageFromSlide = (slide) => {
 
         console.log(`[slideToCanvas] Creating Countdown element`);
 
-        const width = countdownStyling.size?.width || 360;
-        const height = countdownStyling.size?.height || 140;
+        const width = countdownStyling.size?.width || 1080;
+        const height = countdownStyling.size?.height || 420; // Scaled proportionally (140 * 3)
         const x = countdownStyling.position?.x || 0;
-        const y = countdownStyling.position?.y || 180;
+        const y = countdownStyling.position?.y || 540; // Scaled proportionally (180 * 3)
 
         // Generate unique ID to avoid conflicts (ignoring user payload ID)
         const elementId = `countdown-${slideId}-${Math.floor(Math.random() * 100000)}`;
@@ -968,7 +967,7 @@ export const buildPageFromSlide = (slide) => {
             labelColor: countdownStyling.labelColor || '#9ca3af',
             background: countdownStyling.background || '#ffffff',
             radius: countdownStyling.radius !== undefined ? countdownStyling.radius : 12,
-            padding: countdownStyling.padding !== undefined ? countdownStyling.padding : 16,
+            padding: countdownStyling.padding !== undefined ? countdownStyling.padding : 48,
         };
 
         // Generate SVG using the React Renderer (visual fidelity)
@@ -1036,7 +1035,7 @@ export const buildPageFromSlide = (slide) => {
         const qStyle = {
             background: qStyling.background || '#FFFFFF',
             radius: qStyling.radius !== undefined ? qStyling.radius : 16,
-            padding: qStyling.padding !== undefined ? qStyling.padding : 20,
+            padding: qStyling.padding !== undefined ? qStyling.padding : 60,
             questionColor: qStyling.questionColor || '#1F2937',
             questionSize: qStyling.questionSize || 16,
             inputBackground: qStyling.inputBackground || '#F3F4F6',
@@ -1108,7 +1107,7 @@ export const buildPageFromSlide = (slide) => {
         const iqStyle = {
             background: iqStyling.background || '#FFFFFF',
             radius: iqStyling.radius !== undefined ? iqStyling.radius : 16,
-            padding: iqStyling.padding !== undefined ? iqStyling.padding : 20,
+            padding: iqStyling.padding !== undefined ? iqStyling.padding : 60,
             questionColor: iqStyling.questionColor || '#1F2937',
             imageRadius: iqStyling.imageRadius !== undefined ? iqStyling.imageRadius : 8,
             borderColor: iqStyling.borderColor || '#E5E7EB',

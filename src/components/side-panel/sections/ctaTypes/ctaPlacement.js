@@ -1,5 +1,5 @@
 import {
-  BASELINE_EXPORT,
+  BASELINE_DIMENSIONS,
   getStoreExportScale,
   getStoreExportSize,
   toCanvas,
@@ -7,8 +7,8 @@ import {
 
 function mapBaselineExportToCurrent(store, rectOrPoint) {
   const exportSize = getStoreExportSize(store);
-  const sx = exportSize.width / BASELINE_EXPORT.width;
-  const sy = exportSize.height / BASELINE_EXPORT.height;
+  const sx = exportSize.width / BASELINE_DIMENSIONS.width;
+  const sy = exportSize.height / BASELINE_DIMENSIONS.height;
 
   if (!rectOrPoint) return rectOrPoint;
   const out = { ...rectOrPoint };

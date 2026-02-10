@@ -13,6 +13,7 @@ import { forEveryChild } from 'polotno/model/group-model';
 import { detectTemplatePreset, normalizeTemplateDesign } from '../../../utils/normalizeTemplate';
 import { setStorePreset } from '../../../store/polotnoStore';
 import { getStoreExportSize } from '../../../utils/scale';
+import { inferSlideBackgroundFromPage } from '../../../utils/slideBackground';
 
 const useUpdateEffect = (effect, deps) => {
   const first = React.useRef(true);
@@ -54,6 +55,24 @@ const TemplatesGrid = observer(({ store, sizeQuery, query }) => {
     }
 
     const normalized = normalizeTemplateDesign(design, { preset: detected?.preset });
+
+    // Ensure page backgrounds are preserved and properly structured
+    if (Array.isArray(normalized.pages)) {
+      normalized.pages.forEach((page, idx) => {
+        const originalPage = design.pages?.[idx];
+        
+        // Preserve background from original if missing in normalized
+        if (originalPage?.background && !page.background) {
+          page.background = originalPage.background;
+        }
+        
+        // Set up custom.background structure from page.background if it exists
+        if (page.background && !page.custom?.background) {
+          const inferredBg = inferSlideBackgroundFromPage({ background: page.background });
+          page.custom = { ...(page.custom || {}), background: inferredBg };
+        }
+      });
+    }
 
     if (store.pages.length <= 1) {
       store.loadJSON(normalized, true);
@@ -99,7 +118,7 @@ const NormalizedTemplatesPanel = observer(({ store }) => {
 
   // Templates in Polotno are commonly authored at export resolution.
   // When user enables "same size" filtering, use current preset export size
-  // so Story templates (1080×1920) are still visible while working canvas is 360×640.
+  // Templates and canvas are now both in 1080px-based resolution
   const exportSize = getStoreExportSize(store);
   const sizeKey = sameSize ? `${exportSize.width}x${exportSize.height}` : 'all';
 

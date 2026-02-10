@@ -39,14 +39,12 @@ export const detectTemplatePreset = (design) => {
   const direct = detectPresetFromDimensions(w, h);
   if (direct) return direct;
 
-  // Backward compatibility: if it’s a scaled version of any working preset (most commonly 3x).
-  for (const name of ['story', 'square', 'wide']) {
+  // Backward compatibility: check if dimensions match any known preset
+  // (templates created with older viewport-based system no longer supported)
+  for (const name of ['ios-small', 'ios-large', 'android-small', 'android-medium', 'android-large']) {
     const preset = getPreset(name);
-    const scale = getPresetScale(preset);
-    const sw = w / preset.working.width;
-    const sh = h / preset.working.height;
-    if (nearlyEqual(sw, scale) && nearlyEqual(sh, scale)) {
-      return { preset: name, space: 'export' };
+    if (w === preset.dimensions.width && h === preset.dimensions.height) {
+      return { preset: name, space: 'canvas' };
     }
   }
 
@@ -206,30 +204,51 @@ const scaleObjectInPlace = (obj, factor) => {
 
 export const normalizeTemplateDesign = (design, options = {}) => {
   const detected = detectTemplatePreset(design);
-  if (!detected || detected.space !== 'export') return design;
+  if (!detected || detected.space !== 'export') {
+    // Template is already at canvas size or unrecognized - return as-is but ensure structure
+    const result = cloneDeep(design);
+    
+    // Ensure pages preserve all their properties including background
+    if (Array.isArray(result.pages)) {
+      result.pages.forEach((page, idx) => {
+        const originalPage = design.pages?.[idx];
+        if (originalPage) {
+          // Explicitly preserve background if it exists
+          if (originalPage.background !== undefined) {
+            page.background = originalPage.background;
+          }
+        }
+      });
+    }
+    
+    return result;
+  }
 
   const presetName = typeof options.preset === 'string' ? options.preset : detected.preset;
   const preset = getPreset(presetName);
-  const scale = getPresetScale(preset);
-  const factor = 1 / scale;
+  const scale = 1; // Canvas = export dimensions, no scaling needed
+  const factor = 1;
 
   const normalized = cloneDeep(design);
 
-  // Normalize size even if template JSON kept it only on pages.
-  normalized.width = preset.working.width;
-  normalized.height = preset.working.height;
+  // Set canvas dimensions to 1080px-based resolutions
+  normalized.width = preset.dimensions.width;
+  normalized.height = preset.dimensions.height;
 
   // Normalize pages and their children.
   if (Array.isArray(normalized.pages)) {
     normalized.pages.forEach((page) => {
       if (!page || typeof page !== 'object') return;
 
-      // Force pages to rely on store size.
-      if (typeof page.width === 'number') page.width = preset.working.width;
-      if (typeof page.height === 'number') page.height = preset.working.height;
+      // Force pages to rely on store size (1080px-based)
+      if (typeof page.width === 'number') page.width = preset.dimensions.width;
+      if (typeof page.height === 'number') page.height = preset.dimensions.height;
 
       // Scale page bleed if present.
       if (typeof page.bleed === 'number') page.bleed = page.bleed * factor;
+
+      // Preserve background property explicitly (should already be in cloneDeep but ensure it)
+      // This is critical for templates with colored/image backgrounds
 
       if (Array.isArray(page.children)) {
         page.children.forEach((child) => scaleObjectInPlace(child, factor));

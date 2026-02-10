@@ -1,33 +1,73 @@
+/**
+ * Central aspect ratio configuration with 1080px-based canvas resolutions.
+ * These dimensions are used for canvas initialization, rendering, and export.
+ * UI preview scaling is handled separately via CSS transforms.
+ */
+export const ASPECT_RATIO_CONFIG = {
+  '9:16': { width: 1080, height: 1920 },
+  '9:19.5': { width: 1080, height: 2340 },
+  '9:18': { width: 1080, height: 2160 },
+  '9:20': { width: 1080, height: 2400 },
+};
+
+/**
+ * Device presets mapping to aspect ratios.
+ * All presets use 1080px-based canvas dimensions for both editor and export.
+ */
 export const PRESETS = {
-  story: {
-    name: 'story',
-    working: { width: 360, height: 640 },
-    export: { width: 1080, height: 1920 },
+  'ios-small': {
+    name: 'ios-small',
+    label: 'iOS Small Device',
+    platform: 'iOS',
+    aspectRatio: '9:16',
+    dimensions: { width: 1080, height: 1920 },
   },
-  square: {
-    name: 'square',
-    working: { width: 360, height: 360 },
-    export: { width: 1080, height: 1080 },
+  'ios-large': {
+    name: 'ios-large',
+    label: 'iOS Large Device',
+    platform: 'iOS',
+    aspectRatio: '9:19.5',
+    dimensions: { width: 1080, height: 2340 },
   },
-  wide: {
-    name: 'wide',
-    working: { width: 640, height: 360 },
-    export: { width: 1920, height: 1080 },
+  'android-small': {
+    name: 'android-small',
+    label: 'Android Small Device',
+    platform: 'Android',
+    aspectRatio: '9:16',
+    dimensions: { width: 1080, height: 1920 },
+  },
+  'android-medium': {
+    name: 'android-medium',
+    label: 'Android Medium Device',
+    platform: 'Android',
+    aspectRatio: '9:18',
+    dimensions: { width: 1080, height: 2160 },
+  },
+  'android-large': {
+    name: 'android-large',
+    label: 'Android Large Device',
+    platform: 'Android',
+    aspectRatio: '9:20',
+    dimensions: { width: 1080, height: 2400 },
   },
 };
 
-export const DEFAULT_PRESET = 'story';
+export const DEFAULT_PRESET = 'ios-small';
 
-// Baseline export canvas used when some defaults were authored against 1080×1920.
-export const BASELINE_EXPORT = PRESETS.story.export;
+// Baseline canvas dimensions (1080×1920)
+export const BASELINE_DIMENSIONS = PRESETS['ios-small'].dimensions;
 
 export const getPreset = (name) => {
   return PRESETS[name] || PRESETS[DEFAULT_PRESET];
 };
 
+/**
+ * Returns the export scale factor for a preset.
+ * Since canvas dimensions now match export dimensions, this is always 1.
+ * Kept for backward compatibility.
+ */
 export const getPresetScale = (preset) => {
-  const p = typeof preset === 'string' ? getPreset(preset) : preset;
-  return p.export.width / p.working.width;
+  return 1;
 };
 
 export const getStorePresetName = (store) => {
@@ -37,53 +77,72 @@ export const getStorePresetName = (store) => {
 
 export const getStorePreset = (store) => getPreset(getStorePresetName(store));
 
-export const getStoreExportScale = (store) => getPresetScale(getStorePreset(store));
+/**
+ * Returns export scale factor. Always 1 since canvas = export dimensions.
+ */
+export const getStoreExportScale = (store) => 1;
 
-export const getStoreWorkingSize = (store) => getStorePreset(store).working;
+/**
+ * Returns canvas dimensions for the current store preset.
+ */
+export const getStoreCanvasSize = (store) => getStorePreset(store).dimensions;
 
-export const getStoreExportSize = (store) => getStorePreset(store).export;
+/**
+ * Legacy alias - returns same as getStoreCanvasSize
+ * @deprecated Use getStoreCanvasSize instead
+ */
+export const getStoreWorkingSize = (store) => getStoreCanvasSize(store);
 
-export const toCanvas = (value, exportScale = 3) => {
-  const n = Number(value);
-  if (!Number.isFinite(n)) return value;
-  return n / exportScale;
+/**
+ * Returns export dimensions (same as canvas dimensions).
+ */
+export const getStoreExportSize = (store) => getStorePreset(store).dimensions;
+
+/**
+ * Converts a value from export scale to canvas scale.
+ * Since export = canvas dimensions, this is a no-op (returns input).
+ * Kept for backward compatibility.
+ */
+export const toCanvas = (value, exportScale = 1) => {
+  return value;
 };
 
-export const toExport = (value, exportScale = 3) => {
-  const n = Number(value);
-  if (!Number.isFinite(n)) return value;
-  return n * exportScale;
+/**
+ * Converts a value from canvas scale to export scale.
+ * Since export = canvas dimensions, this is a no-op (returns input).
+ * Kept for backward compatibility.
+ */
+export const toExport = (value, exportScale = 1) => {
+  return value;
 };
 
-export const scalePointFromExport = (point, exportScale = 3) => {
-  if (!point) return point;
-  return {
-    ...point,
-    x: toCanvas(point.x, exportScale),
-    y: toCanvas(point.y, exportScale),
-  };
+/**
+ * Scales a point from export coordinates to canvas coordinates.
+ * Since they're the same now, this is a no-op.
+ */
+export const scalePointFromExport = (point, exportScale = 1) => {
+  return point;
 };
 
-export const scaleSizeFromExport = (size, exportScale = 3) => {
-  if (!size) return size;
-  return {
-    ...size,
-    width: toCanvas(size.width, exportScale),
-    height: toCanvas(size.height, exportScale),
-  };
+/**
+ * Scales a size from export coordinates to canvas coordinates.
+ * Since they're the same now, this is a no-op.
+ */
+export const scaleSizeFromExport = (size, exportScale = 1) => {
+  return size;
 };
 
+/**
+ * Detects preset from canvas dimensions.
+ */
 export const detectPresetFromDimensions = (width, height) => {
   const w = Number(width);
   const h = Number(height);
   if (!Number.isFinite(w) || !Number.isFinite(h)) return null;
 
   for (const [name, preset] of Object.entries(PRESETS)) {
-    if (w === preset.export.width && h === preset.export.height) {
-      return { preset: name, space: 'export' };
-    }
-    if (w === preset.working.width && h === preset.working.height) {
-      return { preset: name, space: 'working' };
+    if (w === preset.dimensions.width && h === preset.dimensions.height) {
+      return { preset: name, space: 'canvas' };
     }
   }
 

@@ -147,10 +147,11 @@ export const EditorWorkspace = observer(({ store }) => {
   // Sync custom flip flags for shapes (figure/line) onto Konva nodes.
   useKonvaShapeFlips(store, containerRef);
 
+  // Set initial zoom once - stays constant across aspect ratio changes
   useEffect(() => {
     const id = requestAnimationFrame(() => {
-      // Set specific startup zoom to 81%
-      store.setScale(0.81);
+      // Fixed zoom level - doesn't change when aspect ratio changes
+      store.setScale(0.3);
     });
     return () => cancelAnimationFrame(id);
   }, [store]);

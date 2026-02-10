@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import './Topbar.css';
 
 import { ThemeToggleButton } from './ThemeToggleButton';
@@ -7,9 +7,39 @@ import { ThemeToggleButton } from './ThemeToggleButton';
 // We now use buildSlidePayload from slidePayloadBuilder.js (imported dynamically)
 import { useEditorContext } from '../context/EditorContext';
 import Dropdown from '../components/shared/Dropdown';
+import GroupedDropdown from '../components/shared/GroupedDropdown';
+import { getStorePresetName, PRESETS } from '../utils/scale';
+import { setStorePreset } from '../store/polotnoStore';
+import { updateStoryGroup } from '../services/groupService';
 
 export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar, groupId: propGroupId, slideId: propSlideId }) => {
     const [isSaving, setIsSaving] = useState(false);
+    // Device (Preset) selector state
+    const [activeDevice, setActiveDevice] = useState(getStorePresetName(store));
+
+    // Keep UI in sync with store preset
+    useEffect(() => {
+        setActiveDevice(getStorePresetName(store));
+    }, [store]);
+
+    // Device options grouped by platform
+    const deviceGroups = [
+        {
+            label: 'iOS',
+            options: [
+                { value: 'ios-small', label: 'Small Device', badge: '9:16' },
+                { value: 'ios-large', label: 'Large Device', badge: '9:19.5' },
+            ]
+        },
+        {
+            label: 'Android',
+            options: [
+                { value: 'android-small', label: 'Small Device', badge: '9:16' },
+                { value: 'android-medium', label: 'Medium Device', badge: '9:18' },
+                { value: 'android-large', label: 'Large Device', badge: '9:20' },
+            ]
+        }
+    ];
 
     // Campaign name from context (real data)
     let campaignName = projectName;
@@ -52,6 +82,29 @@ export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar,
     const groupId = contextGroupId || propGroupId || 'demo-group-id';
     const slideId = contextSlideId || propSlideId;
     const [isCreatingGroup, _setIsCreatingGroup] = useState(false);
+
+    // Handler for device change - updates store preset and group aspect ratio
+    const handleDeviceChange = async (selectedDevice) => {
+        setActiveDevice(selectedDevice);
+        setStorePreset(store, selectedDevice, { rescaleExisting: true });
+        
+        // Update group aspect ratio if we have a valid group ID
+        if (groupId && groupId !== 'demo-group-id') {
+            try {
+                const devicePreset = PRESETS[selectedDevice];
+                if (devicePreset && devicePreset.aspectRatio) {
+                    console.log(`📱 Updating group ${groupId} aspect ratio to ${devicePreset.aspectRatio}`);
+                    await updateStoryGroup(groupId, {
+                        aspectRatio: devicePreset.aspectRatio
+                    });
+                    console.log('✅ Group aspect ratio updated successfully');
+                }
+            } catch (error) {
+                console.error('❌ Failed to update group aspect ratio:', error);
+                // Don't block the UI, just log the error
+            }
+        }
+    };
 
     const groupOptions = useMemo(() => {
         const groups = Array.isArray(storyGroups) ? storyGroups : [];
@@ -283,7 +336,7 @@ export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar,
     };
 
     return (
-        <div className="topbar">
+        <div className="topbar" style={{ position: 'relative' }}>
             {/* Left Section - Logo and Breadcrumbs */}
             <div className="topbar-left">
                 {/* Logo */}
@@ -359,6 +412,66 @@ export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar,
                         {campaignName}
                     </span>
                 </div>
+            </div>
+
+            {/* Device Selector - Centered */}
+            <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', zIndex: 2 }}>
+                <GroupedDropdown
+                    groups={deviceGroups}
+                    value={activeDevice}
+                    ariaLabel="Select Device"
+                    panelMinWidth={220}
+                    onChange={handleDeviceChange}
+                    renderTrigger={({ selected }) => {
+                        // Find current device across all groups
+                        let currentGroup = null;
+                        let currentDevice = null;
+                        for (const group of deviceGroups) {
+                            const found = group.options.find(opt => opt.value === activeDevice);
+                            if (found) {
+                                currentGroup = group.label;
+                                currentDevice = found;
+                                break;
+                            }
+                        }
+                        const displayLabel = currentDevice 
+                            ? `${currentGroup} ${currentDevice.label}` 
+                            : 'iOS Small Device';
+                        return (
+                            <button
+                                type="button"
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    padding: '6px 12px',
+                                    background: 'transparent',
+                                    border: '1px solid var(--border-primary)',
+                                    borderRadius: '6px',
+                                    color: 'var(--text-secondary)',
+                                    fontSize: '14px',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                <span style={{ fontWeight: 500 }}>Device:</span>
+                                <span>{displayLabel}</span>
+                                <svg
+                                    width="12"
+                                    height="12"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </button>
+                        );
+                    }}
+                />
             </div>
 
             {/* Right Section - Status and Actions */}
