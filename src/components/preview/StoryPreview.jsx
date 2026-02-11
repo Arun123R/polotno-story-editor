@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { observer } from 'mobx-react-lite';
-import { motion, AnimatePresence } from 'framer-motion';
+import {  AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Helper to normalize boolean values
@@ -72,6 +72,7 @@ const DataTimer = ({ duration }) => {
   const [timeLeft, setTimeLeft] = useState(Math.ceil(duration / 1000));
   
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTimeLeft(Math.ceil(duration / 1000));
     const timer = setInterval(() => {
       setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
@@ -157,7 +158,7 @@ const StoryPreview = observer(({ store }) => {
         cta_border_color: ctaData.borderColor || 'transparent',
       };
     });
-  }, [store?.pages]);
+  }, [store]);
 
   const [[page, direction], setPage] = useState([0, 0]);
   const currentSlideIndex = page;
@@ -194,7 +195,7 @@ const StoryPreview = observer(({ store }) => {
     }, SLIDE_DURATION);
 
     return () => clearTimeout(timer);
-  }, [handleNextSlide, SLIDE_DURATION, slides?.length, currentSlideIndex]);
+  }, [handleNextSlide, SLIDE_DURATION, slides.length, currentSlideIndex, slides]);
 
   // Reset if slides change
   useEffect(() => {
@@ -322,7 +323,7 @@ const StoryPreview = observer(({ store }) => {
 
         return (
           <div
-            className="absolute bottom-0 left-0 right-0 z-[100] flex transition-all duration-200"
+            className="absolute bottom-0 left-0 right-0 z-100 flex transition-all duration-200"
             style={{
               padding: `0 ${marginRight}px ${marginBottom}px ${marginLeft}px`,
               justifyContent: containerAlign === 'left' ? 'flex-start' : 
