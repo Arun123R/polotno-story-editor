@@ -368,6 +368,7 @@ body {
 .appstorys-theme-toggle:hover {
     background-color: var(--bg-hover);
     color: var(--text-primary);
+    border-color: var(--border-accent);
 }
 
 .appstorys-theme-toggle:focus-visible {
@@ -640,11 +641,35 @@ html[data-theme="dark"] .bp5-tab[aria-selected="true"] svg {
     box-shadow: none !important;
 }
 
+.polotno-toolbar button svg,
+.polotno-toolbar .bp5-button svg {
+    fill: currentColor !important;
+}
+
+/* Custom Undo/Redo icons are stroke-based */
+.polotno-toolbar .polotno-undo-button svg,
+.polotno-toolbar .polotno-redo-button svg {
+    fill: none !important;
+    stroke: currentColor !important;
+}
+
+/* Enforce dimensions for Undo/Redo buttons to match other toggle buttons */
+.polotno-toolbar .polotno-undo-button,
+.polotno-toolbar .polotno-redo-button {
+    height: 32px !important;
+    width: 32px !important;
+    min-width: 32px !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
 .polotno-toolbar button:hover,
 .polotno-toolbar .bp5-button:hover {
     background-color: var(--bg-hover) !important;
     color: var(--text-primary) !important;
-    border-color: var(--border-primary) !important;
+    border-color: var(--border-accent) !important;
 }
 
 .polotno-toolbar button:active,

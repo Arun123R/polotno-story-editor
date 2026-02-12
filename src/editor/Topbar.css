@@ -298,6 +298,28 @@
     border-color: var(--border-accent);
 }
 
+/* Device Selector Button */
+.topbar-device-selector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.topbar-device-selector:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+    border-color: var(--border-accent);
+}
+
+
 /* Primary Button (Publish) */
 .topbar-btn-primary {
     background: var(--gradient-primary);
@@ -329,19 +351,43 @@
     height: 36px;
 }
 
-.topbar-btn-preview:hover {
-    opacity: 0.8;
-    transform: translateY(-1px);
-}
 
-.topbar-btn-preview:active {
-    transform: translateY(0);
-}
 
 .topbar-btn-preview svg {
     height: 36px;
     width: auto;
 }
+
+/* Preview Button SVG Theme-Aware Colors */
+.topbar-btn-preview .preview-btn-bg {
+    fill: var(--bg-secondary);
+    transition: fill 0.2s ease;
+}
+
+.topbar-btn-preview:hover .preview-btn-bg {
+    fill: var(--bg-hover);
+}
+
+.topbar-btn-preview .preview-btn-border {
+    fill: var(--border-primary);
+    fill-opacity: 1;
+    transition: fill 0.2s ease;
+}
+
+.topbar-btn-preview:hover .preview-btn-border {
+    fill: var(--border-accent);
+}
+
+
+.topbar-btn-preview .preview-btn-icon {
+    stroke: var(--text-primary);
+    fill: none;
+}
+
+.topbar-btn-preview .preview-btn-text {
+    fill: var(--text-primary);
+}
+
 
 
 /* ==================== RESPONSIVE ==================== */

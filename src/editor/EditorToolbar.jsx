@@ -76,8 +76,33 @@ const toolbarComponents = {
   Duplicate: None,
   Remove: None,
 
-  // History (Undo/Redo) - NOT overridden, keeps default behavior
-  // History Button is handled by Polotno, no override provided here.
+  // History (Undo/Redo)
+  History: observer(({ store }) => (
+    <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+      <Button
+        minimal
+        onClick={() => store.history.undo()}
+        disabled={!store.history.canUndo}
+        className="polotno-undo-button"
+      >
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6.00008 9.33333L2.66675 6L6.00008 2.66667" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M2.66675 6H9.66675C10.1483 6 10.6251 6.09484 11.0699 6.27911C11.5148 6.46338 11.919 6.73346 12.2595 7.07394C12.6 7.41442 12.87 7.81863 13.0543 8.26349C13.2386 8.70835 13.3334 9.18515 13.3334 9.66667C13.3334 10.1482 13.2386 10.625 13.0543 11.0698C12.87 11.5147 12.6 11.9189 12.2595 12.2594C11.919 12.5999 11.5148 12.87 11.0699 13.0542C10.6251 13.2385 10.1483 13.3333 9.66675 13.3333H7.33341" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </Button>
+      <Button
+        minimal
+        onClick={() => store.history.redo()}
+        disabled={!store.history.canRedo}
+        className="polotno-redo-button"
+      >
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 9.33333L13.3333 6L10 2.66667" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M13.3334 6H6.33341C5.36095 6 4.42832 6.38631 3.74069 7.07394C3.05306 7.76157 2.66675 8.69421 2.66675 9.66667C2.66675 10.1482 2.76159 10.625 2.94586 11.0698C3.13012 11.5147 3.40021 11.9189 3.74069 12.2594C4.42832 12.947 5.36095 13.3333 6.33341 13.3333H8.66675" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </Button>
+    </div>
+  )),
   // Download - override to ensure correct export pixelRatio without store monkey-patching.
   DownloadButton: observer(({ store }) => {
     const [loading, setLoading] = React.useState(false);

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { IconSvgPaths16 as OrigPaths16, IconSvgPaths20 as OrigPaths20 } from '@blueprintjs/icons/lib/esm/allPaths.js';
 
 // Re-export everything from the real Blueprint icons package
 // eslint-disable-next-line react-refresh/only-export-components
@@ -65,14 +66,21 @@ export const Plus = React.forwardRef(function PlusIcon(props, ref) {
     <CompatIcon iconName="plus" ref={ref} {...props}>
       {(c) => (
         <>
-          <path d="M3.33325 8H12.6666" stroke={c} strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M8 3.33337V12.6667" stroke={c} strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M3.33325 8H12.6666" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M8 3.33337V12.6667" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </>
       )}
     </CompatIcon>
   );
 });
 Plus.defaultProps = { size: DEFAULT_SIZE, color: DEFAULT_COLOR };
+
+// Aliases for common add-related names to ensure override coverage
+export const Add = Plus;
+export const Insert = Plus;
+export const SmallPlus = Plus;
+export const NewObject = Plus;
+export const AddRowBottom = Plus;
 
 // Duplicate (16x16 provided SVG)
 export const Duplicate = React.forwardRef(function DuplicateIcon(props, ref) {
@@ -106,5 +114,29 @@ export const Trash = React.forwardRef(function TrashIcon(props, ref) {
   );
 });
 Trash.defaultProps = { size: 16, color: DEFAULT_COLOR };
+
+// Custom cleaner path for Plus (filled shape matching user's stroked design)
+// M7 4.333A1 1 0 0 1 9 4.333V7H11.667A1 1 0 0 1 11.667 9H9V11.667A1 1 0 0 1 7 11.667V9H4.333A1 1 0 0 1 4.333 7H7V4.333Z
+const cleanPlusPath = ["M7 4.333A1 1 0 0 1 9 4.333V7H11.667A1 1 0 0 1 11.667 9H9V11.667A1 1 0 0 1 7 11.667V9H4.333A1 1 0 0 1 4.333 7H7V4.333Z"];
+
+export const IconSvgPaths16 = {
+  ...OrigPaths16,
+  plus: cleanPlusPath,
+  add: cleanPlusPath,
+  insert: cleanPlusPath,
+  "small-plus": cleanPlusPath,
+  "new-object": cleanPlusPath,
+  "add-row-bottom": cleanPlusPath,
+};
+
+export const IconSvgPaths20 = {
+  ...OrigPaths20,
+  plus: cleanPlusPath,
+  add: cleanPlusPath,
+  insert: cleanPlusPath,
+  "small-plus": cleanPlusPath,
+  "new-object": cleanPlusPath,
+  "add-row-bottom": cleanPlusPath,
+};
 
 export default {};
