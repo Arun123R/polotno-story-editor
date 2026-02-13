@@ -22,6 +22,34 @@ export const store = createStore({
   showCredit: true,
 });
 
+// =========================
+// PAGE METADATA: SYSTEM PAGES
+// =========================
+// A "SYSTEM page" is a REAL Polotno page (created via store.addPage) that is
+// distinguished purely via `page.custom` metadata. No UI/behavior changes here.
+
+// Reserved system page types.
+export const SYSTEM_PAGE_TYPES = Object.freeze({
+  SYSTEM_START_PAGE: 'SYSTEM_START_PAGE',
+});
+
+export const getPageCustomType = (page) => {
+  return page?.custom?.type ?? null;
+};
+
+export const isSystemPage = (page, type = null) => {
+  const pageType = getPageCustomType(page);
+  if (!pageType) return false;
+  if (type) return pageType === type;
+  return typeof pageType === 'string' && pageType.startsWith('SYSTEM_');
+};
+
+export const setPageCustomType = (page, type) => {
+  if (!page || typeof page.set !== 'function') return;
+  const custom = page.custom || {};
+  page.set({ custom: { ...custom, type } });
+};
+
 const isPageActive = (page) => {
   return page?.custom?.isActive !== false;
 };
@@ -231,345 +259,357 @@ export const setStorePreset = (targetStore, presetName, options = {}) => {
 // Initialize default preset with 1080×1920 canvas.
 setStorePreset(store, DEFAULT_PRESET, { rescaleExisting: false });
 
-// Canvas is now set by setStorePreset to 1080×1920 (or appropriate preset dimensions)
+// =========================
+// PAGE LIFECYCLE: SYSTEM_START_PAGE
+// =========================
+// Requirements:
+// - SYSTEM_START_PAGE must NEVER be removed.
+// - SYSTEM_START_PAGE must ALWAYS be the LAST page in store.pages.
+// - All real pages must be inserted BEFORE it.
 
-// ============================================
-// SPECIAL "ADD SLIDE" PAGE - ALWAYS AT THE END (RIGHT SIDE)
-// ============================================
-// This page is ALWAYS at the LAST position and is used ONLY to add new slides.
-// It has hardcoded static content and is NEVER saved to backend.
-// When user clicks on it, they can add a new slide which appears before it.
+const SYSTEM_START_ROLES = Object.freeze({
+  TITLE: 'SYSTEM_START_TITLE',
+  SUBTITLE: 'SYSTEM_START_SUBTITLE',
+  BUTTON_1: 'SYSTEM_START_BUTTON_1',
+  BUTTON_1_ICON_BG: 'SYSTEM_START_BUTTON_1_ICON_BG',
+  BUTTON_1_ICON_TEXT: 'SYSTEM_START_BUTTON_1_ICON_TEXT',
+  BUTTON_1_LABEL: 'SYSTEM_START_BUTTON_1_LABEL',
+  BUTTON_2: 'SYSTEM_START_BUTTON_2',
+  BUTTON_2_ICON_BG: 'SYSTEM_START_BUTTON_2_ICON_BG',
+  BUTTON_2_ICON_TEXT: 'SYSTEM_START_BUTTON_2_ICON_TEXT',
+  BUTTON_2_LABEL: 'SYSTEM_START_BUTTON_2_LABEL',
+  BUTTON_3: 'SYSTEM_START_BUTTON_3',
+  BUTTON_3_ICON_BG: 'SYSTEM_START_BUTTON_3_ICON_BG',
+  BUTTON_3_ICON_TEXT: 'SYSTEM_START_BUTTON_3_ICON_TEXT',
+  BUTTON_3_LABEL: 'SYSTEM_START_BUTTON_3_LABEL',
+});
 
-// Don't create a first page automatically - user will create it via Add Slide button
-// Just create the Add Slide page
+const SYSTEM_START_ACTIONS = Object.freeze({
+  UPLOAD: 'upload',
+  BLANK: 'blank',
+  TEMPLATE: 'template',
+});
 
-// Then, create the Add Slide page (so it's at the end)
-const createAddSlidePage = () => {
-  const addSlidePage = store.addPage();
-  if (!addSlidePage) return;
+const SYSTEM_START_ROLE_SET = new Set(Object.values(SYSTEM_START_ROLES));
 
-  // Mark this as the special "Add Slide" page
-  addSlidePage.set({
-    custom: {
-      isAddSlidePage: true, // Special marker - this page is NEVER saved
-      isActive: false, // Never "active" for playback
-    },
-    background: '#FFFFFF', // White background
-  });
 
-  // Whole Page Trigger (Interactive Background)
-  addSlidePage.addElement({
-    type: 'figure',
-    subType: 'rect',
-    x: 0,
-    y: 0,
-    width: store.width || 1080,
-    height: store.height || 1920,
-    fill: 'rgba(255,255,255,0.001)', // Almost transparent
-    opacity: 1,
-    listening: true, // Catch ALL clicks
-    selectable: true,
-    draggable: false,
-    name: 'add-slide-trigger',
-    custom: { isAddSlideElement: true, action: 'add-slide' },
-  });
 
-  // Circle Background (Visual Only)
-  addSlidePage.addElement({
-    type: 'figure',
-    subType: 'rect',
-    x: 130,
-    y: 155,
-    width: 100,
-    height: 100,
-    cornerRadius: 50,
-    fill: '#FFFFFF',
-    shadowEnabled: true,
-    shadowColor: 'rgba(0,0,0,0.15)',
-    shadowBlur: 15,
-    shadowOffsetY: 8,
-    opacity: 1,
-    selectable: false,
-    draggable: false,
-    listening: false, // Pass click to trigger
-    name: 'add-slide-visual',
-    custom: { isAddSlideElement: true },
-  });
-
-  // Plus Icon (+) (Visual Only)
-  addSlidePage.addElement({
-    type: 'text',
-    text: '+',
-    x: 420,
-    y: 471,
-    width: 240,
-    fontSize: 222,
-    fontFamily: 'Inter',
-    fill: '#6B7280',
-    align: 'center',
-    opacity: 1,
-    selectable: false,
-    draggable: false,
-    listening: false, // Pass click to trigger
-    name: 'add-slide-visual',
-    custom: { isAddSlideElement: true },
-  });
-
-  // Title (Visual Only)
-  addSlidePage.addElement({
-    type: 'text',
-    text: 'Start Creating',
-    x: 90,
-    y: 840,
-    width: 900,
-    fontSize: 90,
-    lineHeight: 1.2,
-    fontFamily: 'Inter',
-    fontWeight: 'bold',
-    fill: '#1F2937',
-    align: 'center',
-    opacity: 1,
-    selectable: false,
-    draggable: false,
-    listening: false, // Pass click to trigger
-    name: 'add-slide-visual',
-    custom: { isAddSlideElement: true },
-  });
-
-  // Subtitle (Visual Only)
-  addSlidePage.addElement({
-    type: 'text',
-    text: 'Select a template, add CTAs,\nor interactive elements to\nbegin',
-    x: 120,
-    y: 990,
-    width: 840,
-    fontSize: 42,
-    lineHeight: 1.6,
-    fontFamily: 'Inter',
-    fill: '#6B7280',
-    align: 'center',
-    opacity: 1,
-    selectable: false,
-    draggable: false,
-    listening: false, // Pass click to trigger
-    name: 'add-slide-visual',
-    custom: { isAddSlideElement: true },
-  });
-
-  console.log('[PolotnoStore] Created Add Slide page (Simple Click Mode)');
-  return addSlidePage;
+const hasSystemStartContent = (page) => {
+  const children = Array.isArray(page?.children) ? page.children : [];
+  return children.some((el) => SYSTEM_START_ROLE_SET.has(el?.custom?.role));
 };
 
-// Initial creation
 
+const ensureSystemStartPageContent = (page) => {
+  if (!page || typeof page.set !== 'function') return;
 
-// Select the Add Slide page initially and clear any element selection
-if (store.pages.length > 0) {
-  setTimeout(() => {
-    // If there's only the Add Slide page, select it
-    // If there are real pages, select the first real page
-    const realPages = store.pages.filter(p => !p.custom?.isAddSlidePage);
-    if (realPages.length > 0) {
-      store.selectPage(realPages[0].id);
-    } else {
-      store.selectPage(store.pages[0].id);
-    }
-    // Clear any element selection (e.g., if Add Slide button was auto-selected)
-    store.selectElements([]);
-  }, 100);
-}
+  // Make background white for this system page.
+  // The actual UI is rendered as a React overlay (SystemStartOverlay),
+  // NOT as Polotno canvas elements.
+  try {
+    if (page.background !== '#ffffff') page.set({ background: '#ffffff' });
+  } catch {
+    // ignore
+  }
 
-// Helper function to recreate the Add Slide page (for when we need to keep it at the end)
-const recreateAddSlidePage = () => {
-  console.log('[PolotnoStore] Recreating Add Slide page at the END');
-  return createAddSlidePage();
+  // Remove any leftover canvas elements from the old implementation.
+  try {
+    const children = Array.isArray(page.children) ? [...page.children] : [];
+    children.forEach((el) => {
+      try {
+        page.removeElement(el.id);
+      } catch {
+        // ignore
+      }
+    });
+  } catch {
+    // ignore
+  }
 };
 
-// ============================================
-// REACTION: Keep Add Slide page ALWAYS at the END
-// ============================================
-// When new pages are added, move the Add Slide page to the end
-reaction(
-  () => {
-    const pages = store.pages || [];
-    return pages.map(p => p?.id).join('|');
-  },
-  () => {
+const createSystemStartPage = () => {
+  const page = store.addPage();
+  setPageCustomType(page, SYSTEM_PAGE_TYPES.SYSTEM_START_PAGE);
+
+  // Keep new pages in "auto" size mode so they follow store size.
+  if (page && typeof page.set === 'function') {
+    if (page.width !== 'auto') page.set({ width: 'auto' });
+    if (page.height !== 'auto') page.set({ height: 'auto' });
+  }
+
+  // Apply existing normalization defaults.
+  ensurePageIsActiveFlag(page);
+  ensurePageBackgroundObject(page);
+  applySlideBackgroundToPage(page);
+
+  // Ensure system page has white background (UI is a React overlay).
+  ensureSystemStartPageContent(page);
+
+  return page;
+};
+
+const getSystemStartPage = (pages) => {
+  const list = Array.isArray(pages) ? pages : [];
+  return list.find((p) => isSystemPage(p, SYSTEM_PAGE_TYPES.SYSTEM_START_PAGE)) || null;
+};
+
+const ensureSystemStartPageLast = (pages) => {
+  const list = Array.isArray(pages) ? pages : [];
+  if (list.length === 0) return;
+  const system = getSystemStartPage(list);
+  if (!system) return;
+
+  const systemIndex = list.indexOf(system);
+  const lastIndex = list.length - 1;
+  if (systemIndex !== lastIndex && typeof system.setZIndex === 'function') {
     try {
-      const pages = store.pages || [];
-
-      // Find the Add Slide page
-      const addSlideIndex = pages.findIndex(p => p?.custom?.isAddSlidePage === true);
-
-      if (addSlideIndex === -1) {
-        // If missing (e.g. after loadJSON), recreate it immediately
-        // This ensures it always exists
-        console.log('[PolotnoStore] Add Slide page missing, recreating...');
-        createAddSlidePage();
-        return;
-      }
-
-      if (addSlideIndex === pages.length - 1) return; // Already at the end
-
-      // Need to move it to the end
-      // Polotno doesn't have a native movePage, but we can use store.movePage if available
-      // Otherwise, we recreate it
-      const addSlidePage = pages[addSlideIndex];
-
-      if (typeof store.movePage === 'function') {
-        store.movePage(addSlidePage.id, pages.length - 1);
-        console.log('[PolotnoStore] Moved Add Slide page to the end');
-      } else {
-        // Alternative: delete and recreate at end
-        // But this can cause issues, so we just log a warning
-        console.warn('[PolotnoStore] Add Slide page is not at the end (index:', addSlideIndex, ')');
-      }
-    } catch (error) {
-      console.error('[PolotnoStore] Failed to reposition Add Slide page:', error);
+      system.setZIndex(lastIndex);
+    } catch {
+      // ignore
     }
-  },
-  { fireImmediately: true, delay: 100 }
-);
+  }
+};
 
-// ============================================
-// REACTION: Detect Add Slide interactions
-// ============================================
-// Track to prevent infinite loops and double-clicks
-let isCreatingNewPage = false;
-let lastCreationTime = 0;
+const insertRealPageBeforeSystem = (page) => {
+  if (!page) return;
+  const pages = Array.isArray(store.pages) ? store.pages : [];
+  const system = getSystemStartPage(pages);
+  if (!system || typeof page.setZIndex !== 'function') return;
 
-export const createNewSlideAndRecreateAddSlidePage = (currentAddSlidePageId) => {
-  const now = Date.now();
-  if (now - lastCreationTime < 500) {
-    console.log('[PolotnoStore] Throttled Add Slide creation');
+  const systemIndex = pages.indexOf(system);
+  if (systemIndex >= 0) {
+    try {
+      page.setZIndex(systemIndex);
+    } catch {
+      // ignore
+    }
+  }
+
+  ensureSystemStartPageLast(store.pages);
+};
+
+const reconcileSystemStartPage = () => {
+  const pages = Array.isArray(store.pages) ? store.pages : [];
+  if (pages.length === 0) {
+    createSystemStartPage();
     return;
   }
 
-  // Double check flag
-  if (isCreatingNewPage) return;
-  isCreatingNewPage = true;
-  lastCreationTime = now;
+  const systemStartPages = pages.filter((p) => isSystemPage(p, SYSTEM_PAGE_TYPES.SYSTEM_START_PAGE));
 
+  if (systemStartPages.length === 0) {
+    createSystemStartPage();
+    return;
+  }
+
+  const primary = systemStartPages[0];
+  // Ensure system page has white background.
+  ensureSystemStartPageContent(primary);
+
+  // Delete ALL duplicate system pages (keep only the first one)
+  if (systemStartPages.length > 1) {
+    const duplicates = systemStartPages.slice(1);
+    duplicates.forEach((p) => {
+      try {
+        // Use deletePage directly to bypass any wrapped logic
+        store.deletePage(p.id);
+      } catch {
+        // ignore
+      }
+    });
+  }
+
+  // Always keep SYSTEM_START_PAGE last.
+  ensureSystemStartPageLast(store.pages);
+
+  // Prevent duplicating SYSTEM_START_PAGE content into a real page.
+  const pagesToCheck = Array.isArray(store.pages) ? store.pages : [];
+  pagesToCheck.forEach((p) => {
+    if (!isSystemPage(p, SYSTEM_PAGE_TYPES.SYSTEM_START_PAGE) && hasSystemStartContent(p)) {
+      try {
+        store.deletePage(p.id);
+      } catch {
+        // ignore
+      }
+    }
+  });
+};
+
+
+const openFilePicker = (accept) => {
+  return new Promise((resolve) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = accept || '*/*';
+    input.style.display = 'none';
+    input.onchange = () => {
+      const file = input.files && input.files[0] ? input.files[0] : null;
+      input.remove();
+      resolve(file);
+    };
+    document.body.appendChild(input);
+    input.click();
+  });
+};
+
+const openTemplatesPanel = () => {
   try {
-    console.log('[PolotnoStore] Creating new slide and recreating Add Slide page');
-
-    // Step 1: Delete current Add Slide page
-    if (currentAddSlidePageId) {
-      store.deletePages([currentAddSlidePageId]);
+    const tabs = document.querySelectorAll('.polotno-side-panel-tab, .bp5-tab');
+    for (const tab of tabs) {
+      const text = (tab.textContent || '').toLowerCase().trim();
+      const label = (tab.getAttribute('aria-label') || '').toLowerCase();
+      if (text === 'templates' || label.includes('templates')) {
+        tab.click();
+        return;
+      }
     }
-
-    // Step 2: Create the new real page (now it will be at the end)
-    const newPage = store.addPage();
-    let newPageId = null;
-
-    if (newPage) {
-      newPageId = newPage.id;
-      // Mark as real page
-      newPage.set({
-        custom: {
-          ...(newPage.custom || {}),
-          isAddSlidePage: false,
-          isActive: true,
-        },
-      });
-      console.log('[PolotnoStore] Created new slide:', newPageId);
-    }
-
-    // Step 3: Recreate the Add Slide page (will be at the very end)
-    recreateAddSlidePage();
-
-    // Step 4: Select the new real page
-    if (newPageId) {
-      // Use setTimeout to allow MobX to settle
-      setTimeout(() => {
-        store.selectPage(newPageId);
-        // Reset flag after selection is done
-        isCreatingNewPage = false;
-        console.log('[PolotnoStore] Selected new slide:', newPageId);
-      }, 50);
-    } else {
-      isCreatingNewPage = false;
-    }
-
-  } catch (error) {
-    console.error('[PolotnoStore] Failed to create new slide:', error);
-    isCreatingNewPage = false;
+  } catch {
+    // ignore
   }
 };
 
-// Detect when Add Slide button is CLICKED (element selected)
-// 1. Detect when Add Slide button is CLICKED (element selected)
+let systemStartActionInFlight = false;
+export const handleSystemStartAction = async (action) => {
+  if (systemStartActionInFlight) return;
+  systemStartActionInFlight = true;
+
+  try {
+    if (action === SYSTEM_START_ACTIONS.BLANK) {
+      const page = store.addPage();
+      insertRealPageBeforeSystem(page);
+      ensurePageIsActiveFlag(page);
+      ensurePageBackgroundObject(page);
+      applySlideBackgroundToPage(page);
+      if (typeof store.selectPage === 'function') {
+        store.selectPage(page.id);
+      }
+      return;
+    }
+
+    if (action === SYSTEM_START_ACTIONS.UPLOAD) {
+      const file = await openFilePicker('image/*');
+      if (!file) return;
+
+      const { storyAPI } = await import('../services/api');
+      const cdnUrl = await storyAPI.uploadGeneralMedia(file);
+
+      const page = store.addPage();
+      insertRealPageBeforeSystem(page);
+
+      const custom = page.custom || {};
+      page.set({
+        custom: {
+          ...custom,
+          background: {
+            color: { type: 'solid', solid: '#FFFFFF' },
+            media: { mediaUrl: cdnUrl, sizing: 'fill', position: 'center' },
+          },
+        },
+      });
+      applySlideBackgroundToPage(page);
+
+      if (typeof store.selectPage === 'function') {
+        store.selectPage(page.id);
+      }
+      return;
+    }
+
+    if (action === SYSTEM_START_ACTIONS.TEMPLATE) {
+      openTemplatesPanel();
+      return;
+    }
+  } catch {
+    // never block UI
+  } finally {
+    systemStartActionInFlight = false;
+  }
+};
+
+// Wrap store.deletePages to prevent deleting the SYSTEM_START_PAGE at the store level
+const originalDeletePages = store.deletePages.bind(store);
+store.deletePages = function (pageIds) {
+  const ids = Array.isArray(pageIds) ? pageIds : [pageIds];
+  const safeIds = ids.filter((id) => {
+    const page = store.pages.find((p) => p?.id === id);
+    return !isSystemPage(page, SYSTEM_PAGE_TYPES.SYSTEM_START_PAGE);
+  });
+  if (safeIds.length === 0) return;
+  return originalDeletePages(safeIds);
+};
+
+// Intercept page.clone() to prevent cloning SYSTEM_START_PAGE
+store.pages.forEach((page) => {
+  if (typeof page.clone === 'function' && !page.__cloneIntercepted) {
+    const originalClone = page.clone.bind(page);
+    page.clone = function (...args) {
+      if (isSystemPage(page, SYSTEM_PAGE_TYPES.SYSTEM_START_PAGE)) {
+        console.warn('[polotnoStore] Cannot clone SYSTEM_START_PAGE');
+        return null;
+      }
+      return originalClone(...args);
+    };
+    page.__cloneIntercepted = true;
+  }
+});
+
+// Watch for new pages and intercept their clone methods too
 reaction(
-  () => (store.selectedElementsIds || []).join('|'),
+  () => store.pages.length,
   () => {
-    const selectedIds = store.selectedElementsIds || [];
-    if (selectedIds.length === 0) return;
-
-    // Find the Add Slide page
-    const addSlidePage = store.pages.find(p => p?.custom?.isAddSlidePage === true);
-    if (!addSlidePage) return;
-
-    // Check if any selected element is from the Add Slide page and discern the action
-    let isAddSlideButtonClicked = false;
-    let clickedAction = null;
-
-    for (const id of selectedIds) {
-      const element = addSlidePage.children?.find(el => el.id === id);
-      // Check if element belongs to Add Slide group
-      if (element?.custom?.isAddSlideElement === true) {
-        isAddSlideButtonClicked = true;
-        clickedAction = element.custom.action; // No default action
-        break;
+    store.pages.forEach((page) => {
+      if (typeof page.clone === 'function' && !page.__cloneIntercepted) {
+        const originalClone = page.clone.bind(page);
+        page.clone = function (...args) {
+          if (isSystemPage(page, SYSTEM_PAGE_TYPES.SYSTEM_START_PAGE)) {
+            console.warn('[polotnoStore] Cannot clone SYSTEM_START_PAGE');
+            return null;
+          }
+          return originalClone(...args);
+        };
+        page.__cloneIntercepted = true;
       }
-    }
-
-    if (isAddSlideButtonClicked) {
-      // ALWAYS clear selection immediately for visual feedback
-      store.selectElements([]);
-
-      // Only proceed if not already in progress
-      if (!isCreatingNewPage) {
-        if (clickedAction === 'add-slide') {
-          createNewSlideAndRecreateAddSlidePage(addSlidePage.id);
-        } else if (clickedAction === 'upload') {
-          console.log('[PolotnoStore] Upload button clicked');
-          // Trigger upload logic here (e.g. open file picker or switch to upload tab)
-        } else if (clickedAction === 'import') {
-          console.log('[PolotnoStore] Import button clicked');
-          // Trigger import logic here
-        }
-      }
-    }
+    });
   },
   { fireImmediately: false }
 );
 
-
-
-// Also detect when Add Slide PAGE becomes active (clicking on empty area)
-// 2. Also detect when Add Slide PAGE becomes active (clicking on empty area)
 reaction(
-  () => store.activePageId,
-  (activePageId) => {
-    if (isCreatingNewPage) return;
-    if (!activePageId) return;
-
-    const activePage = store.pages.find(p => p.id === activePageId);
-    if (!activePage) return;
-
-    // Check if the Add Slide page was clicked
-    if (activePage.custom?.isAddSlidePage === true) {
-      // With specific buttons (Add/Upload/Import), we don't want auto-creation on page activation
-      // User must explicitly click a button
-      return;
-
-      // PREVIOUS LOGIC:
-      // Only trigger if no elements are selected (button click is handled above)
-      // if (store.selectedElementsIds && store.selectedElementsIds.length > 0) return;
-      // createNewSlideAndRecreateAddSlidePage(activePage.id);
+  () => {
+    const pages = Array.isArray(store.pages) ? store.pages : [];
+    // Track the page list and their custom types.
+    return pages.map((p) => `${p?.id}:${getPageCustomType(p) ?? ''}`).join('|');
+  },
+  () => {
+    try {
+      reconcileSystemStartPage();
+    } catch {
+      // never block UI
     }
   },
-  { fireImmediately: false }
+  { fireImmediately: true }
+);
+
+// Keep layout centered when canvas size changes (preset switch / loadJSON).
+reaction(
+  () => {
+    const pages = Array.isArray(store.pages) ? store.pages : [];
+    const system = pages.find((p) => isSystemPage(p, SYSTEM_PAGE_TYPES.SYSTEM_START_PAGE));
+    const w = Number(store.width);
+    const h = Number(store.height);
+    return `${system?.id || ''}:${Number.isFinite(w) ? w : ''}x${Number.isFinite(h) ? h : ''}`;
+  },
+  () => {
+    try {
+      const pages = Array.isArray(store.pages) ? store.pages : [];
+      const system = pages.find((p) => isSystemPage(p, SYSTEM_PAGE_TYPES.SYSTEM_START_PAGE));
+      if (system) {
+        ensureSystemStartPageContent(system);
+      }
+    } catch {
+      // ignore
+    }
+  },
+  { fireImmediately: true }
 );
 
 // NOTE: Do not monkey-patch store methods (toDataURL/saveAsImage/loadJSON/deleteElements).
@@ -580,30 +620,13 @@ export const getDefaultExportPixelRatio = (targetStore = store) => {
   return getStoreExportScale(targetStore);
 };
 
-// ============================================
-// HELPER: Check if a page is the special "Add Slide" page
-// ============================================
-export const isAddSlidePage = (page) => {
-  return page?.custom?.isAddSlidePage === true;
-};
-
-// ============================================
-// HELPER: Get only real pages (excludes the Add Slide page at index 0)
-// ============================================
-export const getRealPages = (targetStore = store) => {
-  if (!targetStore?.pages) return [];
-  return targetStore.pages.filter((p) => !isAddSlidePage(p));
-};
-
 // setAnimationsEnabled(true);
 // NOTE: Do not auto-start playback on init.
 // Playback is controlled from UI (e.g. Duration section / bottom timeline).
 
-const DEFAULT_PAGE_DURATION = 5000;
+const DEFAULT_PAGE_DURATION = store.pages?.[0]?.duration ?? 5000;
 
 // 0) Ensure each page has custom.isActive (default true) for slide status.
-// Skip the special "Add Slide" page at index 0.
-// 🐛 FIX: Track BOTH page IDs AND page.background to catch loadJSON updates
 reaction(
   () => {
     if (!Array.isArray(store.pages)) return 'no-pages';
@@ -614,8 +637,6 @@ reaction(
   () => {
     try {
       (store.pages || []).forEach((p) => {
-        // Skip the Add Slide page
-        if (isAddSlidePage(p)) return;
         ensurePageIsActiveFlag(p);
         ensurePageBackgroundObject(p);
         applySlideBackgroundToPage(p);

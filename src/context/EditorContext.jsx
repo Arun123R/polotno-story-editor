@@ -15,7 +15,7 @@ import React, { createContext, useContext, useState, useCallback, useMemo, useEf
 import { reaction } from 'mobx';
 import { useCampaignData } from '../hooks/useCampaignData';
 import { useSlideHydration } from '../hooks/useSlideHydration';
-import { store } from '../store/polotnoStore';
+import { store, isSystemPage, SYSTEM_PAGE_TYPES } from '../store/polotnoStore';
 import { storyAPI } from '../services/api';
 import { campaignId as bootstrapCampaignId, storyGroupId as bootstrapGroupId, slideId as bootstrapSlideId } from '../editorBootstrap';
 import {
@@ -122,9 +122,6 @@ export const EditorContextProvider = ({ children }) => {
                 const page = store.pages.find(p => p.id === activePageId);
                 if (!page) return;
 
-                // Skip the special "Add Slide" page (index 0)
-                if (page.custom?.isAddSlidePage) return;
-
                 // Prefer original slide ID if available (hydrated), otherwise usage page ID
                 const slideId = page.custom?.originalSlideId || page.id;
 
@@ -150,21 +147,17 @@ export const EditorContextProvider = ({ children }) => {
     const deletePages = useCallback(async (pageIds) => {
         if (!pageIds || pageIds.length === 0) return;
 
-        // Filter out the special "Add Slide" page - it should NEVER be deleted
-        const realPageIds = pageIds.filter(id => {
-            const page = store.pages.find(p => p.id === id);
-            return page && !page.custom?.isAddSlidePage;
+        // Never allow deleting SYSTEM_START_PAGE.
+        const safePageIds = pageIds.filter((id) => {
+            const page = store.pages.find((p) => p?.id === id);
+            return !isSystemPage(page, SYSTEM_PAGE_TYPES.SYSTEM_START_PAGE);
         });
-
-        if (realPageIds.length === 0) {
-            console.log('[EditorContext] No real pages to delete (filtered out Add Slide page)');
-            return;
-        }
+        if (safePageIds.length === 0) return;
 
         // 1. Identify which slides have backend IDs
         const backendDeletions = [];
         store.pages.forEach(page => {
-            if (realPageIds.includes(page.id) && page.custom?.originalSlideId) {
+            if (safePageIds.includes(page.id) && page.custom?.originalSlideId) {
                 backendDeletions.push(page.custom.originalSlideId);
             }
         });
@@ -188,7 +181,7 @@ export const EditorContextProvider = ({ children }) => {
 
         // 3. Proceed with UI removal using official Polotno API
         // This is the CORRECT way - call the method, don't reassign it
-        store.deletePages(realPageIds);
+        store.deletePages(safePageIds);
     }, []);
 
     // ============================================

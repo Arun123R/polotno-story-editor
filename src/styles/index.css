@@ -821,6 +821,36 @@ html[data-theme="dark"] .bp5-tab[aria-selected="true"] svg {
     border-radius: 8px !important;
 }
 
+/* SYSTEM_START_PAGE thumbnail styling */
+.polotno-page-thumbnail[data-system-start="true"],
+.go3162374498[data-system-start="true"] {
+    background-color: #F9FAFB !important;
+    border-color: #E5E7EB !important;
+    box-shadow: none !important;
+}
+
+/* Prevent selected styling from making SYSTEM_START_PAGE look like real pages */
+.polotno-page-thumbnail[data-system-start="true"].selected,
+.polotno-page-thumbnail[data-system-start="true"][data-selected="true"],
+.go3162374498[data-system-start="true"].selected,
+.go3162374498[data-system-start="true"][data-selected="true"] {
+    border-color: #E5E7EB !important;
+    box-shadow: none !important;
+}
+
+/* Hide per-page controls (delete/duplicate) for SYSTEM_START_PAGE */
+.polotno-pages-timeline button[data-system-hidden="true"] {
+    display: none !important;
+}
+
+/* Hide the context menu (Duplicate/Add/Remove page) for SYSTEM_START_PAGE */
+.polotno-page-container[data-system-start="true"] .polotno-page-menu {
+    display: none !important;
+    pointer-events: none !important;
+}
+
+
+
 .polotno-page-thumbnail:hover {
     border-color: var(--accent-primary) !important;
 }
