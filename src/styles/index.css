@@ -36,9 +36,9 @@
     --text-disabled: #C7C7CC;
 
     /* Orange gradient */
-    --gradient-primary: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
-    --gradient-hover: linear-gradient(135deg, #FB923C 0%, #F97316 100%);
-    --gradient-subtle: linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(234, 88, 12, 0.05) 100%);
+    --gradient-primary: linear-gradient(90deg, #ff6b35, #f7931e);
+    --gradient-hover: linear-gradient(90deg, #fb923c, #f97316);
+    --gradient-subtle: linear-gradient(90deg, rgba(255, 107, 53, 0.1), rgba(247, 147, 30, 0.05));
 
     /* Subtle orange for backgrounds */
     --accent-subtle: rgba(249, 115, 22, 0.08);
@@ -89,10 +89,10 @@
 
     /* Keep legacy vars but no gradients/glow */
     --accent-subtle: rgba(255, 122, 26, 0.14);
-    --accent-glow: rgba(255, 122, 26, 0.0);
-    --gradient-primary: var(--accent-primary);
-    --gradient-hover: var(--accent-hover);
-    --gradient-subtle: var(--accent-soft);
+    --accent-glow: rgba(255, 122, 26, 0.2);
+    --gradient-primary: linear-gradient(90deg, #ff6b35, #f7931e);
+    --gradient-hover: linear-gradient(90deg, #fb923c, #f97316);
+    --gradient-subtle: linear-gradient(90deg, rgba(255, 107, 53, 0.1), rgba(247, 147, 30, 0.05));
 
     /* Status */
     --success: #10b981;
@@ -682,20 +682,20 @@ html[data-theme="dark"] .bp5-tab[aria-selected="true"] svg {
 
 /* Keep only the primary action button orange */
 .polotno-toolbar .polotno-download-button.bp5-button {
-    background: var(--accent-primary) !important;
+    background: var(--gradient-primary) !important;
     color: #FFFFFF !important;
-    border: 1px solid var(--accent-primary) !important;
+    border: 1px solid #ff6b35 !important;
 }
 
 .polotno-toolbar .polotno-download-button.bp5-button:hover {
-    background: var(--accent-hover) !important;
-    border-color: var(--accent-hover) !important;
+    background: var(--gradient-hover) !important;
+    border-color: #fb923c !important;
 }
 
 .polotno-toolbar .polotno-download-button.bp5-button:active,
 .polotno-toolbar .polotno-download-button.bp5-button.bp5-active {
-    background: var(--accent-hover) !important;
-    border-color: var(--accent-hover) !important;
+    background: var(--gradient-hover) !important;
+    border-color: #fb923c !important;
 }
 
 /* ===================================
@@ -1001,34 +1001,34 @@ input[type="search"]:focus {
 }
 
 .bp5-button.bp5-intent-primary {
-    background: var(--accent-primary) !important;
+    background: var(--gradient-primary) !important;
     color: #FFFFFF !important;
-    border: 1px solid var(--accent-primary) !important;
+    border: 1px solid #ff6b35 !important;
     font-weight: 600 !important;
 }
 
 .bp5-button.bp5-intent-primary:hover {
-    background: var(--accent-hover) !important;
-    border-color: var(--accent-hover) !important;
+    background: var(--gradient-hover) !important;
+    border-color: #fb923c !important;
     box-shadow: var(--shadow-glow) !important;
 }
 
 /* Primary toolbar action (Download) */
 .polotno-download-button.bp5-button {
-    background: var(--accent-primary) !important;
+    background: var(--gradient-primary) !important;
     color: #FFFFFF !important;
-    border: 1px solid var(--accent-primary) !important;
+    border: 1px solid #ff6b35 !important;
     font-weight: 600 !important;
 }
 
 .polotno-download-button.bp5-button:hover {
-    background: var(--accent-hover) !important;
-    border-color: var(--accent-hover) !important;
+    background: var(--gradient-hover) !important;
+    border-color: #fb923c !important;
 }
 
 .polotno-download-button.bp5-button.bp5-minimal {
-    background: var(--accent-primary) !important;
-    border: 1px solid var(--accent-primary) !important;
+    background: var(--gradient-primary) !important;
+    border: 1px solid #ff6b35 !important;
 }
 
 .bp5-button.bp5-minimal {

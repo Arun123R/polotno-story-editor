@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import InfoIcon from '../../InfoIcon';
 import DurationHeaderWithTooltip from './DurationHeaderWithTooltip';
@@ -39,6 +39,12 @@ const formatTimeMMSS = (ms) => {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+};
+
+const formatTimeDecimal = (ms) => {
+  const safeMs = Number.isFinite(ms) ? Math.max(0, ms) : 0;
+  const decimalSeconds = safeMs / 1000;
+  return decimalSeconds.toFixed(1);
 };
 
 const getElementTiming = (element, pageDurationMs) => {
@@ -354,6 +360,213 @@ export const ActionButtons = observer(({ store, element }) => {
 });
 
 /**
+ * Helper to get a readable name for an element
+ */
+const getElementDisplayName = (element, index) => {
+  if (!element) return `Element ${index + 1}`;
+  
+  // Check for custom name
+  if (element.name) return element.name;
+  if (element.custom?.name) return element.custom.name;
+  
+  // Use type-based names
+  const type = element.type || 'element';
+  switch (type.toLowerCase()) {
+    case 'text':
+      return `Text ${index + 1}`;
+    case 'image':
+      return `Image ${index + 1}`;
+    case 'video':
+      return `Video ${index + 1}`;
+    case 'svg':
+      return `Shape ${index + 1}`;
+    case 'figure':
+      return `Shape ${index + 1}`;
+    case 'line':
+      return `Line ${index + 1}`;
+    case 'interactive':
+      return element.custom?.interactiveType ? `${element.custom.interactiveType} ${index + 1}` : `Interactive ${index + 1}`;
+    default:
+      return `${type.charAt(0).toUpperCase() + type.slice(1)} ${index + 1}`;
+  }
+};
+
+/**
+ * Individual element slider for timeline view
+ */
+const ElementSlider = observer(({ store, element, elementIndex, pageDurationMs }) => {
+  const [tooltipState, setTooltipState] = useState({ visible: false, time: 0, position: 0, kind: null });
+  const sliderRef = useRef(null);
+  const dragCleanupRef = useRef(null);
+
+  const elementTiming = getElementTiming(element, pageDurationMs);
+  const displayName = getElementDisplayName(element, elementIndex);
+
+  useEffect(() => {
+    return () => {
+      if (typeof dragCleanupRef.current === 'function') {
+        dragCleanupRef.current();
+      }
+      dragCleanupRef.current = null;
+    };
+  }, []);
+
+  const getSliderClientX = (event) => {
+    if (!event) return null;
+    if (event.touches?.length) return event.touches[0].clientX;
+    if (typeof event.clientX === 'number') return event.clientX;
+    if (typeof event.pageX === 'number') return event.pageX;
+    return null;
+  };
+
+  const getTimeFromEventWithRect = (event, rect) => {
+    const clientX = getSliderClientX(event);
+    if (clientX === null) return null;
+    const x = clamp(clientX - rect.left, 0, rect.width);
+    const ratio = rect.width > 0 ? x / rect.width : 0;
+    return ratio * pageDurationMs;
+  };
+
+  const stopActiveDrag = useCallback(() => {
+    if (typeof dragCleanupRef.current === 'function') {
+      dragCleanupRef.current();
+    }
+    dragCleanupRef.current = null;
+  }, []);
+
+  const startGlobalDrag = useCallback((event, { onMove, onEnd, captureTarget }) => {
+    stopActiveDrag();
+
+    const pointerId = event?.pointerId;
+    if (pointerId != null && captureTarget?.setPointerCapture) {
+      try {
+        captureTarget.setPointerCapture(pointerId);
+      } catch {
+        // ignore
+      }
+    }
+
+    const handleMove = (e) => {
+      if (e?.cancelable) e.preventDefault();
+      onMove?.(e);
+    };
+
+    const cleanup = () => {
+      try {
+        if (pointerId != null && captureTarget?.releasePointerCapture) {
+          captureTarget.releasePointerCapture(pointerId);
+        }
+      } catch {
+        // ignore
+      }
+
+      window.removeEventListener('pointermove', handleMove, true);
+      window.removeEventListener('pointerup', handleEnd, true);
+      window.removeEventListener('pointercancel', handleEnd, true);
+      window.removeEventListener('mouseup', handleEnd, true);
+      window.removeEventListener('blur', handleEnd, true);
+      document.removeEventListener('mouseleave', handleEnd, true);
+    };
+
+    const handleEnd = (e) => {
+      if (e?.cancelable) e.preventDefault();
+      cleanup();
+      dragCleanupRef.current = null;
+      onEnd?.(e);
+    };
+
+    window.addEventListener('pointermove', handleMove, { capture: true, passive: false });
+    window.addEventListener('pointerup', handleEnd, { capture: true, passive: false });
+    window.addEventListener('pointercancel', handleEnd, { capture: true, passive: false });
+    window.addEventListener('mouseup', handleEnd, { capture: true, passive: false });
+    window.addEventListener('blur', handleEnd, { capture: true, passive: false });
+    document.addEventListener('mouseleave', handleEnd, { capture: true, passive: false });
+
+    dragCleanupRef.current = cleanup;
+  }, [stopActiveDrag]);
+
+  const startDrag = (kind, event) => {
+    if (!element) return;
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+
+    const rect = sliderRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const updateTimingFromEvent = (e) => {
+      const t = getTimeFromEventWithRect(e, rect);
+      if (t === null) return;
+      const { startTime, endTime } = getElementTiming(element, pageDurationMs);
+      
+      let newTime;
+      if (kind === 'start') {
+        newTime = t;
+        setElementTiming(element, { startTime: t, endTime }, pageDurationMs);
+      } else {
+        newTime = t;
+        setElementTiming(element, { startTime, endTime: t }, pageDurationMs);
+      }
+
+      const pct = pageDurationMs > 0 ? (newTime / pageDurationMs) * 100 : 0;
+      setTooltipState({ visible: true, time: newTime, position: pct, kind });
+    };
+
+    const initialTime = kind === 'start' ? elementTiming.startTime : elementTiming.endTime;
+    const initialPct = pageDurationMs > 0 ? (initialTime / pageDurationMs) * 100 : 0;
+    setTooltipState({ visible: true, time: initialTime, position: initialPct, kind });
+
+    startGlobalDrag(event, {
+      captureTarget: event?.currentTarget,
+      onMove: updateTimingFromEvent,
+      onEnd: () => {
+        setTooltipState({ visible: false, time: 0, position: 0, kind: null });
+      },
+    });
+  };
+
+  const startPct = pageDurationMs > 0 ? (elementTiming.startTime / pageDurationMs) * 100 : 0;
+  const endPct = pageDurationMs > 0 ? (elementTiming.endTime / pageDurationMs) * 100 : 100;
+
+  return (
+    <div className="element-slider-row">
+      <span className="element-slider-label">{displayName}</span>
+      <div 
+        ref={sliderRef}
+        className="element-slider-track"
+        role="slider"
+        aria-label={`${displayName} duration`}
+      >
+        <div className="element-slider-range" />
+        <div
+          className="element-slider-handle start"
+          style={{ left: `${startPct}%` }}
+          onMouseDown={(e) => startDrag('start', e)}
+          onTouchStart={(e) => startDrag('start', e)}
+          onPointerDown={(e) => startDrag('start', e)}
+          title="Start"
+        />
+        <div
+          className="element-slider-handle end"
+          style={{ left: `${endPct}%` }}
+          onMouseDown={(e) => startDrag('end', e)}
+          onTouchStart={(e) => startDrag('end', e)}
+          onPointerDown={(e) => startDrag('end', e)}
+          title="End"
+        />
+        {tooltipState.visible && (
+          <div
+            className="time-tooltip"
+            style={{ left: `${tooltipState.position}%` }}
+          >
+            {formatTimeDecimal(tooltipState.time)}s
+          </div>
+        )}
+      </div>
+    </div>
+  );
+});
+
+/**
  * Duration section with play button and timeline - Dark theme style
  */
 export const DurationSection = observer(({ store, element }) => {
@@ -361,6 +574,9 @@ export const DurationSection = observer(({ store, element }) => {
   const pageStartMs = activePage?.startTime ?? 0;
   const pageDurationMs = activePage?.duration ?? 7000;
   const pageEndMs = pageStartMs + pageDurationMs;
+
+  // Tooltip state for drag feedback
+  const [tooltipState, setTooltipState] = useState({ visible: false, time: 0, position: 0, kind: null });
 
   // IMPORTANT: element reference is stable; compute directly so MobX drives re-renders on observable changes.
   const elementTiming = getElementTiming(element, pageDurationMs);
@@ -606,17 +822,33 @@ export const DurationSection = observer(({ store, element }) => {
       const t = getTimeFromEventWithRect(e, rect);
       if (t === null) return;
       const { startTime, endTime } = getElementTiming(element, pageDurationMs);
+      
+      let newTime;
       if (kind === 'start') {
+        newTime = t;
         setElementTiming(element, { startTime: t, endTime }, pageDurationMs);
       } else {
+        newTime = t;
         setElementTiming(element, { startTime, endTime: t }, pageDurationMs);
       }
+
+      // Update tooltip position and value
+      const pct = pageDurationMs > 0 ? (newTime / pageDurationMs) * 100 : 0;
+      setTooltipState({ visible: true, time: newTime, position: pct, kind });
     };
+
+    // Show initial tooltip
+    const initialTime = kind === 'start' ? elementTiming.startTime : elementTiming.endTime;
+    const initialPct = pageDurationMs > 0 ? (initialTime / pageDurationMs) * 100 : 0;
+    setTooltipState({ visible: true, time: initialTime, position: initialPct, kind });
 
     startGlobalDrag(event, {
       captureTarget: event?.currentTarget,
       onMove: updateTimingFromEvent,
-      onEnd: () => { },
+      onEnd: () => {
+        // Hide tooltip when drag ends
+        setTooltipState({ visible: false, time: 0, position: 0, kind: null });
+      },
     });
   };
 
@@ -701,13 +933,39 @@ export const DurationSection = observer(({ store, element }) => {
                 />
               </>
             )}
+            {tooltipState.visible && (
+              <div
+                className="time-tooltip"
+                style={{ left: `${tooltipState.position}%` }}
+              >
+                {formatTimeDecimal(tooltipState.time)}s
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      <div className="duration-info">
-        Starts at <span>{formatTimeMMSS(elementTiming.startTime)}</span> and ends at <span>{formatTimeMMSS(elementTiming.endTime)}</span>
-      </div>
+      {element && (
+        <div className="duration-info">
+          Starts at <span>{formatTimeMMSS(elementTiming.startTime)}</span> and ends at <span>{formatTimeMMSS(elementTiming.endTime)}</span>
+        </div>
+      )}
+
+      {!element && activePage?.children && (
+        <div className="element-sliders-container">
+          {Array.from(activePage.children)
+            .filter((child) => child?.custom?.role !== 'background-media')
+            .map((child, index) => (
+              <ElementSlider
+                key={child.id || index}
+                store={store}
+                element={child}
+                elementIndex={index}
+                pageDurationMs={pageDurationMs}
+              />
+            ))}
+        </div>
+      )}
     </div>
   );
 });
