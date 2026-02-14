@@ -343,6 +343,113 @@ const getImageSize = (url) => {
   return promise;
 };
 
+// Try to determine media size (image OR video). Returns {width,height} or null.
+const getMediaSize = async (url) => {
+  if (!url) return null;
+  // Try image first
+  try {
+    const img = await getImageSize(url);
+    if (img && img.width && img.height) return img;
+  } catch (e) {
+    // ignore
+  }
+
+  // Try video metadata
+  return await new Promise((resolve) => {
+    try {
+      const v = document.createElement('video');
+      let cleaned = String(url || '');
+      v.preload = 'metadata';
+      const onLoaded = () => {
+        try {
+          const res = { width: v.videoWidth || 0, height: v.videoHeight || 0 };
+          v.onloadedmetadata = null;
+          v.onerror = null;
+          resolve(res.width && res.height ? res : null);
+        } catch {
+          resolve(null);
+        }
+      };
+      const onError = () => {
+        v.onloadedmetadata = null;
+        v.onerror = null;
+        resolve(null);
+      };
+      v.onloadedmetadata = onLoaded;
+      v.onerror = onError;
+      // Some CDNs block range requests for videos; set src last to start loading
+      v.src = cleaned;
+      // Fallback timeout
+      setTimeout(() => {
+        resolve(null);
+      }, 2000);
+    } catch {
+      resolve(null);
+    }
+  });
+};
+
+// Extract a dominant/average color from an image URL. Returns hex or null.
+export const extractDominantColorFromUrl = (url) => {
+  return new Promise((resolve) => {
+    if (!url) return resolve(null);
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        const size = 24;
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        if (!ctx) return resolve(null);
+        ctx.drawImage(img, 0, 0, size, size);
+        const { data } = ctx.getImageData(0, 0, size, size);
+        let r = 0;
+        let g = 0;
+        let b = 0;
+        let count = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          const a = data[i + 3];
+          if (a < 16) continue;
+          r += data[i];
+          g += data[i + 1];
+          b += data[i + 2];
+          count++;
+        }
+        if (!count) return resolve(null);
+        r = Math.round(r / count);
+        g = Math.round(g / count);
+        b = Math.round(b / count);
+        const toHex = (v) => v.toString(16).padStart(2, '0').toUpperCase();
+        resolve(`#${toHex(r)}${toHex(g)}${toHex(b)}`);
+      } catch {
+        resolve(null);
+      }
+    };
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+};
+
+// Build a normalized slide background object from a media URL.
+// Defaults: sizing='fit', position='bottom-center', color derived from media (falls back to default).
+export const buildBackgroundFromMediaUrl = async (mediaUrl, { sizing = 'fit', position = 'bottom-center' } = {}) => {
+  if (!mediaUrl || typeof mediaUrl !== 'string') return null;
+  const hex = await extractDominantColorFromUrl(mediaUrl);
+  return {
+    color: {
+      type: 'solid',
+      solid: hex || DEFAULT_COLOR,
+    },
+    media: {
+      mediaUrl,
+      sizing: normalizeSizing(sizing),
+      position: normalizePosition(position),
+    },
+  };
+};
+
 const findBackgroundMediaElement = (page) => {
   const children = Array.isArray(page?.children) ? page.children : [];
   return children.find((el) => el?.custom?.role === BACKGROUND_MEDIA_ROLE);
@@ -355,11 +462,28 @@ const ensureBackgroundMediaElement = (page, media) => {
   const existing = findBackgroundMediaElement(page);
   if (existing) return existing;
 
+  // Detect if media URL points to a video
+  const url = String(media.mediaUrl || '');
+  const isVideo = /\.(mp4|webm|mov|m4v|ogg)$/i.test(url) || url.toLowerCase().includes('video');
+
+  const payload = isVideo
+    ? {
+        type: 'video',
+        name: 'background-video',
+        src: media.mediaUrl,
+        autoplay: true,
+        loop: true,
+        muted: true,
+      }
+    : {
+        type: 'image',
+        name: 'background-media',
+        src: media.mediaUrl,
+      };
+
   const el = page.addElement(
     {
-      type: 'image',
-      name: 'background-media',
-      src: media.mediaUrl,
+      ...payload,
       x: 0,
       y: 0,
       width: page.computedWidth,
@@ -419,7 +543,7 @@ const updateBackgroundMediaLayout = async (page, element, media) => {
 
   const url = media.mediaUrl;
   const { ax, ay } = positionToAlign(media.position);
-  const size = await getImageSize(url);
+  const size = await getMediaSize(url);
   const imgW = size?.width;
   const imgH = size?.height;
 

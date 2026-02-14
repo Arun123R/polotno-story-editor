@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import Konva from 'konva';
 import './DragDropHandler.css';
-import { applySlideBackgroundToPage, normalizeSlideBackground } from '../utils/slideBackground';
+import { applySlideBackgroundToPage, normalizeSlideBackground, buildBackgroundFromMediaUrl, extractDominantColorFromUrl } from '../utils/slideBackground';
 import { storyAPI } from '../services/api';
 
 // Supported file types
@@ -71,46 +71,7 @@ export const DragDropHandler = observer(({ store, children, onFileUpload }) => {
         return model;
     }, [getStageForActivePage, store]);
 
-    const extractDominantColorFromUrl = useCallback((url) => {
-        return new Promise((resolve) => {
-            if (!url) return resolve(null);
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            img.onload = () => {
-                try {
-                    const canvas = document.createElement('canvas');
-                    const size = 24;
-                    canvas.width = size;
-                    canvas.height = size;
-                    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-                    ctx.drawImage(img, 0, 0, size, size);
-                    const { data } = ctx.getImageData(0, 0, size, size);
-                    let r = 0;
-                    let g = 0;
-                    let b = 0;
-                    let count = 0;
-                    for (let i = 0; i < data.length; i += 4) {
-                        const a = data[i + 3];
-                        if (a < 16) continue;
-                        r += data[i];
-                        g += data[i + 1];
-                        b += data[i + 2];
-                        count++;
-                    }
-                    if (!count) return resolve(null);
-                    r = Math.round(r / count);
-                    g = Math.round(g / count);
-                    b = Math.round(b / count);
-                    const toHex = (v) => v.toString(16).padStart(2, '0').toUpperCase();
-                    resolve(`#${toHex(r)}${toHex(g)}${toHex(b)}`);
-                } catch {
-                    resolve(null);
-                }
-            };
-            img.onerror = () => resolve(null);
-            img.src = url;
-        });
-    }, []);
+
 
     const setImageAsBackgroundMedia = useCallback(async (fileUrl) => {
         const page = store?.activePage;
@@ -134,7 +95,7 @@ export const DragDropHandler = observer(({ store, children, onFileUpload }) => {
             },
         };
 
-        // Always attempt to sync color when a new image is set as background
+        // Prefer shared helper (extractDominantColorFromUrl is available) — set color if found
         const dominant = await extractDominantColorFromUrl(fileUrl);
         if (dominant) {
             nextBg.color = { type: 'solid', solid: dominant };
@@ -143,7 +104,7 @@ export const DragDropHandler = observer(({ store, children, onFileUpload }) => {
         // Apply atomic update
         page.set({ custom: { ...custom, background: nextBg } });
         applySlideBackgroundToPage(page);
-    }, [extractDominantColorFromUrl, store]);
+    }, [store]);
 
     const replaceElementMedia = useCallback((targetElement, fileUrl) => {
         if (!targetElement || !fileUrl) return false;
@@ -198,8 +159,8 @@ export const DragDropHandler = observer(({ store, children, onFileUpload }) => {
 
                 // Canvas drop rules (Storyly-like):
                 // - Drop on existing element => replace media
-                // - Drop on empty canvas => set as background media (images only)
-                if (dropInfo?.target === 'canvas' && isImage) {
+                // - Drop on empty canvas => set as background media (images or videos)
+                if (dropInfo?.target === 'canvas' && (isImage || isVideo)) {
                     const underPointer =
                         typeof dropInfo.clientX === 'number' && typeof dropInfo.clientY === 'number'
                             ? findElementModelUnderClientPoint(dropInfo.clientX, dropInfo.clientY)
@@ -207,7 +168,33 @@ export const DragDropHandler = observer(({ store, children, onFileUpload }) => {
 
                     const replaced = underPointer ? replaceElementMedia(underPointer, fileUrl) : false;
                     if (!replaced) {
-                        setImageAsBackgroundMedia(fileUrl);
+                        // Instead of mutating the currently selected page, create a NEW real page,
+                        // apply the dropped image as its background and select the new page.
+                        try {
+                            const page = store.addPage();
+
+                            // Use shared helper so Drag & Drop behaves identical to right-sidebar and Start Page upload
+                            const bg = await buildBackgroundFromMediaUrl(fileUrl, { sizing: 'fit', position: 'bottom-center' });
+                            const custom = page.custom || {};
+                            page.set({ custom: { ...custom, background: bg } });
+                            applySlideBackgroundToPage(page);
+
+                            // Select the newly created page
+                            if (typeof store.selectPage === 'function') {
+                                store.selectPage(page.id);
+                            }
+                        } catch (err) {
+                            console.error('Failed to create page for dropped background:', err);
+                            // Fallback: apply to active page (defensive)
+                            if (isImage) {
+                                setImageAsBackgroundMedia(fileUrl);
+                            } else if (isVideo && store.activePage) {
+                                // fallback: add a video element to the active page
+                                const width = store.width || 1080;
+                                const height = Math.round(width / (16 / 9));
+                                store.activePage.addElement({ type: 'video', src: fileUrl, x: 0, y: 0, width, height });
+                            }
+                        }
                     }
                     continue;
                 }

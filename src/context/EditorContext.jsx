@@ -15,7 +15,7 @@ import React, { createContext, useContext, useState, useCallback, useMemo, useEf
 import { reaction } from 'mobx';
 import { useCampaignData } from '../hooks/useCampaignData';
 import { useSlideHydration } from '../hooks/useSlideHydration';
-import { store, isSystemPage, SYSTEM_PAGE_TYPES } from '../store/polotnoStore';
+import { store, isSystemPage, SYSTEM_PAGE_TYPES, safeDeletePages } from '../store/polotnoStore';
 import { storyAPI } from '../services/api';
 import { campaignId as bootstrapCampaignId, storyGroupId as bootstrapGroupId, slideId as bootstrapSlideId } from '../editorBootstrap';
 import {
@@ -179,9 +179,8 @@ export const EditorContextProvider = ({ children }) => {
             }
         }
 
-        // 3. Proceed with UI removal using official Polotno API
-        // This is the CORRECT way - call the method, don't reassign it
-        store.deletePages(safePageIds);
+        // 3. Proceed with UI removal using official Polotno API (use wrapper to avoid mutating proxied store)
+        safeDeletePages(safePageIds);
     }, []);
 
     // ============================================
