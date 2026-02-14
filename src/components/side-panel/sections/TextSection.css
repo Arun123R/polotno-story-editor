@@ -12,7 +12,7 @@ html .custom-text-section .bp5-tab.bp5-selected,
 html .custom-text-section .polotno-side-panel-tab.active,
 html .custom-text-section .bp5-tab.bp5-active {
     color: var(--sidebar-text-white, #ffffff) !important;
-    background: var(--sidebar-accent, #FF6B1A) !important;
+    background: linear-gradient(90deg, #ff6b35, #f7931e) !important;
 }
 
 /* MAXIMUM SPECIFICITY - Target exact element structure */
@@ -21,7 +21,7 @@ html body .custom-text-section .bp5-tab[aria-selected="true"][data-tab-id],
 html body .custom-text-section div.bp5-tab[aria-selected="true"],
 html body .custom-text-section div[role="tab"][aria-selected="true"] {
     color: #ffffff !important;
-    background: var(--sidebar-accent, #FF6B1A) !important;
+    background: linear-gradient(90deg, #ff6b35, #f7931e) !important;
 }
 
 /* Force white for all child elements */
@@ -45,7 +45,7 @@ html[data-theme="dark"] .custom-text-section .polotno-side-panel-tab[aria-select
 html[data-theme="dark"] .custom-text-section .bp5-tab[aria-selected="true"],
 html[data-theme="dark"] .custom-text-section .bp5-tab.bp5-selected {
     color: var(--sidebar-text-white, #ffffff) !important;
-    background: var(--sidebar-accent, #FF6B1A) !important;
+    background: linear-gradient(90deg, #ff6b35, #f7931e) !important;
 }
 
 html[data-theme="dark"] .custom-text-section .polotno-side-panel-tab[aria-selected="true"] *,
@@ -188,7 +188,7 @@ html[data-theme="dark"] .custom-text-section .bp5-tab[aria-selected="true"] svg 
 .custom-text-section .bp5-tab.bp5-active,
 .custom-text-section [role="tab"][aria-selected="true"] {
     color: var(--sidebar-text-white, #ffffff) !important;
-    background: var(--sidebar-accent, #FF6B1A) !important;
+    background: linear-gradient(90deg, #ff6b35, #f7931e) !important;
     border: none !important;
     box-shadow: none !important;
 }
@@ -790,7 +790,7 @@ html[data-theme="dark"] .custom-text-section .bp5-tab[aria-selected="true"] svg 
 :root[data-theme="dark"] .custom-text-section .bp5-tab.bp5-active,
 :root[data-theme="dark"] .custom-text-section [role="tab"][aria-selected="true"] {
     color: var(--sidebar-text-white, #ffffff) !important;
-    background: var(--sidebar-accent, #FF6B1A) !important;
+    background: linear-gradient(90deg, #ff6b35, #f7931e) !important;
 }
 
 /* Final scoped override to precisely match Right Sidebar tab layout.
@@ -857,7 +857,7 @@ html[data-theme="dark"] .custom-text-section .bp5-tab[aria-selected="true"] svg 
 .custom-text-section .polotno-side-panel-tab.active,
 .custom-text-section .bp5-tab[aria-selected="true"] {
     color: var(--sidebar-text-white, #ffffff) !important;
-    background: var(--sidebar-accent, #FF6B1A) !important;
+    background: linear-gradient(90deg, #ff6b35, #f7931e) !important;
     border: none !important;
 }
 
