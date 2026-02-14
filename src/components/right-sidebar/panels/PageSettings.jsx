@@ -10,6 +10,7 @@ import {
   DEFAULT_SLIDE_BACKGROUND,
   normalizeSlideBackground,
   applySlideBackgroundToPage,
+  buildBackgroundFromMediaUrl,
 } from '../../../utils/slideBackground';
 import { useEditorContext } from '../../../context/EditorContext';
 import { storyAPI } from '../../../services/api';
@@ -104,52 +105,7 @@ export const PageSettings = observer(({ store }) => {
     });
   };
 
-  const extractDominantColor = (url) => {
-    return new Promise((resolve) => {
-      if (!url) return resolve(null);
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        try {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d', { willReadFrequently: true });
-          if (!ctx) return resolve(null);
 
-          const sampleW = 24;
-          const sampleH = 24;
-          canvas.width = sampleW;
-          canvas.height = sampleH;
-          ctx.drawImage(img, 0, 0, sampleW, sampleH);
-          const { data } = ctx.getImageData(0, 0, sampleW, sampleH);
-
-          let r = 0;
-          let g = 0;
-          let b = 0;
-          let count = 0;
-          for (let i = 0; i < data.length; i += 4) {
-            const a = data[i + 3];
-            if (a < 32) continue;
-            r += data[i];
-            g += data[i + 1];
-            b += data[i + 2];
-            count += 1;
-          }
-          if (!count) return resolve(null);
-          r = Math.round(r / count);
-          g = Math.round(g / count);
-          b = Math.round(b / count);
-          const hex = `#${r.toString(16).padStart(2, '0')}${g
-            .toString(16)
-            .padStart(2, '0')}${b.toString(16).padStart(2, '0')}`.toUpperCase();
-          resolve(hex);
-        } catch {
-          resolve(null);
-        }
-      };
-      img.onerror = () => resolve(null);
-      img.src = url;
-    });
-  };
 
   const handlePickMediaFile = async (file) => {
     if (!file) return;
@@ -158,39 +114,11 @@ export const PageSettings = observer(({ store }) => {
       // 1. Upload to CDN
       const cdnUrl = await storyAPI.uploadGeneralMedia(file);
 
-      // 2. Determine if we should sync the background color
-      // We sync if it's white, OR if no media was present (fresh start), OR if it's already a solid color.
-      // Most users expect the background to adapt to the new image.
-      const shouldAutoColor = true; 
+      // 2. Determine if we should sync the background color (sidebar upload always auto-colors)
 
-      // 3. Prepare next background state
-      const prevMedia = currentBg.media || {
-        mediaUrl: '',
-        sizing: 'fit',
-        position: 'bottom-center',
-      };
-      
-      let nextBg = {
-        ...currentBg,
-        media: {
-          ...prevMedia,
-          mediaUrl: cdnUrl,
-        },
-      };
-
-      // 4. Extract color if needed
-      if (shouldAutoColor) {
-        const hex = await extractDominantColor(cdnUrl);
-        if (hex) {
-          nextBg.color = {
-            type: 'solid',
-            solid: hex,
-          };
-        }
-      }
-
-      // 5. Apply full update once
-      setBackgroundPatch(nextBg);
+      // Use shared helper so sidebar upload, drag-drop and start-page uploads are identical
+      const nextBg = await buildBackgroundFromMediaUrl(cdnUrl, { sizing: 'fit', position: 'bottom-center' });
+      if (nextBg) setBackgroundPatch(nextBg);
     } catch (error) {
       console.error('Failed to upload background media:', error);
     }

@@ -14,6 +14,7 @@ import {
   applySlideBackgroundToPage,
   inferSlideBackgroundFromPage,
   normalizeSlideBackground,
+  buildBackgroundFromMediaUrl,
 } from '../utils/slideBackground';
 import { enableRuntimeValidation } from '../utils/canvasValidation';
 
@@ -487,7 +488,7 @@ export const handleSystemStartAction = async (action) => {
     }
 
     if (action === SYSTEM_START_ACTIONS.UPLOAD) {
-      const file = await openFilePicker('image/*');
+      const file = await openFilePicker('image/*,video/*');
       if (!file) return;
 
       const { storyAPI } = await import('../services/api');
@@ -496,16 +497,10 @@ export const handleSystemStartAction = async (action) => {
       const page = store.addPage();
       insertRealPageBeforeSystem(page);
 
+      // Build background using shared helper so Start Page upload matches other entry points
+      const bg = await buildBackgroundFromMediaUrl(cdnUrl, { sizing: 'fit', position: 'bottom-center' });
       const custom = page.custom || {};
-      page.set({
-        custom: {
-          ...custom,
-          background: {
-            color: { type: 'solid', solid: '#FFFFFF' },
-            media: { mediaUrl: cdnUrl, sizing: 'fill', position: 'center' },
-          },
-        },
-      });
+      page.set({ custom: { ...custom, background: bg } });
       applySlideBackgroundToPage(page);
 
       if (typeof store.selectPage === 'function') {
@@ -525,16 +520,16 @@ export const handleSystemStartAction = async (action) => {
   }
 };
 
-// Wrap store.deletePages to prevent deleting the SYSTEM_START_PAGE at the store level
-const originalDeletePages = store.deletePages.bind(store);
-store.deletePages = function (pageIds) {
+// Provide a safe wrapper for deleting pages WITHOUT mutating the proxied `store`.
+// Do NOT reassign `store.deletePages` — doing so can throw when `store` is a Proxy in production.
+export const safeDeletePages = (pageIds) => {
   const ids = Array.isArray(pageIds) ? pageIds : [pageIds];
   const safeIds = ids.filter((id) => {
-    const page = store.pages.find((p) => p?.id === id);
+    const page = Array.isArray(store.pages) ? store.pages.find((p) => p?.id === id) : null;
     return !isSystemPage(page, SYSTEM_PAGE_TYPES.SYSTEM_START_PAGE);
   });
   if (safeIds.length === 0) return;
-  return originalDeletePages(safeIds);
+  return store.deletePages(safeIds);
 };
 
 // Intercept page.clone() to prevent cloning SYSTEM_START_PAGE

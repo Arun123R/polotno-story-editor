@@ -22,12 +22,12 @@
 .system-start-page-buttons {
   display: flex;
   flex-direction: column;
-  gap: 1.5em;
+  gap: 1.2em;
   padding: 1.5em;
   pointer-events: auto;
-  min-width: 240px;
+  min-width: 260px;
   max-width: 500px;
-  width: 80%;
+  width: 30%;
 }
 
 /* ---- Button Card ---- */
@@ -35,7 +35,7 @@
   display: flex;
   align-items: center;
   gap: 1.2em;
-  padding: 1.4em 1.8em;
+  padding: 1.5em;
   background: #ffffff;
   border: 1.5px solid #E5E7EB;
   border-radius: 1.2em;
