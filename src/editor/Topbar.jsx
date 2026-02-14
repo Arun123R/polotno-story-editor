@@ -48,7 +48,7 @@ export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar,
         if (context && context.campaign && context.campaign.name) {
             campaignName = context.campaign.name;
         }
-        // eslint-disable-next-line no-unused-vars
+    // eslint-disable-next-line no-unused-vars
     } catch (e) {
         // fallback to prop
     }
@@ -57,7 +57,7 @@ export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar,
     let contextValues = {};
     try {
         contextValues = useEditorContext();
-        // eslint-disable-next-line no-unused-vars
+    // eslint-disable-next-line no-unused-vars
     } catch (e) {
         // Not in provider, use props
         contextValues = {
@@ -250,7 +250,7 @@ export const Topbar = observer(({ store, projectName = 'Campaign Name', toolbar,
             const {
                 buildSlidePayload,
                 buildCreateSlideFormData,
-                buildUpdateSlideFormData } = await import('../utils/slidePayloadBuilder.js');
+                buildUpdateSlideFormData            } = await import('../utils/slidePayloadBuilder.js');
             const { storyAPI } = await import('../services/api.js');
 
             // Get current page for element extraction

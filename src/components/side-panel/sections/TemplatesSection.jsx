@@ -11,7 +11,7 @@ import { t } from 'polotno/utils/l10n';
 import { forEveryChild } from 'polotno/model/group-model';
 
 import { detectTemplatePreset, normalizeTemplateDesign } from '../../../utils/normalizeTemplate';
-import { setStorePreset } from '../../../store/polotnoStore';
+import { isSystemPage, SYSTEM_PAGE_TYPES, setStorePreset } from '../../../store/polotnoStore';
 import { getStoreExportSize } from '../../../utils/scale';
 import { inferSlideBackgroundFromPage } from '../../../utils/slideBackground';
 
@@ -74,8 +74,33 @@ const TemplatesGrid = observer(({ store, sizeQuery, query }) => {
       });
     }
 
-    if (store.pages.length <= 1) {
+    const systemPage = store.pages.find((p) => isSystemPage(p, SYSTEM_PAGE_TYPES.SYSTEM_START_PAGE));
+    const isSystemStartActive = isSystemPage(store.activePage, SYSTEM_PAGE_TYPES.SYSTEM_START_PAGE);
+
+    if (store.pages.length <= 1 && !systemPage) {
       store.loadJSON(normalized, true);
+      return;
+    }
+
+    if (systemPage && isSystemStartActive) {
+      const current = JSON.parse(JSON.stringify(store.toJSON()));
+
+      if (current.width !== normalized.width || current.height !== normalized.height) {
+        (normalized.pages || []).forEach((p) => {
+          p.width = p.width || normalized.width;
+          p.height = p.height || normalized.height;
+        });
+      }
+
+      forEveryChild({ children: normalized.pages }, (node) => {
+        node.id = nanoid(10);
+      });
+
+      const systemIndex = current.pages.findIndex((p) => p?.id === systemPage.id);
+      const insertIndex = systemIndex >= 0 ? systemIndex : current.pages.length;
+      current.pages.splice(insertIndex, 0, ...(normalized.pages || []));
+
+      store.loadJSON(current, true);
       return;
     }
 

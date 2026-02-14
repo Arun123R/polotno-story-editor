@@ -5,7 +5,7 @@ import { DurationSection, TrashIcon } from '../shared/CommonControls';
 import { ColorPicker } from '../shared/ColorPicker';
 import Dropdown from '../../shared/Dropdown';
 
-import { isAddSlidePage, getRealPages } from '../../../store/polotnoStore';
+import { getStorePresetName } from '../../../utils/scale';
 import {
   DEFAULT_SLIDE_BACKGROUND,
   normalizeSlideBackground,
@@ -13,6 +13,7 @@ import {
 } from '../../../utils/slideBackground';
 import { useEditorContext } from '../../../context/EditorContext';
 import { storyAPI } from '../../../services/api';
+import { isSystemPage, SYSTEM_PAGE_TYPES } from '../../../store/polotnoStore';
 
 /**
  * Page settings panel (when no element is selected) - Storyly-inspired dark theme
@@ -21,35 +22,32 @@ export const PageSettings = observer(({ store }) => {
   const { deletePages } = useEditorContext();
   const activePage = store.activePage;
 
-  // Compute currentBg safely even when activePage is null
-  const currentBg = activePage
-    ? normalizeSlideBackground(activePage.custom?.background || DEFAULT_SLIDE_BACKGROUND)
-    : normalizeSlideBackground(DEFAULT_SLIDE_BACKGROUND);
+  // UI-only preset state (NO store change)
+  const [, setActivePreset] = useState(getStorePresetName(store));
 
-  // ALL HOOKS MUST BE CALLED BEFORE ANY EARLY RETURN
-  const [colorPickerMode, setColorPickerMode] = useState(
-    currentBg.color?.type === 'gradient' ? 'gradient' : 'solid'
-  );
-
-  // Update color picker mode when page or background type changes
+  // Keep UI in sync with store preset.
   useEffect(() => {
-    if (activePage) {
-      setColorPickerMode(currentBg.color?.type === 'gradient' ? 'gradient' : 'solid');
-    }
-  }, [activePage?.id, currentBg.color?.type]);
+    setActivePreset(getStorePresetName(store));
+  }, [store]);
 
-  // Early return AFTER all hooks
   if (!activePage) return null;
-  if (isAddSlidePage(activePage)) return null;
 
-  // Get real pages (excluding the Add Slide page)
-  const realPages = getRealPages(store);
-  const realPageIndex = realPages.findIndex(p => p.id === activePage.id);
+  const isSystemStartPage = isSystemPage(activePage, SYSTEM_PAGE_TYPES.SYSTEM_START_PAGE);
 
   const isSlideActive = activePage.custom?.isActive !== false;
-  const allSlidesInactive = realPages.length > 0
-    ? realPages.every((p) => p?.custom?.isActive === false)
+  const allSlidesInactive = Array.isArray(store.pages) && store.pages.length > 0
+    ? store.pages.every((p) => p?.custom?.isActive === false)
     : false;
+
+  const currentBg = normalizeSlideBackground(
+    activePage.custom?.background || DEFAULT_SLIDE_BACKGROUND
+  );
+
+  const [colorPickerMode, setColorPickerMode] = useState(currentBg.color?.type === 'gradient' ? 'gradient' : 'solid');
+
+  useEffect(() => {
+    setColorPickerMode(currentBg.color?.type === 'gradient' ? 'gradient' : 'solid');
+  }, [activePage.id, currentBg.color?.type]);
 
   const setBackgroundPatch = (nextBg) => {
     const custom = activePage.custom || {};
@@ -161,7 +159,6 @@ export const PageSettings = observer(({ store }) => {
       const cdnUrl = await storyAPI.uploadGeneralMedia(file);
 
       // 2. Determine if we should sync the background color
-      const currentSolid = currentBg.color?.type === 'solid' ? (currentBg.color.solid || '#FFFFFF').toUpperCase() : null;
       // We sync if it's white, OR if no media was present (fresh start), OR if it's already a solid color.
       // Most users expect the background to adapt to the new image.
       const shouldAutoColor = true; 
@@ -251,205 +248,209 @@ export const PageSettings = observer(({ store }) => {
             </div>
           ) : null}
 
-          <div className="control-row">
-            <span className="control-label">Background</span>
-          </div>
-
-          <div className="control-row" style={{ alignItems: 'flex-start' }}>
-            <span className="control-label" style={{ paddingTop: 7 }}>Color</span>
-            <div
-              className="control-value"
-              style={{
-                width: 220,
-                flexDirection: 'column',
-                alignItems: 'stretch',
-                justifyContent: 'flex-start',
-                gap: 10,
-              }}
-            >
-              <div className="segment-group" style={{ width: '100%' }}>
-                <button
-                  className={`segment-btn ${colorPickerMode === 'solid' ? 'active' : ''}`}
-                  onClick={() => setColorPickerMode('solid')}
-                  type="button"
-                >
-                  Solid
-                </button>
-                <button
-                  className={`segment-btn ${colorPickerMode === 'gradient' ? 'active' : ''}`}
-                  onClick={() => setColorPickerMode('gradient')}
-                  type="button"
-                >
-                  Gradient
-                </button>
+          {!isSystemStartPage ? (
+            <>
+              <div className="control-row">
+                <span className="control-label">Background</span>
               </div>
 
-              {colorPickerMode === 'solid' ? (
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <ColorPicker
-                    value={currentBg.color?.type === 'solid' ? currentBg.color.solid : '#FFFFFF'}
-                    onChange={(color) => setColorSolid(color)}
-                  />
+              <div className="control-row" style={{ alignItems: 'flex-start' }}>
+                <span className="control-label" style={{ paddingTop: 7 }}>Color</span>
+                <div
+                  className="control-value"
+                  style={{
+                    width: 220,
+                    flexDirection: 'column',
+                    alignItems: 'stretch',
+                    justifyContent: 'flex-start',
+                    gap: 10,
+                  }}
+                >
+                  <div className="segment-group" style={{ width: '100%' }}>
+                    <button
+                      className={`segment-btn ${colorPickerMode === 'solid' ? 'active' : ''}`}
+                      onClick={() => setColorPickerMode('solid')}
+                      type="button"
+                    >
+                      Solid
+                    </button>
+                    <button
+                      className={`segment-btn ${colorPickerMode === 'gradient' ? 'active' : ''}`}
+                      onClick={() => setColorPickerMode('gradient')}
+                      type="button"
+                    >
+                      Gradient
+                    </button>
+                  </div>
+
+                  {colorPickerMode === 'solid' ? (
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                      <ColorPicker
+                        value={currentBg.color?.type === 'solid' ? currentBg.color.solid : '#FFFFFF'}
+                        onChange={(color) => setColorSolid(color)}
+                      />
+                    </div>
+                  ) : (
+                    <>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                        <span style={{ fontSize: 12, color: 'var(--sidebar-text-muted)', minWidth: 56 }}>From</span>
+                        <ColorPicker
+                          value={
+                            currentBg.color?.type === 'gradient'
+                              ? currentBg.color.gradient?.from || '#FF0000'
+                              : '#FF0000'
+                          }
+                          onChange={(color) => setColorGradient({ from: color })}
+                        />
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                        <span style={{ fontSize: 12, color: 'var(--sidebar-text-muted)', minWidth: 56 }}>To</span>
+                        <ColorPicker
+                          value={
+                            currentBg.color?.type === 'gradient'
+                              ? currentBg.color.gradient?.to || '#0000FF'
+                              : '#0000FF'
+                          }
+                          onChange={(color) => setColorGradient({ to: color })}
+                        />
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <span style={{ fontSize: 12, color: 'var(--sidebar-text-muted)' }}>Direction</span>
+                        <div className="select-wrapper" style={{ width: '100%' }}>
+                          <Dropdown
+                            value={
+                              currentBg.color?.type === 'gradient'
+                                ? currentBg.color.gradient?.direction || 'top'
+                                : 'top'
+                            }
+                            onChange={(v) => setColorGradient({ direction: v })}
+                            options={[
+                              { value: 'top', label: 'Top' },
+                              { value: 'bottom', label: 'Bottom' },
+                              { value: 'left', label: 'Left' },
+                              { value: 'right', label: 'Right' },
+                              { value: 'radial', label: 'Radial' },
+                            ]}
+                            ariaLabel="Gradient direction"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
-              ) : (
-                <>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                    <span style={{ fontSize: 12, color: 'var(--sidebar-text-muted)', minWidth: 56 }}>From</span>
-                    <ColorPicker
-                      value={
-                        currentBg.color?.type === 'gradient'
-                          ? currentBg.color.gradient?.from || '#FF0000'
-                          : '#FF0000'
-                      }
-                      onChange={(color) => setColorGradient({ from: color })}
-                    />
-                  </div>
+              </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                    <span style={{ fontSize: 12, color: 'var(--sidebar-text-muted)', minWidth: 56 }}>To</span>
-                    <ColorPicker
-                      value={
-                        currentBg.color?.type === 'gradient'
-                          ? currentBg.color.gradient?.to || '#0000FF'
-                          : '#0000FF'
-                      }
-                      onChange={(color) => setColorGradient({ to: color })}
-                    />
-                  </div>
+              <div className="control-row" style={{ alignItems: 'center' }}>
+                <span className="control-label">Media</span>
+                <div
+                  className="control-value"
+                  style={{
+                    width: 220,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                    gap: 8,
+                  }}
+                >
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <label
+                      style={{
+                        padding: '8px 10px',
+                        borderRadius: 8,
+                        border: '1px solid var(--sidebar-border)',
+                        background: 'var(--sidebar-bg-secondary)',
+                        color: 'var(--sidebar-text)',
+                        cursor: 'pointer',
+                        fontSize: 12,
+                        fontWeight: 600,
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      Upload
+                      <input
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={(e) => handlePickMediaFile(e.target.files?.[0])}
+                      />
+                    </label>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    <span style={{ fontSize: 12, color: 'var(--sidebar-text-muted)' }}>Direction</span>
+                    {currentBg.media?.mediaUrl ? (
+                      <button
+                        type="button"
+                        onClick={() => setMedia(null)}
+                        style={{
+                          padding: '8px 10px',
+                          borderRadius: 8,
+                          border: '1px solid var(--sidebar-border)',
+                          background: 'transparent',
+                          color: 'var(--sidebar-text-secondary)',
+                          cursor: 'pointer',
+                          fontSize: 12,
+                          fontWeight: 600,
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        Remove
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+
+              {currentBg.media?.mediaUrl ? (
+                <div className="control-row">
+                  <span className="control-label">Sizing</span>
+                  <div className="control-value">
+                    <div className="segment-group" style={{ width: 160 }}>
+                      <button
+                        className={`segment-btn ${currentBg.media?.sizing !== 'fill' ? 'active' : ''}`}
+                        onClick={() => setMedia({ sizing: 'fit' })}
+                        type="button"
+                      >
+                        Fit
+                      </button>
+                      <button
+                        className={`segment-btn ${currentBg.media?.sizing === 'fill' ? 'active' : ''}`}
+                        onClick={() => setMedia({ sizing: 'fill' })}
+                        type="button"
+                      >
+                        Fill
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
+              {currentBg.media?.mediaUrl ? (
+                <div className="control-row">
+                  <span className="control-label">Position</span>
+                  <div className="control-value" style={{ width: 180 }}>
                     <div className="select-wrapper" style={{ width: '100%' }}>
                       <Dropdown
-                        value={
-                          currentBg.color?.type === 'gradient'
-                            ? currentBg.color.gradient?.direction || 'top'
-                            : 'top'
-                        }
-                        onChange={(v) => setColorGradient({ direction: v })}
+                        value={currentBg.media?.position || 'bottom-center'}
+                        onChange={(v) => setMedia({ position: v })}
                         options={[
+                          { value: 'center', label: 'Center' },
                           { value: 'top', label: 'Top' },
                           { value: 'bottom', label: 'Bottom' },
                           { value: 'left', label: 'Left' },
                           { value: 'right', label: 'Right' },
-                          { value: 'radial', label: 'Radial' },
+                          { value: 'top-left', label: 'Top Left' },
+                          { value: 'top-right', label: 'Top Right' },
+                          { value: 'bottom-left', label: 'Bottom Left' },
+                          { value: 'bottom-right', label: 'Bottom Right' },
+                          { value: 'bottom-center', label: 'Bottom Center' },
                         ]}
-                        ariaLabel="Gradient direction"
+                        ariaLabel="Media position"
                       />
                     </div>
                   </div>
-                </>
-              )}
-            </div>
-          </div>
-
-          <div className="control-row" style={{ alignItems: 'center' }}>
-            <span className="control-label">Media</span>
-            <div
-              className="control-value"
-              style={{
-                width: 220,
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-                gap: 8,
-              }}
-            >
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <label
-                  style={{
-                    padding: '8px 10px',
-                    borderRadius: 8,
-                    border: '1px solid var(--sidebar-border)',
-                    background: 'var(--sidebar-bg-secondary)',
-                    color: 'var(--sidebar-text)',
-                    cursor: 'pointer',
-                    fontSize: 12,
-                    fontWeight: 600,
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  Upload
-                  <input
-                    type="file"
-                    accept="image/*"
-                    style={{ display: 'none' }}
-                    onChange={(e) => handlePickMediaFile(e.target.files?.[0])}
-                  />
-                </label>
-
-                {currentBg.media?.mediaUrl ? (
-                  <button
-                    type="button"
-                    onClick={() => setMedia(null)}
-                    style={{
-                      padding: '8px 10px',
-                      borderRadius: 8,
-                      border: '1px solid var(--sidebar-border)',
-                      background: 'transparent',
-                      color: 'var(--sidebar-text-secondary)',
-                      cursor: 'pointer',
-                      fontSize: 12,
-                      fontWeight: 600,
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    Remove
-                  </button>
-                ) : null}
-              </div>
-            </div>
-          </div>
-
-          {currentBg.media?.mediaUrl ? (
-            <div className="control-row">
-              <span className="control-label">Sizing</span>
-              <div className="control-value">
-                <div className="segment-group" style={{ width: 160 }}>
-                  <button
-                    className={`segment-btn ${currentBg.media?.sizing !== 'fill' ? 'active' : ''}`}
-                    onClick={() => setMedia({ sizing: 'fit' })}
-                    type="button"
-                  >
-                    Fit
-                  </button>
-                  <button
-                    className={`segment-btn ${currentBg.media?.sizing === 'fill' ? 'active' : ''}`}
-                    onClick={() => setMedia({ sizing: 'fill' })}
-                    type="button"
-                  >
-                    Fill
-                  </button>
                 </div>
-              </div>
-            </div>
-          ) : null}
-
-          {currentBg.media?.mediaUrl ? (
-            <div className="control-row">
-              <span className="control-label">Position</span>
-              <div className="control-value" style={{ width: 180 }}>
-                <div className="select-wrapper" style={{ width: '100%' }}>
-                  <Dropdown
-                    value={currentBg.media?.position || 'bottom-center'}
-                    onChange={(v) => setMedia({ position: v })}
-                    options={[
-                      { value: 'center', label: 'Center' },
-                      { value: 'top', label: 'Top' },
-                      { value: 'bottom', label: 'Bottom' },
-                      { value: 'left', label: 'Left' },
-                      { value: 'right', label: 'Right' },
-                      { value: 'top-left', label: 'Top Left' },
-                      { value: 'top-right', label: 'Top Right' },
-                      { value: 'bottom-left', label: 'Bottom Left' },
-                      { value: 'bottom-right', label: 'Bottom Right' },
-                      { value: 'bottom-center', label: 'Bottom Center' },
-                    ]}
-                    ariaLabel="Media position"
-                  />
-                </div>
-              </div>
-            </div>
+              ) : null}
+            </>
           ) : null}
 
           <div className="control-row">
@@ -469,7 +470,7 @@ export const PageSettings = observer(({ store }) => {
           </div>
         </div>
 
-        <DurationSection store={store} />
+        {!isSystemStartPage ? <DurationSection store={store} /> : null}
 
         <div
           style={{
@@ -479,24 +480,22 @@ export const PageSettings = observer(({ store }) => {
             color: 'var(--sidebar-text-muted)',
           }}
         >
-          Page {realPageIndex + 1} of {realPages.length}
+          Page {store.pages.indexOf(activePage) + 1} of {store.pages.length}
         </div>
       </div>
 
       <div className="settings-footer">
         <div className="action-buttons">
-          <button
-            className="action-btn delete"
-            onClick={() => deletePages([activePage.id])}
-            disabled={realPages.length <= 1}
-            style={{
-              opacity: realPages.length <= 1 ? 0.5 : 1,
-              justifyContent: 'center',
-              width: '100%'
-            }}
-          >
-            <span><TrashIcon /></span> Delete
-          </button>
+          {!isSystemStartPage ? (
+            <button
+              className="action-btn delete"
+              onClick={() => deletePages([activePage.id])}
+              disabled={store.pages.length <= 1}
+              style={{ opacity: store.pages.length <= 1 ? 0.5 : 1 }}
+            >
+              <span><TrashIcon /></span> Delete
+            </button>
+          ) : null}
         </div>
       </div>
     </div>
